@@ -1,0 +1,3 @@
+[submodule "deps/ckb-js-toolkit-contrib"]
+	path = deps/ckb-js-toolkit-contrib
+	url = https://github.com/xxuejie/ckb-js-toolkit-contrib.git
