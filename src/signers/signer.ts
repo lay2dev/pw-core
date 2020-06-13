@@ -25,6 +25,9 @@ export abstract class Signer {
   abstract async signMessages(messages: Message[]): Promise<string[]>;
 
   async sign(): Promise<Transaction> {
+    this.tx.witnesses[0] = `0x5500000010000000550000005500000041000000${'0'.repeat(
+      130
+    )}`;
     const messages = this.toMessages();
     const witnesses = await this.signMessages(messages);
     witnesses[0] = new Reader(

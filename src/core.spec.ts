@@ -15,7 +15,7 @@ test.before(async (t) => {
   t.context = { pw, address };
 });
 
-test.skip('send simple tx', async (t) => {
+test('send simple tx', async (t) => {
   const { pw, address } = t.context;
   const amount100 = new Amount('100');
   const txHash = await pw.send(address, amount100);

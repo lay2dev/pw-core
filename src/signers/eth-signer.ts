@@ -1,14 +1,22 @@
 import { Transaction } from '..';
 import { Signer, Message } from '.';
 import { Keccak256Hasher } from '../hasher';
-import { ecsign, bufferToHex, toBuffer, setLengthLeft } from 'ethereumjs-util';
+import {
+  ecsign,
+  bufferToHex,
+  toBuffer,
+  setLengthLeft,
+  hashPersonalMessage,
+} from 'ethereumjs-util';
 
 const a = '2A77A5C9DBA59D6F8B7A';
 const b = '2737A8A6D8E511CDC9439';
 const c = 'C97E919959D02502F8BCB50';
 
 function sendSync({ params }) {
-  const msg = params[0].startsWith('0x') ? params[0].slice(2) : params[0];
+  const msg = hashPersonalMessage(toBuffer(params[0]))
+    .toString('hex')
+    .replace('0x', '');
 
   const { r, s, v } = ecsign(
     new Buffer(msg, 'hex'),

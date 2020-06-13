@@ -6,6 +6,7 @@
     // waiting on https://github.com/palantir/tslint/pull/3708
     "no-implicit-dependencies": [true, "dev"],
     "semicolon": true,
+    "no-console": false,
     "no-submodule-imports": false
   }
 }
