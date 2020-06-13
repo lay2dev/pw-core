@@ -66,8 +66,6 @@ export default class PWCore {
 
     let tx = await sBuilder.build();
 
-    // const fee = sBuilder.getFee(); // example to get the tx fee
-
     tx.validate();
 
     const ethSigner = new EthSigner(tx, address.addressString);
@@ -75,7 +73,12 @@ export default class PWCore {
     tx = await ethSigner.sign();
 
     // throw new Error(
-    //   '[debug send tx ]' + JSON.stringify(transformers.TransformTransaction(tx))
+    //   '[debug] fee:' +
+    //     sBuilder.getFee().toString(AmountUnit.ckb) +
+    //     ', size:' +
+    //     tx.getSize() +
+    //     '\n\ntx:' +
+    //     JSON.stringify(transformers.TransformTransaction(tx))
     // );
 
     const txHash = await this.rpc.send_transaction(

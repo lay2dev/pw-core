@@ -58,6 +58,8 @@ export class SimpleBuilder extends Builder {
     if (
       Amount.GT(Amount.ADD(this.fee, Builder.MIN_CHANGE), changeCell.capacity)
     ) {
+      // TODO: collect more cells and recalculate fee, until input capacity is
+      // enough or no more available unspent cells.
       throw new Error(
         `input capacity not enough, need ${Amount.ADD(
           outputCell.capacity,

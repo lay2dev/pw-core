@@ -18,6 +18,7 @@ test.before(async (t) => {
 test('send simple tx', async (t) => {
   const { pw, address } = t.context;
   const amount100 = new Amount('100');
+  // const amount100000 = new Amount('100000');
   const txHash = await pw.send(address, amount100);
   t.pass('tx sent: ' + txHash);
 });

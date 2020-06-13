@@ -23,8 +23,11 @@ export class Transaction implements CKBModel {
   getSize(): number {
     const tx = transformers.TransformTransaction(this);
     validators.ValidateTransaction(tx);
-    return SerializeTransaction(normalizers.NormalizeTransaction(tx))
-      .byteLength;
+
+    //TODO: find out why the size is always smaller than the correct value by exact '4'
+    return (
+      SerializeTransaction(normalizers.NormalizeTransaction(tx)).byteLength + 4
+    );
   }
 
   validate(): boolean {
