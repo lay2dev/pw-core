@@ -1,4 +1,3 @@
-import { Transaction } from '..';
 import { Signer, Message } from '.';
 import { Keccak256Hasher } from '../hasher';
 import {
@@ -35,8 +34,8 @@ function sendSync({ params }) {
 }
 
 export class EthSigner extends Signer {
-  constructor(tx: Transaction, public readonly from: string) {
-    super(tx, new Keccak256Hasher());
+  constructor(public readonly from: string) {
+    super(new Keccak256Hasher());
   }
 
   signMessages(messages: Message[]): Promise<string[]> {

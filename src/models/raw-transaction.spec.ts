@@ -1,20 +1,17 @@
-import test from 'ava';
+import anyTest, { TestInterface } from 'ava';
 import PWCore, { ChainID, Address, AddressType } from '..';
 import { RawTransaction, Cell, OutPoint, CellDep } from '.';
-import { DummyCollector } from '../collectors';
+import { DummyCollector } from '../collectors/dummy-collector';
 import { DepType } from '../interfaces';
+import { DummyProvider } from '../providers/dummy-provider';
+import { Platform } from '../providers';
+
+const test = anyTest as TestInterface<{ raw: RawTransaction }>;
 
 const address = new Address(
   'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs',
   AddressType.ckb
 );
-
-let pw: PWCore;
-
-test.before(async () => {
-  pw = new PWCore('https://aggron.ckb.dev');
-  await pw.init(new DummyCollector(address), ChainID.ckb_testnet);
-});
 
 const outPoint1 = new OutPoint(
   '0x85f2eb3737f79af418361e6c6c03a5d9f0060b085a888c0c70d762842af1b6c1',
@@ -33,9 +30,13 @@ const outPoint4 = new OutPoint(
   '0x0'
 );
 
-let rawTx = null;
-
-test.before(async () => {
+test.before(async (t) => {
+  const pw = new PWCore('https://aggron.ckb.dev');
+  await pw.init(
+    new DummyProvider(Platform.eth),
+    new DummyCollector(address),
+    ChainID.ckb_testnet
+  );
   const cells = await Promise.all([
     Cell.loadFromBlockchain(pw.rpc, outPoint1),
     Cell.loadFromBlockchain(pw.rpc, outPoint2),
@@ -46,16 +47,16 @@ test.before(async () => {
   const outputs = cells.slice(1);
   const cellDeps = [new CellDep(DepType.depGroup, outPoint4)];
 
-  rawTx = new RawTransaction(inputs, outputs, cellDeps);
+  t.context.raw = new RawTransaction(inputs, outputs, cellDeps);
 });
 
 test('validate', (t) => {
-  t.notThrows(() => rawTx.validate());
+  t.notThrows(() => t.context.raw.validate());
 });
 
 test('toHash', (t) => {
   t.is(
-    rawTx.toHash(),
+    t.context.raw.toHash(),
     '0x79221866125b9aff33c4303a6c35bde25d235e7e10025a86ca2a5d6ad657f51f'
   );
 });

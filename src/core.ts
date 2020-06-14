@@ -2,9 +2,10 @@ import { RPC, transformers } from 'ckb-js-toolkit';
 import { CHAIN_SPECS } from './constants';
 import { Config } from './interfaces';
 import { Address, Amount } from './models';
-import { EthSigner } from './signers';
+import { EthSigner, Signer } from './signers';
 import { Collector } from './collectors';
-import { SimpleBuilder } from './builders';
+import { SimpleBuilder, Builder } from './builders';
+import { Provider } from './providers';
 
 export enum ChainID {
   ckb,
@@ -15,6 +16,7 @@ export enum ChainID {
 export default class PWCore {
   static config: Config;
   static chainId: ChainID;
+  static provider: Provider;
   static defaultCollector: Collector;
 
   private readonly _rpc: RPC;
@@ -23,7 +25,12 @@ export default class PWCore {
     this._rpc = new RPC(nodeUrl);
   }
 
-  async init(defaultCollector: Collector, chainId?: ChainID, config?: Config) {
+  async init(
+    provider: Provider,
+    defaultCollector: Collector,
+    chainId?: ChainID,
+    config?: Config
+  ) {
     if (chainId) {
       if (!(chainId in ChainID)) {
         throw new Error(`invalid chainId ${chainId}`);
@@ -46,6 +53,13 @@ export default class PWCore {
         ...config,
       };
     }
+
+    if (provider instanceof Provider) {
+      provider.init();
+    } else {
+      throw new Error('provider must be provided');
+    }
+
     if (defaultCollector instanceof Collector) {
       PWCore.defaultCollector = defaultCollector;
     } else {
@@ -62,35 +76,16 @@ export default class PWCore {
     amount: Amount,
     feeRate?: number
   ): Promise<string> {
-    const sBuilder = new SimpleBuilder(address, amount, feeRate);
-
-    let tx = await sBuilder.build();
-
-    tx.validate();
-
-    const ethSigner = new EthSigner(tx, address.addressString);
-
-    tx = await ethSigner.sign();
-
-    // throw new Error(
-    //   '[debug] fee:' +
-    //     sBuilder.getFee().toString(AmountUnit.ckb) +
-    //     ', size:' +
-    //     tx.getSize() +
-    //     '\n\ntx:' +
-    //     JSON.stringify(transformers.TransformTransaction(tx))
-    // );
-
-    const txHash = await this.rpc.send_transaction(
-      transformers.TransformTransaction(tx)
-    );
-
-    return txHash;
+    const simpleBuilder = new SimpleBuilder(address, amount, feeRate);
+    const ethSigner = new EthSigner(address.addressString);
+    return this.sendTransaction(simpleBuilder, ethSigner);
   }
 
-  // public async sendTransaction()
-
-  // async getBalance(address: Address, collector?: Collector): Amount {
-
-  // }
+  async sendTransaction(builder: Builder, signer: Signer): Promise<string> {
+    return this.rpc.send_transaction(
+      transformers.TransformTransaction(
+        await signer.sign((await builder.build()).validate())
+      )
+    );
+  }
 }

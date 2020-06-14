@@ -2,6 +2,8 @@ import anyTest, { TestInterface } from 'ava';
 import PWCore, { Address, AddressType, Amount, ChainID } from '.';
 import { PwCollector } from './collectors/pw-collector';
 import { CHAIN_SPECS } from './constants';
+import { DummyProvider } from './providers/dummy-provider';
+import { Platform } from './providers';
 
 const test = anyTest as TestInterface<{ pw: PWCore; address: Address }>;
 
@@ -11,14 +13,18 @@ test.before(async (t) => {
     AddressType.eth
   );
   const pw = new PWCore('https://lay2.ckb.dev');
-  await pw.init(new PwCollector(address), ChainID.ckb_dev, CHAIN_SPECS.Lay2);
+  await pw.init(
+    new DummyProvider(Platform.eth),
+    new PwCollector(address),
+    ChainID.ckb_dev,
+    CHAIN_SPECS.Lay2
+  );
   t.context = { pw, address };
 });
 
 test('send simple tx', async (t) => {
   const { pw, address } = t.context;
   const amount100 = new Amount('100');
-  // const amount100000 = new Amount('100000');
   const txHash = await pw.send(address, amount100);
   t.pass('tx sent: ' + txHash);
 });

@@ -1,26 +1,36 @@
-import test from 'ava';
+import anyTest, { TestInterface } from 'ava';
 import PWCore, { ChainID } from '../core';
-// import { Address, AddressType } from './address';
-// import { AmountUnit } from './amount';
-import { DummyCollector } from '../collectors';
+import { DummyCollector } from '../collectors/dummy-collector';
 import { validators, transformers } from 'ckb-js-toolkit';
-import { Cell } from './cell';
-import { OutPoint } from './out-point';
-import { Amount, AmountUnit } from './amount';
-import { Address, AddressType } from './address';
-import { Script } from './script';
+import {
+  Address,
+  AddressType,
+  Amount,
+  AmountUnit,
+  Cell,
+  OutPoint,
+  Script,
+} from '.';
 import { HashType } from '../interfaces';
+import { DummyProvider } from '../providers/dummy-provider';
+import { Platform } from '../providers';
+
+const test = anyTest as TestInterface<{ pw: PWCore }>;
 
 const address = new Address(
   'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs',
   AddressType.ckb
 );
 
-let pw: PWCore;
+test.before(async (t) => {
+  const pw = new PWCore('https://aggron.ckb.dev');
+  await pw.init(
+    new DummyProvider(Platform.eth),
+    new DummyCollector(address),
+    ChainID.ckb_testnet
+  );
 
-test.before(async () => {
-  pw = new PWCore('https://aggron.ckb.dev');
-  await pw.init(new DummyCollector(address), ChainID.ckb_testnet);
+  t.context.pw = pw;
 });
 
 // from cell at https://explorer.nervos.org/aggron/transaction/0x79221866125b9aff33c4303a6c35bde25d235e7e10025a86ca2a5d6ad657f51f
@@ -52,7 +62,7 @@ test('loadFromBlockchain and validate', async (t) => {
     '0x79221866125b9aff33c4303a6c35bde25d235e7e10025a86ca2a5d6ad657f51f',
     '0x0'
   );
-  const loadedCell = await Cell.loadFromBlockchain(pw.rpc, outPoint);
+  const loadedCell = await Cell.loadFromBlockchain(t.context.pw.rpc, outPoint);
   t.notThrows(() =>
     validators.ValidateCellOutput(
       transformers.TransformCellOutput(loadedCell.serializeJson())

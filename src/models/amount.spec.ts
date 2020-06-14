@@ -1,7 +1,9 @@
 import test from 'ava';
 import PWCore, { ChainID } from '../core';
-import { DummyCollector } from '../collectors';
+import { DummyCollector } from '../collectors/dummy-collector';
 import { Address, AddressType, Amount, AmountUnit } from '.';
+import { DummyProvider } from '../providers/dummy-provider';
+import { Platform } from '../providers';
 
 const address = new Address(
   'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs',
@@ -10,6 +12,7 @@ const address = new Address(
 
 test.before(async () => {
   await new PWCore('https://aggron.ckb.dev').init(
+    new DummyProvider(Platform.eth),
     new DummyCollector(address),
     ChainID.ckb_testnet
   );

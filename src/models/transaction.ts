@@ -24,15 +24,15 @@ export class Transaction implements CKBModel {
     const tx = transformers.TransformTransaction(this);
     validators.ValidateTransaction(tx);
 
-    //TODO: find out why the size is always smaller than the correct value by exact '4'
+    // TODO: find out why the size is always smaller than the correct value by exact '4'
     return (
       SerializeTransaction(normalizers.NormalizeTransaction(tx)).byteLength + 4
     );
   }
 
-  validate(): boolean {
+  validate(): Transaction {
     validators.ValidateTransaction(transformers.TransformTransaction(this));
-    return true;
+    return this;
   }
 
   serializeJson(): object {

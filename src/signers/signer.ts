@@ -17,32 +17,29 @@ export interface Message {
 }
 
 export abstract class Signer {
-  protected constructor(
-    protected tx: Transaction,
-    private readonly hasher: Hasher
-  ) {}
+  protected constructor(private readonly hasher: Hasher) {}
 
-  abstract async signMessages(messages: Message[]): Promise<string[]>;
+  protected abstract async signMessages(messages: Message[]): Promise<string[]>;
 
-  async sign(): Promise<Transaction> {
-    this.tx.witnesses[0] = `0x5500000010000000550000005500000041000000${'0'.repeat(
+  async sign(tx: Transaction): Promise<Transaction> {
+    tx.witnesses[0] = `0x5500000010000000550000005500000041000000${'0'.repeat(
       130
     )}`;
-    const messages = this.toMessages();
+    const messages = this.toMessages(tx);
     const witnesses = await this.signMessages(messages);
     witnesses[0] = new Reader(
       SerializeWitnessArgs(
         normalizers.NormalizeWitnessArgs({ lock: witnesses[0] })
       )
     ).serializeJson();
-    FillSignedWitnesses(this.tx, messages, witnesses);
-    return this.tx;
+    FillSignedWitnesses(tx, messages, witnesses);
+    return tx;
   }
 
-  private toMessages(): Message[] {
-    this.tx.validate();
+  private toMessages(tx: Transaction): Message[] {
+    tx.validate();
 
-    if (this.tx.raw.inputs.length !== this.tx.raw.inputCells.length) {
+    if (tx.raw.inputs.length !== tx.raw.inputCells.length) {
       throw new Error('Input number does not match!');
     }
 
@@ -50,40 +47,36 @@ export abstract class Signer {
       new Reader(
         SerializeRawTransaction(
           normalizers.NormalizeRawTransaction(
-            transformers.TransformRawTransaction(this.tx.raw)
+            transformers.TransformRawTransaction(tx.raw)
           )
         )
       )
     );
 
     const messages = [];
-    const used = this.tx.raw.inputs.map((_input) => false);
-    for (let i = 0; i < this.tx.raw.inputs.length; i++) {
+    const used = tx.raw.inputs.map((_input) => false);
+    for (let i = 0; i < tx.raw.inputs.length; i++) {
       if (used[i]) {
         continue;
       }
-      if (i >= this.tx.witnesses.length) {
+      if (i >= tx.witnesses.length) {
         throw new Error(
           `Input ${i} starts a new script group, but witness is missing!`
         );
       }
       used[i] = true;
       this.hasher.update(txHash);
-      const firstWitness = new Reader(this.tx.witnesses[i]);
+      const firstWitness = new Reader(tx.witnesses[i]);
       this.hasher.update(serializeBigInt(firstWitness.length()));
       this.hasher.update(firstWitness);
       for (
         let j = i + 1;
-        j < this.tx.raw.inputs.length && j < this.tx.witnesses.length;
+        j < tx.raw.inputs.length && j < tx.witnesses.length;
         j++
       ) {
-        if (
-          this.tx.raw.inputCells[i].lock.sameWith(
-            this.tx.raw.inputCells[j].lock
-          )
-        ) {
+        if (tx.raw.inputCells[i].lock.sameWith(tx.raw.inputCells[j].lock)) {
           used[j] = true;
-          const currentWitness = new Reader(this.tx.witnesses[j]);
+          const currentWitness = new Reader(tx.witnesses[j]);
           this.hasher.update(serializeBigInt(currentWitness.length()));
           this.hasher.update(currentWitness);
         }
@@ -91,7 +84,7 @@ export abstract class Signer {
       messages.push({
         index: i,
         message: this.hasher.digest().serializeJson(), // hex string
-        lock: this.tx.raw.inputCells[i].lock,
+        lock: tx.raw.inputCells[i].lock,
       });
 
       this.hasher.reset();
