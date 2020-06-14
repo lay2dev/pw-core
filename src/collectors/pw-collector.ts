@@ -6,10 +6,17 @@ export class PwCollector extends Collector {
   constructor() {
     super();
   }
-  public async collect(
-    address: Address,
-    neededAmount: Amount
-  ): Promise<Cell[]> {
+
+  async getBalance(address: Address): Promise<Amount> {
+    const res = await axios.get(
+      `https://cellapi.ckb.pw/cell/getCapacityByLockHash?lockHash=${address
+        .toLockScript()
+        .toHash()}`
+    );
+    return new Amount(res.data, AmountUnit.shannon);
+  }
+
+  async collect(address: Address, neededAmount: Amount): Promise<Cell[]> {
     const cells: Cell[] = [];
 
     const res = await axios.get(

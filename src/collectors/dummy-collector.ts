@@ -2,6 +2,9 @@ import { Collector } from './collector';
 import { Cell, Address, Amount, OutPoint } from '..';
 
 export class DummyCollector extends Collector {
+  getBalance(): Promise<Amount> {
+    throw new Error('Method not implemented.');
+  }
   // public collect(): CollectorResults {
   //   return [new Cell(new Amount('1000000'), this.address.toLockScript())];
   // }

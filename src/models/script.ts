@@ -13,6 +13,11 @@ import { generateAddress, LumosConfigs } from '../utils';
 import { validators, transformers } from 'ckb-js-toolkit';
 
 export class Script implements CKBModel {
+  static fromRPC(data: any): Script | null {
+    if (!data) return null;
+    validators.ValidateScript(data);
+    return new Script(data.code_hash, data.args, data.hash_type);
+  }
   constructor(
     public codeHash: string,
     public args: string,

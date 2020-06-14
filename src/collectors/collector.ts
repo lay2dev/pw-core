@@ -6,7 +6,8 @@ import { Cell, Address, Amount } from '../models';
 
 export abstract class Collector {
   protected constructor() {}
-  public abstract async collect(
+  abstract async getBalance(address: Address): Promise<Amount>;
+  abstract async collect(
     address: Address,
     neededAmount?: Amount
   ): Promise<Cell[]>;

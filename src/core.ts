@@ -30,7 +30,7 @@ export default class PWCore {
     defaultCollector: Collector,
     chainId?: ChainID,
     config?: Config
-  ) {
+  ): Promise<PWCore> {
     if (chainId) {
       if (!(chainId in ChainID)) {
         throw new Error(`invalid chainId ${chainId}`);
@@ -65,6 +65,8 @@ export default class PWCore {
     } else {
       throw new Error('defaultCollector must be provided');
     }
+
+    return this;
   }
 
   get rpc(): RPC {
