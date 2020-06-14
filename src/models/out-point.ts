@@ -1,16 +1,23 @@
-import { CKBModel } from '../interfaces';
 import { validators, transformers } from 'ckb-js-toolkit';
+import { CKBModel } from '..';
 
 export class OutPoint implements CKBModel {
-  constructor(public txHash: string, public index: string) {}
-
-  sameWith({ txHash, index }: OutPoint): boolean {
-    return this.txHash === txHash && this.index === index;
+  static fromRPC(data: any): OutPoint | null {
+    if (!data) return null;
+    validators.ValidateOutPoint(data);
+    return new OutPoint(data.tx_hash, data.index);
   }
 
-  validate(): boolean {
+  constructor(public txHash: string, public index: string) {}
+
+  sameWith(outPoint: OutPoint): boolean {
+    validators.ValidateOutPoint(transformers.TransformOutPoint(outPoint));
+    return this.txHash === outPoint.txHash && this.index === outPoint.index;
+  }
+
+  validate(): OutPoint {
     validators.ValidateOutPoint(transformers.TransformOutPoint(this));
-    return true;
+    return this;
   }
 
   serializeJson(): object {

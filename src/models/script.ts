@@ -14,21 +14,22 @@ import { validators, transformers } from 'ckb-js-toolkit';
 
 export class Script implements CKBModel {
   static fromRPC(data: any): Script | null {
-    if (!data) return null;
     validators.ValidateScript(data);
     return new Script(data.code_hash, data.args, data.hash_type);
   }
+
   constructor(
     public codeHash: string,
     public args: string,
     public hashType: HashType
   ) {}
 
-  sameWith({ args, codeHash, hashType }: Script) {
+  sameWith(script: Script) {
+    validators.ValidateScript(transformers.TransformScript(script));
     return (
-      this.args === args &&
-      this.codeHash === codeHash &&
-      this.hashType === hashType
+      this.args === script.args &&
+      this.codeHash === script.codeHash &&
+      this.hashType === script.hashType
     );
   }
 

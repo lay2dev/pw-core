@@ -1,6 +1,8 @@
 import { Address, Amount, Script, CellDep, Transaction } from './models';
 
 export interface CKBModel {
+  validate(): any;
+  sameWith(model: any): boolean;
   serializeJson(): object;
 }
 

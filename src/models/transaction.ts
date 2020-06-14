@@ -20,6 +20,14 @@ export class Transaction implements CKBModel {
     }
   }
 
+  sameWith(tx: Transaction): boolean {
+    validators.ValidateTransaction(transformers.TransformTransaction(tx));
+    return (
+      tx.raw.sameWith(this.raw) &&
+      tx.witnesses.join('-') === this.witnesses.join('-')
+    );
+  }
+
   getSize(): number {
     const tx = transformers.TransformTransaction(this);
     validators.ValidateTransaction(tx);

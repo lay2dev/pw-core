@@ -21,6 +21,10 @@ export class RawTransaction implements CKBModel {
     this.inputs = inputCells.map((i) => i.toCellInput());
     this.outputsData = this.outputs.map((o) => o.getHexData());
   }
+  sameWith(raw: RawTransaction): boolean {
+    validators.ValidateTransaction(transformers.TransformTransaction(raw));
+    return raw.toHash() === this.toHash();
+  }
 
   toHash() {
     const rawTx = transformers.TransformRawTransaction(this);

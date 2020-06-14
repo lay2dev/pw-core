@@ -3,7 +3,20 @@ import { CKBModel } from '..';
 import { validators, transformers } from 'ckb-js-toolkit';
 
 export class CellInput implements CKBModel {
+  static fromRPC(data: any): CellInput {
+    validators.ValidateCellInput(data);
+    return new CellInput(data.previous_output, data.since);
+  }
+
   constructor(public previousOutput: OutPoint, public since: string = '0x0') {}
+
+  sameWith(cellInput: CellInput): boolean {
+    validators.ValidateCellInput(transformers.TransformCellInput(cellInput));
+    return (
+      cellInput.previousOutput.sameWith(this.previousOutput) &&
+      cellInput.since === this.since
+    );
+  }
 
   validate(): boolean {
     validators.ValidateCellInput(transformers.TransformCellInput(this));

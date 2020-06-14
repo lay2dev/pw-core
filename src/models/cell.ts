@@ -8,6 +8,20 @@ import { RPC, validators, transformers } from 'ckb-js-toolkit';
 import { HashType } from '..';
 
 export class Cell implements CKBModel {
+  static fromRPC(data: any): Cell {
+    if (!data) {
+      throw new Error('Cannot create cell from empty data');
+    }
+    validators.ValidateCellOutput(data);
+    return new Cell(
+      data.capacity,
+      Script.fromRPC(data.lock),
+      Script.fromRPC(data.type),
+      OutPoint.fromRPC(data.out_point),
+      data.data
+    );
+  }
+
   static async loadFromBlockchain(rpc: RPC, outPoint: OutPoint): Promise<Cell> {
     const index = Number(outPoint.index);
     const {
@@ -34,10 +48,16 @@ export class Cell implements CKBModel {
   ) {
     this.spaceCheck();
   }
+  sameWith(cell: Cell): boolean {
+    if (!cell || !cell.outPoint || !this.outPoint) {
+      throw new Error('to be compared, cells must have outPoint value');
+    }
+    return cell.outPoint.sameWith(this.outPoint);
+  }
 
-  // TODO check if current cell can be filled in to the capacity provided
-  // if not, throw an exception
   spaceCheck() {
+    // TODO: check if current cell can be filled in to the capacity provided
+    // if not, throw an exception
     return true;
   }
 
@@ -45,14 +65,14 @@ export class Cell implements CKBModel {
     return this.outPoint ? new CellInput(this.outPoint, since) : undefined;
   }
 
-  validate(): boolean {
+  validate(): Cell {
     validators.ValidateCellOutput(transformers.TransformCellOutput(this));
     if (this.outPoint) {
       validators.ValidateCellInput(
         transformers.TransformCellInput(this.toCellInput())
       );
     }
-    return true;
+    return this;
   }
 
   // CellOutput format
