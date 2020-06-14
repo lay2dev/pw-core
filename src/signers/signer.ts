@@ -1,7 +1,7 @@
 // import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
 // import { mergeTypedArraysUnsafe } from '../utils';
 import { Transaction } from '..';
-import { Hasher, Blake2bHasher } from '../hasher';
+import { Hasher, Blake2bHasher } from '../hashers';
 import { normalizers, Reader, transformers } from 'ckb-js-toolkit';
 import JSBI from 'jsbi';
 import {

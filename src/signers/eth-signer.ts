@@ -1,5 +1,5 @@
 import { Signer, Message } from '.';
-import { Keccak256Hasher } from '../hasher';
+import { Keccak256Hasher } from '../hashers';
 import {
   ecsign,
   bufferToHex,

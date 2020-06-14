@@ -1,7 +1,7 @@
 import { Address } from '..';
 
 export enum Platform {
-  // ckb,
+  ckb,
   eth,
   // btc,
   // eos,
@@ -20,5 +20,5 @@ export abstract class Provider {
     this._address = value;
   }
 
-  abstract async init(): Promise<void>;
+  abstract async init(): Promise<Provider>;
 }

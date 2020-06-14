@@ -13,7 +13,6 @@ import {
 } from '.';
 import { HashType } from '../interfaces';
 import { DummyProvider } from '../providers/dummy-provider';
-import { Platform } from '../providers';
 
 const test = anyTest as TestInterface<{ pw: PWCore }>;
 
@@ -24,11 +23,7 @@ const address = new Address(
 
 test.before(async (t) => {
   const pw = new PWCore('https://aggron.ckb.dev');
-  await pw.init(
-    new DummyProvider(Platform.eth),
-    new DummyCollector(address),
-    ChainID.ckb_testnet
-  );
+  await pw.init(new DummyProvider(), new DummyCollector(), ChainID.ckb_testnet);
 
   t.context.pw = pw;
 });

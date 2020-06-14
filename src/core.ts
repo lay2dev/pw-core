@@ -55,7 +55,7 @@ export default class PWCore {
     }
 
     if (provider instanceof Provider) {
-      provider.init();
+      PWCore.provider = await provider.init();
     } else {
       throw new Error('provider must be provided');
     }

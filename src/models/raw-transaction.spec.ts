@@ -1,17 +1,16 @@
 import anyTest, { TestInterface } from 'ava';
-import PWCore, { ChainID, Address, AddressType } from '..';
-import { RawTransaction, Cell, OutPoint, CellDep } from '.';
+import PWCore, {
+  ChainID,
+  DepType,
+  RawTransaction,
+  Cell,
+  OutPoint,
+  CellDep,
+} from '..';
 import { DummyCollector } from '../collectors/dummy-collector';
-import { DepType } from '../interfaces';
 import { DummyProvider } from '../providers/dummy-provider';
-import { Platform } from '../providers';
 
 const test = anyTest as TestInterface<{ raw: RawTransaction }>;
-
-const address = new Address(
-  'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs',
-  AddressType.ckb
-);
 
 const outPoint1 = new OutPoint(
   '0x85f2eb3737f79af418361e6c6c03a5d9f0060b085a888c0c70d762842af1b6c1',
@@ -32,11 +31,7 @@ const outPoint4 = new OutPoint(
 
 test.before(async (t) => {
   const pw = new PWCore('https://aggron.ckb.dev');
-  await pw.init(
-    new DummyProvider(Platform.eth),
-    new DummyCollector(address),
-    ChainID.ckb_testnet
-  );
+  await pw.init(new DummyProvider(), new DummyCollector(), ChainID.ckb_testnet);
   const cells = await Promise.all([
     Cell.loadFromBlockchain(pw.rpc, outPoint1),
     Cell.loadFromBlockchain(pw.rpc, outPoint2),

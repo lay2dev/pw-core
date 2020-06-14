@@ -3,7 +3,6 @@ import PWCore, { Address, AddressType, Amount, ChainID } from '.';
 import { PwCollector } from './collectors/pw-collector';
 import { CHAIN_SPECS } from './constants';
 import { DummyProvider } from './providers/dummy-provider';
-import { Platform } from './providers';
 
 const test = anyTest as TestInterface<{ pw: PWCore; address: Address }>;
 
@@ -14,8 +13,8 @@ test.before(async (t) => {
   );
   const pw = new PWCore('https://lay2.ckb.dev');
   await pw.init(
-    new DummyProvider(Platform.eth),
-    new PwCollector(address),
+    new DummyProvider(),
+    new PwCollector(),
     ChainID.ckb_dev,
     CHAIN_SPECS.Lay2
   );

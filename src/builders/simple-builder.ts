@@ -8,6 +8,7 @@ import {
   RawTransaction,
   Transaction,
 } from '../models';
+import PWCore from '..';
 
 export class SimpleBuilder extends Builder {
   constructor(
@@ -29,7 +30,10 @@ export class SimpleBuilder extends Builder {
     const inputCells: Cell[] = [];
 
     // fill the inputs
-    const cells = await this.collector.collect(neededAmount);
+    const cells = await this.collector.collect(
+      PWCore.provider.address,
+      neededAmount
+    );
     for (const cell of cells) {
       inputCells.push(cell);
       inputSum = Amount.ADD(inputSum, cell.capacity);
