@@ -1,5 +1,5 @@
 {
-  "name": "@pw-sdk/core",
+  "name": "@lay2/pw-core",
   "version": "0.1.1",
   "description": "the javascript sdk of pw-sdk",
   "main": "build/main/index.js",
