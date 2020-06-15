@@ -12,18 +12,11 @@ export const DUMMY_ADDRESSES = {
 
 export const CHAIN_SPECS = {
   Lina: {
-    table: new CellDep(
-      DepType.code,
-      new OutPoint(
-        '0x07a824df0419adf4c92ca563085525e7224b014ecc97cf3de684dd7b57c05856',
-        '0x0'
-      )
-    ),
     daoType: {
       cellDep: new CellDep(
         DepType.code,
         new OutPoint(
-          '0x15fb8111fc78fa36da6af96c45ac4714cc9a33974fdae13cc524b29e1a488c7f',
+          '0xe2fb199810d49a4d8beec56718ba2593b665db9d52299a0f9e6e75416d73ff5c',
           '0x2'
         )
       ),
@@ -37,7 +30,7 @@ export const CHAIN_SPECS = {
       cellDep: new CellDep(
         DepType.depGroup,
         new OutPoint(
-          '0x84dcb061adebff4ef93d57c975ba9058a9be939d79ea12ee68003f6492448890',
+          '0x71a7ba8fc96349fea0ed3a5c47992e3b4084b031a42264a018e0072e8172e46c',
           '0x0'
         )
       ),
@@ -51,7 +44,7 @@ export const CHAIN_SPECS = {
       cellDep: new CellDep(
         DepType.depGroup,
         new OutPoint(
-          '0x84dcb061adebff4ef93d57c975ba9058a9be939d79ea12ee68003f6492448890',
+          '0x71a7ba8fc96349fea0ed3a5c47992e3b4084b031a42264a018e0072e8172e46c',
           '0x1'
         )
       ),
@@ -78,18 +71,11 @@ export const CHAIN_SPECS = {
   },
 
   Aggron: {
-    table: new CellDep(
-      DepType.code,
-      new OutPoint(
-        '0x07a824df0419adf4c92ca563085525e7224b014ecc97cf3de684dd7b57c05856',
-        '0x0'
-      )
-    ),
     daoType: {
       cellDep: new CellDep(
         DepType.code,
         new OutPoint(
-          '0x15fb8111fc78fa36da6af96c45ac4714cc9a33974fdae13cc524b29e1a488c7f',
+          '0x8f8c79eb6671709633fe6a46de93c0fedc9c1b8a6527a18d3983879542635c9f',
           '0x2'
         )
       ),
@@ -103,7 +89,7 @@ export const CHAIN_SPECS = {
       cellDep: new CellDep(
         DepType.depGroup,
         new OutPoint(
-          '0x84dcb061adebff4ef93d57c975ba9058a9be939d79ea12ee68003f6492448890',
+          '0xf8de3bb47d055cdf460d93a2a6e1b05f7432f9777c8c474abf4eec1d4aee5d37',
           '0x0'
         )
       ),
@@ -117,7 +103,7 @@ export const CHAIN_SPECS = {
       cellDep: new CellDep(
         DepType.depGroup,
         new OutPoint(
-          '0x84dcb061adebff4ef93d57c975ba9058a9be939d79ea12ee68003f6492448890',
+          '0x6495cede8d500e4309218ae50bbcadb8f722f24cc7572dd2274f5876cb603e4e',
           '0x1'
         )
       ),
@@ -131,12 +117,12 @@ export const CHAIN_SPECS = {
       cellDep: new CellDep(
         DepType.code,
         new OutPoint(
-          '0x07a824df0419adf4c92ca563085525e7224b014ecc97cf3de684dd7b57c05856',
+          '0x760a6db1efb79eeed0675c18afa75ecba1f723d48aeb7cca48e7f34843fb5182',
           '0x0'
         )
       ),
       script: new Script(
-        '0xac8a4bc0656aeee68d4414681f4b2611341c4f0edd4c022f2d250ef8bb58682f',
+        '0xb768aa03816668d690449e61e01a87c46a2fb162cfd16ea12169defcde0015d4',
         '0x',
         HashType.type
       ),
@@ -144,13 +130,6 @@ export const CHAIN_SPECS = {
   },
   // dev - lay2.ckb.dev
   Lay2: {
-    table: new CellDep(
-      DepType.code,
-      new OutPoint(
-        '0xa563884b3686078ec7e7677a5f86449b15cf2693f3c1241766c6996f206cc541',
-        '0x3'
-      )
-    ),
     daoType: {
       cellDep: new CellDep(
         DepType.code,

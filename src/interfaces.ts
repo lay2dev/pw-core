@@ -28,7 +28,6 @@ export interface ConfigItem {
 }
 
 export interface Config {
-  table: CellDep;
   daoType: ConfigItem;
   defaultLock: ConfigItem;
   multiSigLock: ConfigItem;

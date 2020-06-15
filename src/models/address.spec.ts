@@ -4,10 +4,10 @@ import { Address, AddressType } from './address';
 import { DummyCollector } from '../collectors/dummy-collector';
 import { DummyProvider } from '../providers/dummy-provider';
 
-const eth = '0x54755f5857b992f643DD22197c0B768395ADfCa8'.toLowerCase();
+const eth = '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc'.toLowerCase();
 const ckb = 'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs';
 const ckbFull =
-  'ckt1qjkg5j7qv44wae5dgs2xs86tycgng8z0pmw5cq3095jsa79mtp5z74r4tav90wvj7epa6gse0s9hdqu44h72sgdhq2v';
+  'ckt1qjmk32srs9nx345sgj0xrcq6slzx5ta3vt8azm4py95aalx7qq2agvh5ct04panc49rqn6v03mnllv2tv7vmc2z5pkp';
 
 const ckbAddress = new Address(ckb, AddressType.ckb);
 const ckbFullAddress = new Address(ckbFull, AddressType.ckb);
@@ -52,7 +52,7 @@ test('to lock script', (t) => {
   });
 
   t.deepEqual(ckbFullAddress.toLockScript().serializeJson(), {
-    args: '0x54755f5857b992f643dd22197c0b768395adfca8',
+    args: '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc',
     code_hash: PWCore.config.pwLock.script.codeHash,
     hash_type: PWCore.config.pwLock.script.hashType,
   });

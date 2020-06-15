@@ -12,7 +12,7 @@ export class RawTransaction implements CKBModel {
     public inputCells: Cell[],
     public outputs: Cell[],
     public cellDeps: CellDep[] = [
-      PWCore.config.table,
+      PWCore.config.defaultLock.cellDep,
       PWCore.config.pwLock.cellDep,
     ],
     public headerDeps: string[] = [],

@@ -1,6 +1,6 @@
 {
   "name": "@lay2/pw-core",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "the javascript sdk of pw-sdk",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -31,8 +31,7 @@
     "version": "standard-version",
     "reset": "git clean -dfx && git reset --hard && npm i",
     "clean": "trash build test",
-    "prepare-release": "run-s reset test cov:check doc:html version doc:publish",
-    "preinstall": "node -e \"if(process.env.npm_execpath.indexOf('yarn') === -1) throw new Error('ckb-pw-core must be installed with Yarn: https://yarnpkg.com/')\""
+    "prepare-release": "run-s reset test cov:check doc:html version doc:publish"
   },
   "scripts-info": {
     "info": "Display information about the package scripts",
