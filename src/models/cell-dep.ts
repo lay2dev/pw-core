@@ -4,6 +4,7 @@ import { validators, transformers } from 'ckb-js-toolkit';
 
 export class CellDep implements CKBModel {
   static fromRPC(data: any): CellDep {
+    if (!data) return null;
     validators.ValidateCellDep(data);
     return new CellDep(data.dep_type, data.out_point);
   }

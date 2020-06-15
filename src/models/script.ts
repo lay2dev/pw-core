@@ -1,19 +1,17 @@
 import { HashType, CKBModel } from '../interfaces';
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils';
-// import { SerializeScript } from '@ckb-lumos/types/lib/core';
 import {
   Address,
   AddressType,
   AddressPrefix,
   getDefaultPrefix,
 } from './address';
-// import { Blake2bHasher } from '../hasher';
-// import { Reader } from 'ckb-js-toolkit';
 import { generateAddress, LumosConfigs } from '../utils';
 import { validators, transformers } from 'ckb-js-toolkit';
 
 export class Script implements CKBModel {
   static fromRPC(data: any): Script | null {
+    if (!data) return null;
     validators.ValidateScript(data);
     return new Script(data.code_hash, data.args, data.hash_type);
   }
@@ -48,12 +46,6 @@ export class Script implements CKBModel {
 
   toHash(): string {
     return scriptToHash(this);
-    /*
-    const serializedScript = SerializeScript(this.serializeJson());
-    return new Blake2bHasher()
-      .hash(new Reader(serializedScript))
-      .serializeJson();
-      */
   }
 
   toAddress(prefix: AddressPrefix = getDefaultPrefix()): Address {

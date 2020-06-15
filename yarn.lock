@@ -203,26 +203,6 @@
     typedoc-default-themes "^0.6.0-0"
     typescript "3.5.x"
 
-"@ckb-lumos/common-scripts@^0.2.4":
-  version "0.2.4"
-  resolved "https://registry.npm.taobao.org/@ckb-lumos/common-scripts/download/@ckb-lumos/common-scripts-0.2.4.tgz#d73602505408976f8541f530477a73ba7c3b88e8"
-  integrity sha1-1zYCUFQIl2+FQfUwR3pzunw7iOg=
-  dependencies:
-    "@ckb-lumos/helpers" "^0.2.4"
-    "@ckb-lumos/types" "^0.2.4"
-    ckb-js-toolkit "^0.9.1"
-    immutable "^4.0.0-rc.12"
-
-"@ckb-lumos/helpers@^0.2.4":
-  version "0.2.4"
-  resolved "https://registry.npm.taobao.org/@ckb-lumos/helpers/download/@ckb-lumos/helpers-0.2.4.tgz#b9902c405e49b8a3874cd1ecdd7e72ec6d0f1b5c"
-  integrity sha1-uZAsQF5JuKOHTNHs3X5y7G0PG1w=
-  dependencies:
-    "@ckb-lumos/types" "^0.2.4"
-    bech32 "^1.1.4"
-    ckb-js-toolkit "^0.9.1"
-    immutable "^4.0.0-rc.12"
-
 "@ckb-lumos/types@^0.2.4":
   version "0.2.4"
   resolved "https://registry.npm.taobao.org/@ckb-lumos/types/download/@ckb-lumos/types-0.2.4.tgz#1733d29a7489af8ddfc297a240249fb3046fda7a"

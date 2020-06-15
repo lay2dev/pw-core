@@ -1,12 +1,11 @@
 import { CKBModel } from '../interfaces';
-import { utf8ToHex, hexToUtf8 } from '@nervosnetwork/ckb-sdk-utils';
 import { Amount, Script, OutPoint } from '.';
 import { CellInput } from './cell-input';
 // import { minimalCellCapacity } from '../utils';
 import { AmountUnit } from './amount';
-import { RPC, validators, transformers, normalizers } from 'ckb-js-toolkit';
+import { RPC, validators, transformers } from 'ckb-js-toolkit';
 import { HashType } from '..';
-import { SerializeCellOutput } from '@ckb-lumos/types/lib/core';
+import { byteArrayToHex, hexToByteArray } from '../utils';
 
 export class Cell implements CKBModel {
   static fromRPC(data: any): Cell {
@@ -58,12 +57,13 @@ export class Cell implements CKBModel {
   }
 
   resize() {
-    const base = SerializeCellOutput(
-      normalizers.NormalizeCellOutput(transformers.TransformCellOutput(this))
-    ).byteLength;
-    const extra = new Buffer(this.data, 'hex').byteLength;
+    // const base = SerializeCellOutput(
+    //   normalizers.NormalizeCellOutput(transformers.TransformCellOutput(this))
+    // ).byteLength;
+    const base = this.type ? 102 : 61;
+    const extra = new Buffer(this.data.replace('0x', ''), 'hex').byteLength;
     const size = base + extra;
-    this.capacity = new Amount(size.toString(), AmountUnit.ckb);
+    this.capacity = new Amount(size.toString());
     return size;
   }
 
@@ -97,7 +97,12 @@ export class Cell implements CKBModel {
   }
 
   setData(data: string) {
-    this.data = utf8ToHex(data.trim());
+    data = data.trim();
+    const bytes = [];
+    for (let i = 0; i < data.length; i++) {
+      bytes.push(data.charCodeAt(i));
+    }
+    this.data = byteArrayToHex(bytes);
     this.spaceCheck();
   }
 
@@ -111,7 +116,9 @@ export class Cell implements CKBModel {
   }
 
   getData(): string {
-    return hexToUtf8(this.data.trim());
+    return hexToByteArray(this.data.trim())
+      .map((char) => String.fromCharCode(char))
+      .join('');
   }
 
   getHexData(): string {

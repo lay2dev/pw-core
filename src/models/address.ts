@@ -66,20 +66,6 @@ export class Address {
         hashType === HashType.data ? AType.DataCodeHash : AType.TypeCodeHash,
       prefix: APrefix[getDefaultPrefix()],
     });
-
-    /*
-    const script = transformers.TransformScript(this.toLockScript());
-    validators.ValidateScript(script);
-    const script1 = new LumosScript(SerializeScript(script));
-    throw new Error('[toCKBAddress] script' + JSON.stringify(script1));
-
-    return generateAddress(
-      { ...script, hash_type: 1 },
-      {
-        config: LumosConfigs[this.addressType],
-      }
-    );
-    */
   }
 
   toLockScript(): Script {

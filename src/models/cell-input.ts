@@ -4,6 +4,7 @@ import { validators, transformers } from 'ckb-js-toolkit';
 
 export class CellInput implements CKBModel {
   static fromRPC(data: any): CellInput {
+    if (!data) return null;
     validators.ValidateCellInput(data);
     return new CellInput(data.previous_output, data.since);
   }

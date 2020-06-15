@@ -27,19 +27,19 @@ export const shannonToCKB = (
     fraction = `0${fraction}`;
   }
 
-  if (!options?.pad) {
+  if (options && !options.pad) {
     fraction = fraction.match(/^([0-9]*[1-9]|0)(0*)/)[1];
   }
 
   let whole = JSBI.divide(amount, base).toString(10);
 
-  if (options?.commify) {
+  if (options && options.commify) {
     whole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
   let result = `${whole}${fraction === '0' ? '' : `.${fraction}`}`;
 
-  if (options?.section === 'whole') {
+  if (options && options.section === 'whole') {
     result = whole;
   }
 
@@ -47,7 +47,7 @@ export const shannonToCKB = (
     result = `-${result}`;
   }
 
-  if (options?.section === 'fraction') {
+  if (options && options.section === 'fraction') {
     result = fraction;
   }
 
@@ -80,7 +80,7 @@ export const ckbToShannon = (ckbAmount: string): string => {
   return result.toString();
 };
 
-// from helper
+// from @lumos/helper
 
 const LINA = {
   PREFIX: 'ckb',
@@ -229,9 +229,6 @@ export function parseAddress(address, { config = LINA } = {}) {
       if (!scriptTemplate) {
         throw Error(`Invalid code hash index: ${data[1]}!`);
       }
-      // return Object.assign({}, scriptTemplate.SCRIPT, {
-      //   args: byteArrayToHex(data.slice(2)),
-      // });
       return { ...scriptTemplate.SCRIPT, args: byteArrayToHex(data.slice(2)) };
     case 2:
       if (data.length < 33) {
