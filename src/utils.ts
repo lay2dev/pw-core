@@ -1,6 +1,7 @@
 import JSBI from 'jsbi';
 import { validators, Reader } from 'ckb-js-toolkit';
 import bech32 from 'bech32';
+import { FormatOptions } from '.';
 
 const BigInt = JSBI.BigInt;
 
@@ -8,12 +9,6 @@ const BASE = '100000000';
 const ZERO = BigInt(0);
 const base = BigInt(BASE);
 const baseLen = BASE.length - 1;
-
-export interface FormatOptions {
-  section?: 'full' | 'whole' | 'fraction';
-  pad?: boolean;
-  commify?: boolean;
-}
 
 export const shannonToCKB = (
   shannonAmount: string,

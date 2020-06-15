@@ -37,9 +37,16 @@ test('data actions', (t) => {
     new Amount('100', AmountUnit.ckb),
     address.toLockScript()
   );
+
+  t.true(cell.isEmpty());
+
+  // t.is(cell.resize(), 61);
+
   cell.setData(data);
   t.is(cell.getData(), data);
   t.is(cell.getHexData(), hexData);
+
+  t.false(cell.isEmpty());
 
   cell.setHexData(hexData);
   t.is(cell.getData(), data);

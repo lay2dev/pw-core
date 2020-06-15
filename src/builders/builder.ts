@@ -1,5 +1,4 @@
 import { Collector } from '../collectors/collector';
-import { ReceivePair } from '../interfaces';
 import { Amount, AmountUnit, Transaction } from '../models';
 import PWCore from '..';
 
@@ -24,16 +23,9 @@ export abstract class Builder {
   protected fee: Amount;
 
   protected constructor(
-    protected outputs: ReceivePair[],
-    protected feeRate: number,
-    protected collector: Collector
-  ) {
-    this.feeRate = feeRate || Builder.MIN_FEE_RATE;
-    this.collector = collector || PWCore.defaultCollector;
-    // throw new Error(
-    //   'builder collector' + JSON.stringify(PWCore.defaultCollector)
-    // );
-  }
+    protected feeRate: number = Builder.MIN_FEE_RATE,
+    protected collector: Collector = PWCore.defaultCollector
+  ) {}
 
   getFee(): Amount {
     return this.fee;

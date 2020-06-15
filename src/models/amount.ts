@@ -1,10 +1,16 @@
 import JSBI from 'jsbi';
-import { ckbToShannon, FormatOptions, shannonToCKB } from '../utils';
+import { ckbToShannon, shannonToCKB } from '../utils';
 import { HexStringToBigInt } from 'ckb-js-toolkit';
 
 export enum AmountUnit {
   ckb,
   shannon,
+}
+
+export interface FormatOptions {
+  section?: 'full' | 'whole' | 'fraction';
+  pad?: boolean;
+  commify?: boolean;
 }
 
 export class Amount {

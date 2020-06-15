@@ -4,8 +4,9 @@ import { Amount, Script, OutPoint } from '.';
 import { CellInput } from './cell-input';
 // import { minimalCellCapacity } from '../utils';
 import { AmountUnit } from './amount';
-import { RPC, validators, transformers } from 'ckb-js-toolkit';
+import { RPC, validators, transformers, normalizers } from 'ckb-js-toolkit';
 import { HashType } from '..';
+import { SerializeCellOutput } from '@ckb-lumos/types/lib/core';
 
 export class Cell implements CKBModel {
   static fromRPC(data: any): Cell {
@@ -48,11 +49,22 @@ export class Cell implements CKBModel {
   ) {
     this.spaceCheck();
   }
+
   sameWith(cell: Cell): boolean {
     if (!cell || !cell.outPoint || !this.outPoint) {
       throw new Error('to be compared, cells must have outPoint value');
     }
     return cell.outPoint.sameWith(this.outPoint);
+  }
+
+  resize() {
+    const base = SerializeCellOutput(
+      normalizers.NormalizeCellOutput(transformers.TransformCellOutput(this))
+    ).byteLength;
+    const extra = new Buffer(this.data, 'hex').byteLength;
+    const size = base + extra;
+    this.capacity = new Amount(size.toString(), AmountUnit.ckb);
+    return size;
   }
 
   spaceCheck() {
@@ -85,11 +97,12 @@ export class Cell implements CKBModel {
   }
 
   setData(data: string) {
-    this.data = utf8ToHex(data);
+    this.data = utf8ToHex(data.trim());
     this.spaceCheck();
   }
 
   setHexData(data: string) {
+    data = data.trim();
     if (!data.startsWith('0x')) {
       throw new Error('Hex data should start with 0x');
     }
@@ -97,11 +110,15 @@ export class Cell implements CKBModel {
     this.spaceCheck();
   }
 
-  getData() {
-    return hexToUtf8(this.data);
+  getData(): string {
+    return hexToUtf8(this.data.trim());
   }
 
-  getHexData() {
-    return this.data;
+  getHexData(): string {
+    return this.data.trim();
+  }
+
+  isEmpty(): boolean {
+    return this.data.trim() === '0x';
   }
 }

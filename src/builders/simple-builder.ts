@@ -12,20 +12,17 @@ import PWCore from '..';
 
 export class SimpleBuilder extends Builder {
   constructor(
-    address: Address,
-    amount: Amount,
+    private address: Address,
+    private amount: Amount,
     feeRate?: number,
     collector?: Collector
   ) {
-    super([{ address, amount }], feeRate, collector);
+    super(feeRate, collector);
   }
 
   async build(): Promise<Transaction> {
-    const outputCell = new Cell(
-      this.outputs[0].amount,
-      this.outputs[0].address.toLockScript()
-    );
-    const neededAmount = Amount.ADD(this.outputs[0].amount, Builder.MIN_CHANGE);
+    const outputCell = new Cell(this.amount, this.address.toLockScript());
+    const neededAmount = Amount.ADD(this.amount, Builder.MIN_CHANGE);
     let inputSum = new Amount('0');
     const inputCells: Cell[] = [];
 
@@ -40,7 +37,7 @@ export class SimpleBuilder extends Builder {
       if (Amount.GT(inputSum, neededAmount)) break;
     }
 
-    if (Amount.LT(inputSum, this.outputs[0].amount)) {
+    if (Amount.LT(inputSum, this.amount)) {
       throw new Error(
         `input capacity not enough, need ${outputCell.capacity.toString(
           AmountUnit.ckb
@@ -50,7 +47,7 @@ export class SimpleBuilder extends Builder {
 
     const changeCell = new Cell(
       Amount.SUB(inputSum, outputCell.capacity),
-      this.outputs[0].address.toLockScript()
+      PWCore.provider.address.toLockScript()
     );
 
     const tx = new Transaction(
