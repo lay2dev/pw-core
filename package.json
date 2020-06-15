@@ -1,6 +1,6 @@
 {
   "name": "ckb-pw-core",
-  "version": "1.0.0",
+  "version": "0.1.1",
   "description": "the javascript sdk of pw-sdk",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -51,8 +51,6 @@
     "node": ">=8.9"
   },
   "dependencies": {
-    "@ckb-lumos/common-scripts": "^0.2.4",
-    "@ckb-lumos/helpers": "^0.2.4",
     "@ckb-lumos/types": "^0.2.4",
     "@nervosnetwork/ckb-sdk-utils": "^0.32.0",
     "bech32": "^1.1.4",
