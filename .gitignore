@@ -3,9 +3,13 @@ build
 test
 src/**.js
 .idea/*
+.vscode
 
 coverage
 .nyc_output
 *.log
 
+.editorconfig
+
 package-lock.json
+yarn.lock

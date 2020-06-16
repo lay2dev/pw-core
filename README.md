@@ -1,7 +1,11 @@
 # pw-core
+
 The front-end SDK of pw-sdk
 
+> There will be a big update on this document soon.
+
 ---
+
 # Classes
 
 ## PWCore
@@ -22,28 +26,24 @@ Create a PWCore instance.
 const pwcore = new PWCore('https://lina.ckb.dev');
 ```
 
-
-
 ### init
 
 Initialize the needed ckb environment for pw-core.
 
->  @params
+> @params
 
-- ***chainId***: [ChainID](#chainid), optional, id of the ckb network. If not provided, the chainId will be decided by a rpc call to the node provided in the constructor.
-- ***config***: [Config](#config), optional if `chainId` is `ChainID.ckb`  or `ChainID.ckb_testnet`, otherwise this field is required, and an exception will be thrown if not provided.
+- **_chainId_**: [ChainID](#chainid), optional, id of the ckb network. If not provided, the chainId will be decided by a rpc call to the node provided in the constructor.
+- **_config_**: [Config](#config), optional if `chainId` is `ChainID.ckb` or `ChainID.ckb_testnet`, otherwise this field is required, and an exception will be thrown if not provided.
 
 > @return
 
 - A `Promise<void>` object.
 
-
-
 ### rpc
 
 Get a RPC handler to communate with the ckb blockchain. Check the full list of [avaliable RPC methods](https://github.com/nervosnetwork/ckb/tree/develop/rpc).
 
->  @return
+> @return
 
 A readonly [RPC](https://github.com/xxuejie/ckb-js-toolkit#rpc) (from package '[ckb-js-toolkit](https://www.npmjs.com/package/ckb-js-toolkit)') instance.
 
@@ -60,8 +60,6 @@ const info = await rpc.get_blockchain_info();
 // }
 ```
 
-
-
 ### send
 
 Send ckb to some address.
@@ -70,13 +68,11 @@ Send ckb to some address.
 
 - **address**: Address, the reciever's address.
 - **amount**: Amount, the amount (capacity) of ckb to be sent.
-- ***feeRate***: string, optional, a string of decimal feeRate value in unit **Shannons / KB**. The minium value is '1000'.
+- **_feeRate_**: string, optional, a string of decimal feeRate value in unit **Shannons / KB**. The minium value is '1000'.
 
 > @return
 
 - A `Promise<string>` object. If succeed the transaction hash will be resolved.
-
-
 
 ### sendTransaction
 
@@ -91,8 +87,6 @@ Send a fully customizable ckb transaction.
 
 - A `Promise<string>` object. If succeed the transaction hash will be resolved.
 
-
-
 ### getBalance
 
 Get balance of any address.
@@ -100,13 +94,11 @@ Get balance of any address.
 > @params
 
 - **address**: [Address](#address), the address to be checked.
-- ***collector***: [Collector](#collector), optional, the cell collector to be used. If not provided, the RPC collector will be applied.
+- **_collector_**: [Collector](#collector), optional, the cell collector to be used. If not provided, the RPC collector will be applied.
 
 > @return
 
 - An [Amount](#amount) object, the balance of the above address.
-
-
 
 ## Builder
 
@@ -116,11 +108,9 @@ An abstract class to build raw transaction.
 
 > @params
 
-- **outputs**:  [ReceivePair](#receivepair)[], an array contains the output information.
+- **outputs**: [ReceivePair](#receivepair)[], an array contains the output information.
 - **feeRate**: string, a string of decimal feeRate value in unit **Shannons / KB**. The minium value is '1000'.
 - **collector**: [Collector](#collector), the cell collector used to get unspent cells for inputs.
-
-
 
 ### build
 
@@ -130,7 +120,7 @@ An abstract method which actually builds the raw transaction.
 
 - A `Promise<RawTransaction>` object. If succeed, the built [RawTransaction](#rawtransaction) instance will be resolved.
 
-Below is a sample builder implementation  to help you start easier.
+Below is a sample builder implementation to help you start easier.
 
 ```typescript
  class SimpleBuilder extends Builder {
@@ -188,8 +178,6 @@ Below is a sample builder implementation  to help you start easier.
   }
 ```
 
-
-
 ## Signer
 
 An abstract class to sign a raw transaction and return the sendable transaction.
@@ -200,8 +188,6 @@ An abstract class to sign a raw transaction and return the sendable transaction.
 
 - **fromAddress**: [Address](#address), the sender's address.
 
-
-
 ### toBytes
 
 A method helps you to transform raw transaction to signable byte array. You can use it in your sign function.
@@ -209,8 +195,6 @@ A method helps you to transform raw transaction to signable byte array. You can 
 > @return
 
 - An `Uint8Array` which contains the serialized and transformed raw transaction data.
-
-
 
 ### sign
 
@@ -224,8 +208,6 @@ A abstract method to sign the raw transaction.
 
 - A `Promise <Transaction>` object. If succeed, the signed Transaction instance will be resolved.
 
-
-
 ## Collector
 
 An abstract class to retrieval unspent cells for inputs.
@@ -236,8 +218,6 @@ An abstract class to retrieval unspent cells for inputs.
 
 - **amount**: [Amount](#amount), the total capacity of unspent cells needed.
 
-
-
 ### collect
 
 An abstract method which collects the needed unspent cells.
@@ -246,8 +226,6 @@ An abstract method which collects the needed unspent cells.
 
 - A `Promise<Cell[] | undefined>` object. If the requirements are all met, the collected [Cell](#cell) instances will be resolved.
 
-
-
 ## Cell
 
 ### constructor
@@ -255,12 +233,10 @@ An abstract method which collects the needed unspent cells.
 > @params
 
 - **capacity**: [Amount](#amount), capacity of the cell.
-- ***lock***: [Script](#script), optional, lock script of the cell. If not provided, pw-lock will be applied.
-- ***type***: [Script](#script), optional, type script of the cell.
-- ***outPoint***: [OutPoint](#outpoint), optional, info to locate the cell.
-- ***data***: string, optional, data of the cell.
-
-
+- **_lock_**: [Script](#script), optional, lock script of the cell. If not provided, pw-lock will be applied.
+- **_type_**: [Script](#script), optional, type script of the cell.
+- **_outPoint_**: [OutPoint](#outpoint), optional, info to locate the cell.
+- **_data_**: string, optional, data of the cell.
 
 ### loadFromBlockchain [static]
 
@@ -274,8 +250,6 @@ Load a cell by out point with rpc call.
 
 - A `Promise<Cell | undefined>` object. If the out point exists on the blockchain, a [Cell](#cell) instance filled with on-chain data will be resolved.
 
-
-
 ### setData
 
 Set the content of cell's `data` field. You can pass the raw string content and leave the hex tranformation to be done by this method.
@@ -287,8 +261,6 @@ Set the content of cell's `data` field. You can pass the raw string content and 
 > @return
 
 - The actual content set in the `data` field.
-
-
 
 ## Address
 
@@ -303,8 +275,6 @@ Set the content of cell's `data` field. You can pass the raw string content and 
 
 - An `Address` instance.
 
-
-
 ### fromLockScript [static]
 
 Create an Address instance from a lock script.
@@ -317,31 +287,33 @@ Create an Address instance from a lock script.
 
 - An `Address` instance.
 
-
-
 ### toCKBAddress
 
 Get a ckb format address.
 
 > @return
 
-- A ckb address string. If `type` of the instance is `AddressType.ckb`, the original string will be returned; Otherwise a [full-payload address](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0021-ckb-address-format/0021-ckb-address-format.md#full-payload-format) string will be returned. 
+- A ckb address string. If `type` of the instance is `AddressType.ckb`, the original string will be returned; Otherwise a [full-payload address](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0021-ckb-address-format/0021-ckb-address-format.md#full-payload-format) string will be returned.
 
 ```typescript
-const address1 = new Address('0x90C132C127916B458d096D429477e108B4180D1D', AddressType.eth);
+const address1 = new Address(
+  '0x90C132C127916B458d096D429477e108B4180D1D',
+  AddressType.eth
+);
 
 const ckbAddress1 = address1.toCKBAddress();
 
 // ckbAddress1 (testnet): ckt1qsp6sv9mzzjlx3r9g0yxjthn83qe7pxwx8ppfcta3jg9ejrt8fwanyxpxtqj0yttgkxsjm2zj3m7zz95rqx36m858ne
-      
-const address2 = new Address('ckb1qyqv5sdzfnfcy4rstumjvqgsfcrecem70ers7a0frk', AddressType.ckb);
+
+const address2 = new Address(
+  'ckb1qyqv5sdzfnfcy4rstumjvqgsfcrecem70ers7a0frk',
+  AddressType.ckb
+);
 
 const ckbAddress2 = address2.toCKBAddress();
 
 // ckbAddress2 (main-net): ckb1qyqv5sdzfnfcy4rstumjvqgsfcrecem70ers7a0frk
 ```
-
-
 
 ### toLockScript
 
@@ -363,8 +335,6 @@ const lockScript = address.toLockScript();
 //	}
 ```
 
-
-
 ### toLockScriptHash
 
 Get the hash string of the LockScript object provided above.
@@ -378,10 +348,8 @@ const address = new Address('0x90C132C127916B458d096D429477e108B4180D1D');
 
 const lockHash = address.toLockScriptHash();
 
-// lockHash: 
+// lockHash:
 ```
-
-
 
 ## Amount
 
@@ -390,13 +358,11 @@ const lockHash = address.toLockScriptHash();
 > @params
 
 - **amount**: string, decimal value in string format.
-- **unit:**  [AmountUnit](#amountunit), optional, default value is `AmountUnit.ckb`.
+- **unit:** [AmountUnit](#amountunit), optional, default value is `AmountUnit.ckb`.
 
 > @return
 
 - An `Amount` instance.
-
-
 
 ### toString
 
@@ -424,14 +390,12 @@ const shannon1String = shannon1.toString(AmountUnit.ckb);
 const shannon1MString = shannon1M.toString(AmountUnit.ckb);
 // shannon1MString: '0.01'
 
-const shannon1MPaddedString = shannon1M.toString(AmountUnit.ckb, { pad: true});
+const shannon1MPaddedString = shannon1M.toString(AmountUnit.ckb, { pad: true });
 // shannon1MPaddedString: '0.01000000'
 
-const shannon1TString = shannon1T.toString(AmountUnit.ckb, {commify: true});
+const shannon1TString = shannon1T.toString(AmountUnit.ckb, { commify: true });
 // shannon1TString = '10,000'
 ```
-
-
 
 ### toBigInt
 
@@ -446,8 +410,6 @@ const result = JSBI.EQ(amountBN, JSBI.BigInt('100000000'));
 // result: true
 ```
 
-
-
 ### toHexString
 
 > @return
@@ -459,8 +421,6 @@ const amount = new Amount('1', A);
 const amountHexString = amount.toHexString();
 // amountHexString: '0x5f5e100'
 ```
-
-
 
 ### static functions for calculation and comparison
 
@@ -488,8 +448,6 @@ const lte = Amount.LTE(amount1, amount1);
 
 ---
 
-
-
 # Interfaces
 
 ## Config
@@ -505,11 +463,11 @@ interface Config {
 }
 ```
 
-The sdk will preset the Config object of ckb main-net (Lina) and testnet (Aggron). If you are using a self-ran dev-chain, you should provide your own Config object in the  [init](#init) function.
+The sdk will preset the Config object of ckb main-net (Lina) and testnet (Aggron). If you are using a self-ran dev-chain, you should provide your own Config object in the [init](#init) function.
 
 ## ConfigItem
 
-Content item object of Config. For example, if we have a ConfigItem object named `pwLock`, which represents the information we needed to use pw-lock, then `pwLock.cell_dep` tells which cell should we refer in `cell_deps` field of the transaction, and  `pwLock.script` will give you the `code_hash` and `hash_type` of pw-lock, while you can replace the default '0x' value of `args` with your actual value.
+Content item object of Config. For example, if we have a ConfigItem object named `pwLock`, which represents the information we needed to use pw-lock, then `pwLock.cell_dep` tells which cell should we refer in `cell_deps` field of the transaction, and `pwLock.script` will give you the `code_hash` and `hash_type` of pw-lock, while you can replace the default '0x' value of `args` with your actual value.
 
 ```typescript
 interface ConfigItem {
@@ -575,8 +533,6 @@ interface FormatOptions {
 }
 ```
 
-
-
 ---
 
 # Enums
@@ -587,13 +543,11 @@ Defines the valid chainId values.
 
 ```typescript
 enum ChainID {
-	ckb = 'ckb',
+  ckb = 'ckb',
   ckb_testnet = 'ckb_testnet',
-  ckb_dev = 'ckb_dev'
-};
+  ckb_dev = 'ckb_dev',
+}
 ```
-
-
 
 ## DepType
 
@@ -604,8 +558,6 @@ enum DepType {
 }
 ```
 
-
-
 ## HashType
 
 ```typescript
@@ -614,8 +566,6 @@ enum HashType {
   type = 'type',
 }
 ```
-
-
 
 ## AddressType
 
@@ -628,8 +578,6 @@ enum AddressType {
 }
 ```
 
-
-
 ## AmountUnit
 
 ```typescript
@@ -639,8 +587,6 @@ enum AmountUnit {
 }
 ```
 
-
-
 ## ReceivePair
 
 ```typescript
@@ -649,8 +595,6 @@ interface ReceivePair {
   amount: Amount;
 }
 ```
-
-
 
 ## RawTransaction
 
@@ -665,8 +609,6 @@ interface RawTransaction {
 }
 ```
 
-
-
 ## Transaction
 
 ```typescript
@@ -675,8 +617,6 @@ interface Transaction {
   witness: string[];
 }
 ```
-
-
 
 ## CellInput
 
@@ -687,8 +627,6 @@ interface CellInput {
 }
 ```
 
-
-
 ## CellOutput
 
 ```typescript
@@ -698,8 +636,6 @@ interface CellOutput {
   type?: Script;
 }
 ```
-
-
 
 ## OutPoint
 
