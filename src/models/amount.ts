@@ -14,39 +14,39 @@ export interface FormatOptions {
 }
 
 export class Amount {
-  static ADD(a: Amount, b: Amount): Amount {
-    const res = JSBI.add(a.toBigInt(), b.toBigInt()).toString();
+  add(val: Amount): Amount {
+    const res = JSBI.add(this.toBigInt(), val.toBigInt()).toString();
     return new Amount(res, AmountUnit.shannon);
   }
 
-  static SUB(a: Amount, b: Amount): Amount {
-    const res = JSBI.subtract(a.toBigInt(), b.toBigInt()).toString();
+  sub(val: Amount): Amount {
+    const res = JSBI.subtract(this.toBigInt(), val.toBigInt()).toString();
     return new Amount(res, AmountUnit.shannon);
   }
 
-  static MUL(a: Amount, b: Amount): Amount {
-    const res = JSBI.multiply(a.toBigInt(), b.toBigInt()).toString();
+  mul(val: Amount): Amount {
+    const res = JSBI.multiply(this.toBigInt(), val.toBigInt()).toString();
     return new Amount(res, AmountUnit.shannon);
   }
 
-  static GT(a: Amount, b: Amount): boolean {
-    return JSBI.GT(a.toBigInt(), b.toBigInt());
+  gt(val: Amount): boolean {
+    return JSBI.GT(this.toBigInt(), val.toBigInt());
   }
 
-  static GTE(a: Amount, b: Amount): boolean {
-    return JSBI.greaterThanOrEqual(a.toBigInt(), b.toBigInt());
+  gte(val: Amount): boolean {
+    return JSBI.greaterThanOrEqual(this.toBigInt(), val.toBigInt());
   }
 
-  static LT(a: Amount, b: Amount): boolean {
-    return JSBI.LT(a.toBigInt(), b.toBigInt());
+  lt(val: Amount): boolean {
+    return JSBI.LT(this.toBigInt(), val.toBigInt());
   }
 
-  static LTE(a: Amount, b: Amount): boolean {
-    return JSBI.lessThanOrEqual(a.toBigInt(), b.toBigInt());
+  lte(val: Amount): boolean {
+    return JSBI.lessThanOrEqual(this.toBigInt(), val.toBigInt());
   }
 
-  static EQ(a: Amount, b: Amount): boolean {
-    return JSBI.EQ(a.toBigInt(), b.toBigInt());
+  eq(val: Amount): boolean {
+    return JSBI.EQ(this.toBigInt(), val.toBigInt());
   }
 
   private amount: string;

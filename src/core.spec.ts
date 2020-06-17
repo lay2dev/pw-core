@@ -6,6 +6,20 @@ import { DummyProvider } from './providers/dummy-provider';
 
 const test = anyTest as TestInterface<{ pw: PWCore; address: Address }>;
 
+test('chain specs auto select', async (t) => {
+  await new PWCore('https://lina.ckb.dev').init(
+    new DummyProvider(),
+    new PwCollector()
+  );
+  t.is(PWCore.chainId, ChainID.ckb);
+
+  await new PWCore('https://aggron.ckb.dev').init(
+    new DummyProvider(),
+    new PwCollector()
+  );
+  t.is(PWCore.chainId, ChainID.ckb_testnet);
+});
+
 test.before(async (t) => {
   const address = new Address(
     '0x26C5F390FF2033CbB44377361c63A3Dd2DE3121d',

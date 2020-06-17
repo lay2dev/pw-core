@@ -70,7 +70,7 @@ test('loadFromBlockchain and validate', async (t) => {
       transformers.TransformCellOutput(loadedCell.serializeJson())
     )
   );
-  t.true(Amount.EQ(loadedCell.capacity, new Amount('76', AmountUnit.ckb)));
+  t.true(loadedCell.capacity.eq(new Amount('76', AmountUnit.ckb)));
   t.true(
     loadedCell.lock.sameWith(
       new Script(

@@ -38,7 +38,11 @@ export default class PWCore {
       PWCore.chainId = chainId;
     } else {
       const info = await this.rpc.get_blockchain_info();
-      PWCore.chainId = info.chain;
+      PWCore.chainId = {
+        ckb: ChainID.ckb,
+        ckb_testnet: ChainID.ckb_testnet,
+        ckb_dev: ChainID.ckb_dev,
+      }[info.chain];
     }
 
     if (PWCore.chainId === ChainID.ckb_dev) {

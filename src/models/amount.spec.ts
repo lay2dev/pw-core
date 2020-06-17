@@ -67,13 +67,13 @@ test('formatting test set', (t) => {
 });
 
 test('calculation test set', (t) => {
-  t.is(Amount.ADD(shannon1, shannon1).toString(AmountUnit.shannon), '2');
+  t.is(shannon1.add(shannon1).toString(AmountUnit.shannon), '2');
   t.is(
-    Amount.ADD(shannon1T, shannon1).toString(AmountUnit.shannon),
+    shannon1T.add(shannon1).toString(AmountUnit.shannon),
     T.slice(0, -1) + '1'
   );
-  t.is(Amount.ADD(ckb1, shannon1).toString(AmountUnit.shannon), M + '01');
-  t.is(Amount.ADD(ckb10000, ckb1).toString(AmountUnit.ckb), '10001');
+  t.is(ckb1.add(shannon1).toString(AmountUnit.shannon), M + '01');
+  t.is(ckb10000.add(ckb1).toString(AmountUnit.ckb), '10001');
 
   // TODO more to go
 });

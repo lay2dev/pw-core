@@ -22,7 +22,7 @@ export class SimpleBuilder extends Builder {
 
   async build(): Promise<Transaction> {
     const outputCell = new Cell(this.amount, this.address.toLockScript());
-    const neededAmount = Amount.ADD(this.amount, Builder.MIN_CHANGE);
+    const neededAmount = this.amount.add(Builder.MIN_CHANGE);
     let inputSum = new Amount('0');
     const inputCells: Cell[] = [];
 
@@ -33,11 +33,11 @@ export class SimpleBuilder extends Builder {
     );
     for (const cell of cells) {
       inputCells.push(cell);
-      inputSum = Amount.ADD(inputSum, cell.capacity);
-      if (Amount.GT(inputSum, neededAmount)) break;
+      inputSum = inputSum.add(cell.capacity);
+      if (inputSum.gt(neededAmount)) break;
     }
 
-    if (Amount.LT(inputSum, this.amount)) {
+    if (inputSum.lt(this.amount)) {
       throw new Error(
         `input capacity not enough, need ${outputCell.capacity.toString(
           AmountUnit.ckb
@@ -46,7 +46,7 @@ export class SimpleBuilder extends Builder {
     }
 
     const changeCell = new Cell(
-      Amount.SUB(inputSum, outputCell.capacity),
+      inputSum.sub(outputCell.capacity),
       PWCore.provider.address.toLockScript()
     );
 
@@ -56,21 +56,18 @@ export class SimpleBuilder extends Builder {
 
     this.fee = Builder.calcFee(tx);
 
-    if (
-      Amount.GT(Amount.ADD(this.fee, Builder.MIN_CHANGE), changeCell.capacity)
-    ) {
+    if (this.fee.add(Builder.MIN_CHANGE).gt(changeCell.capacity)) {
       // TODO: collect more cells and recalculate fee, until input capacity is
       // enough or no more available unspent cells.
       throw new Error(
-        `input capacity not enough, need ${Amount.ADD(
-          outputCell.capacity,
-          this.fee
-        ).toString(AmountUnit.ckb)}, got ${inputSum.toString(AmountUnit.ckb)}`
+        `input capacity not enough, need ${outputCell.capacity
+          .add(this.fee)
+          .toString(AmountUnit.ckb)}, got ${inputSum.toString(AmountUnit.ckb)}`
       );
     }
 
     // sub fee from changeCell
-    changeCell.capacity = Amount.SUB(changeCell.capacity, this.fee);
+    changeCell.capacity = changeCell.capacity.sub(this.fee);
     tx.raw.outputs.pop();
     tx.raw.outputs.push(changeCell);
 
