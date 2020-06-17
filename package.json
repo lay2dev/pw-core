@@ -1,6 +1,6 @@
 {
   "name": "@lay2/pw-core",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "the javascript sdk of pw-sdk",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
