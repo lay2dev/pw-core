@@ -64,7 +64,10 @@ export class Address {
       codeHash,
       type:
         hashType === HashType.data ? AType.DataCodeHash : AType.TypeCodeHash,
-      prefix: APrefix[getDefaultPrefix()],
+      prefix:
+        getDefaultPrefix() === AddressPrefix.ckb
+          ? APrefix.Mainnet
+          : APrefix.Testnet,
     });
   }
 

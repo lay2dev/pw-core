@@ -30,9 +30,13 @@ export class Cell implements CKBModel {
     const { capacity, lock, type } = outputs[index];
     return new Cell(
       new Amount(capacity, AmountUnit.shannon),
-      new Script(lock.code_hash, lock.args, HashType[lock.hash_type]),
+      new Script(lock.code_hash, lock.args, HashType[lock.hash_type as string]),
       type
-        ? new Script(type.code_hash, type.args, HashType[type.hash_type])
+        ? new Script(
+            type.code_hash,
+            type.args,
+            HashType[type.hash_type as string]
+          )
         : null,
       outPoint,
       outputs_data[index]

@@ -34,7 +34,7 @@ export abstract class Signer {
     ).serializeJson();
     FillSignedWitnesses(tx, messages, witnesses);
 
-    console.log('[signer] sigend tx: ', tx);
+    console.log('[signer] signed tx: ', tx);
     return tx;
   }
 
