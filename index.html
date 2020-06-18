@@ -1,0 +1,570 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@lay2/pw-core</title>
+	<meta name="description" content="Documentation for @lay2/pw-core">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@lay2/pw-core</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1>@lay2/pw-core</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#pw-core-a-friendly-and-powerful-sdk-for-ckb-dapps" id="pw-core-a-friendly-and-powerful-sdk-for-ckb-dapps" style="color: inherit; text-decoration: none;">
+					<h1>pw-core: A Friendly and Powerful SDK for CKB dApps</h1>
+				</a>
+				<blockquote>
+					<p>pw-core is the front-end sdk of <a href="https://talk.nervos.org/t/lay2-pw-sdk-build-dapps-on-ckb-and-run-them-everywhere/4289">pw-sdk</a></p>
+				</blockquote>
+				<a href="#quick-start" id="quick-start" style="color: inherit; text-decoration: none;">
+					<h2>Quick Start</h2>
+				</a>
+				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+					<h3>Installation</h3>
+				</a>
+				<p>You can install pw-core to your project with <strong>npm</strong></p>
+				<pre><code class="language-bash"><span class="hljs-comment"># in your project root</span>
+$ npm install @lay2/pw-core --save</code></pre>
+				<p>Or with <strong>yarn</strong></p>
+				<pre><code class="language-bash"><span class="hljs-comment"># in your project root</span>
+$ yarn add @lay2/pw-core</code></pre>
+				<a href="#hello-world" id="hello-world" style="color: inherit; text-decoration: none;">
+					<h3>Hello World</h3>
+				</a>
+				<p>Let&#39;s see how to send CKB with pw-core.</p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> PWCore, {
+  EthProvider,
+  PwCollector,
+  ChainID,
+  Address,
+  Amount,
+  AddressType,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@lay2/pw-core&#x27;</span>;
+
+<span class="hljs-comment">// insdie an async scope</span>
+
+<span class="hljs-keyword">const</span> pwcore = <span class="hljs-keyword">await</span> <span class="hljs-keyword">new</span> PWCore(<span class="hljs-string">&#x27;https://ckb-node-url&#x27;</span>).init(
+  <span class="hljs-keyword">new</span> EthProvider(), <span class="hljs-comment">// a built-in Provider for Ethereum env.</span>
+  <span class="hljs-keyword">new</span> PwCollector() <span class="hljs-comment">// a custom Collector to retrive cells from cache server.</span>
+);
+
+<span class="hljs-keyword">const</span> txHash = <span class="hljs-keyword">await</span> pwcore.send(
+  <span class="hljs-keyword">new</span> Address(<span class="hljs-string">&#x27;0x26C5F390FF2033CbB44377361c63A3Dd2DE3121d&#x27;</span>, AddressType.eth),
+  <span class="hljs-keyword">new</span> Amount(<span class="hljs-string">&#x27;100&#x27;</span>)
+);</code></pre>
+				<p>That&#39;s it! If CKB transaction (with Ethereum wallets, e.g. MetaMask) is the only thing you need, you can already start your integration with pw-core.</p>
+				<a href="#one-step-further" id="one-step-further" style="color: inherit; text-decoration: none;">
+					<h3>One Step Further</h3>
+				</a>
+				<p>However, if you need more features, such as adding multiple outputs, setting data, or adding custom lock/type scripts, you can always implement you own builder extends the <code>Builder</code> class. If you have more requirements with retriving unspent cells, a custom cell collector based on <code>Collector</code> is a good choice. The same approach applies to <code>Signer</code> / <code>Hasher</code> / <code>Provider</code>. In fact, you will find that almost every aspect of buiding a transaction can be customized to meet your demands. This is because we have well encapsulated the transaction process as <strong>build -&gt; sign -&gt; send</strong>, and any kind of transaction can be created and sent given a builder and a signer. For example, the basic <code>send</code> method used in the Hello World example is implented like this:</p>
+				<pre><code class="language-typescript"><span class="hljs-comment">// code from: https://github.com/lay2dev/pw-core/blob/master/src/core.ts#L80</span>
+
+<span class="hljs-keyword">import</span> { transformers } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;ckb-js-toolkit&#x27;</span>
+<span class="hljs-keyword">import</span> { Address, Amount } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./models&#x27;</span>
+<span class="hljs-keyword">import</span> { SimpleBuilder } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./builders&#x27;</span>
+<span class="hljs-keyword">import</span> { EthSigner } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./signers&#x27;</span>
+
+<span class="hljs-keyword">async</span> send(address: Address, amount: Amount, feeRate?: <span class="hljs-built_in">number</span>): <span class="hljs-built_in">Promise</span>&lt;<span class="hljs-built_in">string</span>&gt; {
+  <span class="hljs-keyword">const</span> simpleBuilder = <span class="hljs-keyword">new</span> SimpleBuilder(address, amount, feeRate);
+  <span class="hljs-keyword">const</span> = <span class="hljs-keyword">new</span> EthSigner(address.addressString);
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">this</span>.sendTransaction(simpleBuilder, ethSigner);
+}
+
+<span class="hljs-keyword">async</span> sendTransaction(builder: Builder, signer: Signer): <span class="hljs-built_in">Promise</span>&lt;<span class="hljs-built_in">string</span>&gt; {
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">this</span>.rpc.send_transaction(
+    transformers.TransformTransaction(
+      <span class="hljs-keyword">await</span> signer.sign((<span class="hljs-keyword">await</span> builder.build()).validate())
+    )
+  );
+}</code></pre>
+				<p>Finally, here is an <a href="https://github.com/lay2dev/simplestdapp">example project</a> which shows how to implement custom classes to achieve certain features. The <code>SDCollector</code> can collect unspent cells with a <a href="https://github.com/quake/ckb-indexer">ckb-indexer</a>, while the <code>SDBuilder</code> can build transactions for creating / updating / deleting cells. More over, the built-in <code>EthProvider</code> and <code>EthSigner</code> (along with <code>Keccak256Hasher</code>) are used to make this dApp runnable in Ethereum enviromment (such as MetaMask).</p>
+				<a href="#highlights" id="highlights" style="color: inherit; text-decoration: none;">
+					<h2>Highlights</h2>
+				</a>
+				<ul>
+					<li>
+						<a href="#concise-api" id="concise-api" style="color: inherit; text-decoration: none;">
+							<h3>Concise API</h3>
+						</a>
+						<p>We only provide two types of interfaces, one is the most commonly used and the other is fully customizable. For example, you can use <code>pwcore.send</code> to just send some CKB, and use <code>pwcore.sendTransaction</code> to send any type of transactions. More over, you can even use <code>pwcore.rpc</code> to get direct access to ckb rpc calls, which enables abilities far beyond sending transactions.</p>
+					</li>
+					<li>
+						<a href="#thoughtful-models" id="thoughtful-models" style="color: inherit; text-decoration: none;">
+							<h3>Thoughtful Models</h3>
+						</a>
+						<p>Talk is cheap, let&#39;s show some code.</p>
+						<pre><code class="language-typescript"><span class="hljs-comment">/* Address */</span>
+<span class="hljs-keyword">const</span> addressCkb = <span class="hljs-keyword">new</span> Address(<span class="hljs-string">&#x27;ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs&#x27;</span>, AddressType.ckb);
+
+<span class="hljs-keyword">const</span> addressEth = <span class="hljs-keyword">new</span> Address(<span class="hljs-string">&#x27;0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc&#x27;</span>, AddressType.eth);
+
+<span class="hljs-keyword">const</span> addressCkbFull = <span class="hljs-keyword">new</span> Address(<span class="hljs-string">&#x27;ckt1qjmk32srs9nx345sgj0xrcq6slzx5ta3vt8azm4py95aalx7qq2agvh5ct04panc49rqn6v03mnllv2tv7vmc2z5pkp&#x27;</span>, AddressType.ckb);
+
+<span class="hljs-built_in">console</span>.log(addressEth.toCKBAddress());
+<span class="hljs-comment">//&#x27;ckt1qjmk32srs9nx345sgj0xrcq6slzx5ta3vt8azm4py95aalx7qq2agvh5ct04panc49rqn6v03mnllv2tv7vmc2z5pkp&#x27;</span>
+
+</code></pre>
+					</li>
+				</ul>
+				<p>  /* Script */
+					const lockScript = addressCkb.toLockScript().toHash();
+					const lockScriptHash = lockScript.toHash();
+					const address1 = Address.fromLockScript(lockScript);
+				const address2 = lockScript.toAddress();</p>
+				<p>  console.log(addressEth.toLockScript().sameWith(addressCkbFull.toLockScript()));
+				//true</p>
+				<p>  /* Amount */
+					const ckb100 = new Amount(&#39;100&#39;);
+					const ckb1M = new Amount(&#39;1000000&#39;);
+					const shannon1k = new Amount(&#39;1000&#39;, AmountUnit.shannon);
+				const shannon10B = new Amount(&#39;10000000000&#39;, AmountUnit.shannon);</p>
+				<p>  console.log(ckb100.eq(shannon10B)); //true
+				console.log(ckb100.lt(shannon1k)); //false</p>
+				<p>  const result = ckb1M.add(ckb100).sub(shannon1k);
+				console.log(result.eq(new Amount(&#39;1000099.99999&#39;))); //true</p>
+				<p>  console.log(ckb100.toString(AmountUnit.shannon)); //&#39;10000000000&#39;
+				console.log(ckb100.toHexString()); //&#39;0x2540be400&#39;</p>
+				<p>  console.log(result.toString(AmountUnit.ckb, {
+					section: &#39;full&#39;, pad: true, commify: true
+				})); //&#39;1,000,099.99999000&#39;</p>
+				<p>  console.log(result.toString(Amount), { section: &#39;whole&#39; })); //&#39;1000099&#39;
+					console.log(result.toString(Amount), { section: &#39;whole&#39;, commify: true })); //&#39;1,000,099&#39;
+					console.log(result.toString(Amount), { section: &#39;fraction&#39; })); //&#39;99999&#39;
+				console.log(result.toString(Amount), { section: &#39;fraction&#39;, pad: true })); //&#39;99999000&#39;</p>
+				<p>  /* Cell */
+				const cell = new Cell(new Amount(&#39;100&#39;), PWCore.provider.address.toLockScript());</p>
+				<p>  cell.setData(&#39;Hello from Lay2&#39;);
+					console.log(cell.getHexData()); //&#39;0x48656c6c6f2066726f6d204c617932&#39;
+					cell.setHexData(&#39;0x48656c6c6f204261636b&#39;);
+				console.log(cell.getData()); //&#39;Hello Back&#39;</p>
+				<p>  cell.setData(&#39;a looooooooooooooooooooooong data&#39;);
+				cell.resize(); // cell.capacity will be adjusted to the actual space usage.</p>
+				<pre><code>
+- ### Simple <span class="hljs-keyword">and</span> Clear Structure
+
+  CKB dApp development <span class="hljs-keyword">is</span> mostly about manipulating cells. However, when we actually <span class="hljs-keyword">try</span> <span class="hljs-keyword">to</span> design a dApp, it turns <span class="hljs-keyword">out</span> that we are always dealing <span class="hljs-keyword">with</span> transactions. <span class="hljs-keyword">If</span> you ever tried <span class="hljs-keyword">to</span> build a CKB transaction, you<span class="hljs-string">&#x27;ll definitely be impressed (or most likely, confused) by the bunch of fields. Questions may be asked like:
+
+  &gt; There are data structures like &#x27;</span>CellInput<span class="hljs-string">&#x27; and &#x27;</span>CellOutput<span class="hljs-string">&#x27;, but where is &#x27;</span>Cell<span class="hljs-string">&#x27; ?
+  &gt;
+  &gt; How to calculate the transaction fee? How to adjust the change output?
+  &gt;
+  &gt; What kind of unit ( CKB or Shannon) and format (mostly hex string) to use?
+
+  Things are different with pw-core. Let&#x27;</span>s see the actual <span class="hljs-function"><span class="hljs-keyword">constructor</span> <span class="hljs-title">of</span> `<span class="hljs-title">RawTransaction</span>`
+
+  ```<span class="hljs-title">typescript</span>
+  // <span class="hljs-title">code</span> <span class="hljs-title">from</span>:</span> https:<span class="hljs-comment">//github.com/lay2dev/pw-core/blob/master/src/models/raw-transaction.ts#L7</span>
+
+  export <span class="hljs-keyword">class</span> RawTransaction <span class="hljs-keyword">implements</span> CKBModel <span class="hljs-comment">{
+    constructor(
+      public inputCells: Cell[],
+      public outputs: Cell[],
+      public cellDeps: CellDep[] = [
+        PWCore.config.defaultLock.cellDep,
+        PWCore.config.pwLock.cellDep,
+      ],
+      public headerDeps: string[] = [],
+      public readonly version: string = &#x27;0x0&#x27;
+    ) {
+      this.inputs = inputCells.map((i) =&gt; i.toCellInput());
+      this.outputsData = this.outputs.map((o) =&gt; o.getHexData());
+    }</span>
+
+    <span class="hljs-comment">// ...</span>
+  }</code></pre><p>  It&#39;s easy to findout that both inputs and outputs are Array of cells, and the low-level details and transformations are done silently. And yes, we have the &#39;Cell&#39; structure.</p>
+				<ul>
+					<li>
+						<a href="#work-with-or-without-pw-lock" id="work-with-or-without-pw-lock" style="color: inherit; text-decoration: none;">
+							<h3>Work With or Without pw-lock</h3>
+						</a>
+						<p>Although pw-core works closely with pw-lock (both projects are components of pw-sdk), you can still use the default blake2b lock or your own lock, as long as the corresponding builder, signer and hasher are implemented. In fact, the <code>Blake2bHasher</code> is already built-in, and a <code>CkbSigner</code> is very likely to be added in the near future. With the progress of pw-sdk, more algorithm be added to the built-in collections, such as <code>Sha256Hasher</code> and <code>P256Signer</code>.</p>
+					</li>
+				</ul>
+				<a href="#api-document" id="api-document" style="color: inherit; text-decoration: none;">
+					<h2>API Document</h2>
+				</a>
+				<p>You can find a detailed <a href="https://docs.lay2.dev/pw-core">API Document Here</a>.</p>
+				<a href="#get-involved" id="get-involved" style="color: inherit; text-decoration: none;">
+					<h2>Get Involved</h2>
+				</a>
+				<p>Currently pw-core is still at a very early stage, and all kinds of suggestions and bug reports are very much welcomed. Feel free to open an issue, or join our <a href="https://discord.gg/ZuFQGCx">Discord</a> server to talk directly to us. And of couse, a <strong>star</strong> is very much appreciated :).</p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-enum">
+						<a href="enums/addressprefix.html" class="tsd-kind-icon">Address<wbr>Prefix</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/addresstype.html" class="tsd-kind-icon">Address<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/amountunit.html" class="tsd-kind-icon">Amount<wbr>Unit</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/chainid.html" class="tsd-kind-icon">ChainID</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/deptype.html" class="tsd-kind-icon">Dep<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/hashtype.html" class="tsd-kind-icon">Hash<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/locktype.html" class="tsd-kind-icon">Lock<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/platform.html" class="tsd-kind-icon">Platform</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/address.html" class="tsd-kind-icon">Address</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/amount.html" class="tsd-kind-icon">Amount</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/blake2bhasher.html" class="tsd-kind-icon">Blake2b<wbr>Hasher</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/builder.html" class="tsd-kind-icon">Builder</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/cell.html" class="tsd-kind-icon">Cell</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/celldep.html" class="tsd-kind-icon">Cell<wbr>Dep</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/cellinput.html" class="tsd-kind-icon">Cell<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/collector.html" class="tsd-kind-icon">Collector</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/dummycollector.html" class="tsd-kind-icon">Dummy<wbr>Collector</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/dummyprovider.html" class="tsd-kind-icon">Dummy<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/ethprovider.html" class="tsd-kind-icon">Eth<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/ethsigner.html" class="tsd-kind-icon">Eth<wbr>Signer</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/hasher.html" class="tsd-kind-icon">Hasher</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/keccak256hasher.html" class="tsd-kind-icon">Keccak256<wbr>Hasher</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/outpoint.html" class="tsd-kind-icon">Out<wbr>Point</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/pwcore.html" class="tsd-kind-icon">PWCore</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/provider.html" class="tsd-kind-icon">Provider</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/pwcollector.html" class="tsd-kind-icon">Pw<wbr>Collector</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/rawtransaction.html" class="tsd-kind-icon">Raw<wbr>Transaction</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/script.html" class="tsd-kind-icon">Script</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/signer.html" class="tsd-kind-icon">Signer</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/simplebuilder.html" class="tsd-kind-icon">Simple<wbr>Builder</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/transaction.html" class="tsd-kind-icon">Transaction</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ckbmodel.html" class="tsd-kind-icon">CKBModel</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/collectoroptions.html" class="tsd-kind-icon">Collector<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/config.html" class="tsd-kind-icon">Config</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/configitem.html" class="tsd-kind-icon">Config<wbr>Item</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/formatoptions.html" class="tsd-kind-icon">Format<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/hashmethod.html" class="tsd-kind-icon">Hash<wbr>Method</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/message.html" class="tsd-kind-icon">Message</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/witnessargs.html" class="tsd-kind-icon">Witness<wbr>Args</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#b" class="tsd-kind-icon">B</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#base" class="tsd-kind-icon">BASE</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#bigint" class="tsd-kind-icon">Big<wbr>Int</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#dao_withdraw_2_witness_len" class="tsd-kind-icon">DAO_<wbr>WITHDRAW_<wbr>2_WITNESS_<wbr>LEN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#ecdsa_witness_len" class="tsd-kind-icon">ECDSA_<wbr>WITNESS_<wbr>LEN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#f" class="tsd-kind-icon">F</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#fee_base" class="tsd-kind-icon">FEE_<wbr>BASE</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#k" class="tsd-kind-icon">K</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#lumosconfigs" class="tsd-kind-icon">Lumos<wbr>Configs</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#m" class="tsd-kind-icon">M</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#t" class="tsd-kind-icon">T</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#zero" class="tsd-kind-icon">ZERO</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#address" class="tsd-kind-icon">address</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#base" class="tsd-kind-icon">base</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#baselen" class="tsd-kind-icon">base<wbr>Len</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#ckb" class="tsd-kind-icon">ckb</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#ckb1" class="tsd-kind-icon">ckb1</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#ckb10000" class="tsd-kind-icon">ckb10000</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#ckbaddress" class="tsd-kind-icon">ckb<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#ckbfull" class="tsd-kind-icon">ckb<wbr>Full</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#ckbfulladdress" class="tsd-kind-icon">ckb<wbr>Full<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#data" class="tsd-kind-icon">data</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#eth" class="tsd-kind-icon">eth</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#ethaddress" class="tsd-kind-icon">eth<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#hexdata" class="tsd-kind-icon">hex<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#lockscript" class="tsd-kind-icon">lock<wbr>Script</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#outpoint1" class="tsd-kind-icon">out<wbr>Point1</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#outpoint2" class="tsd-kind-icon">out<wbr>Point2</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#outpoint3" class="tsd-kind-icon">out<wbr>Point3</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#outpoint4" class="tsd-kind-icon">out<wbr>Point4</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#shannon1" class="tsd-kind-icon">shannon1</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#shannon1b" class="tsd-kind-icon">shannon1B</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#shannon1m" class="tsd-kind-icon">shannon1M</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#shannon1t" class="tsd-kind-icon">shannon1T</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#shannonfull" class="tsd-kind-icon">shannon<wbr>Full</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#test" class="tsd-kind-icon">test</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#fillsignedwitnesses" class="tsd-kind-icon">Fill<wbr>Signed<wbr>Witnesses</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#bytearraytohex" class="tsd-kind-icon">byte<wbr>Array<wbr>ToHex</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#ckbtoshannon" class="tsd-kind-icon">ckb<wbr>ToShannon</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#generateaddress" class="tsd-kind-icon">generate<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getdefaultprefix" class="tsd-kind-icon">get<wbr>Default<wbr>Prefix</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#hextobytearray" class="tsd-kind-icon">hex<wbr>ToByte<wbr>Array</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#minimalcellcapacity" class="tsd-kind-icon">minimal<wbr>Cell<wbr>Capacity</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parseaddress" class="tsd-kind-icon">parse<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializebigint" class="tsd-kind-icon">serialize<wbr>Big<wbr>Int</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#shannontockb" class="tsd-kind-icon">shannon<wbr>ToCKB</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#aggron4" class="tsd-kind-icon">AGGRON4</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#chain_specs" class="tsd-kind-icon">CHAIN_<wbr>SPECS</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#dummy_addresses" class="tsd-kind-icon">DUMMY_<wbr>ADDRESSES</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#lina" class="tsd-kind-icon">LINA</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
