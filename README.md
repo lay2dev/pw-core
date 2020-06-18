@@ -188,7 +188,7 @@ Finally, here is an [example project](https://github.com/lay2dev/simplestdapp) w
 
 ## API Document
 
-You can find a detailed [API Document Here](https://docs.lay2.dev/pw-core).
+You can find a detailed [API Document Here](https://docs.lay2.dev).
 
 ## Get Involved
 
