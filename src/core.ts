@@ -13,6 +13,9 @@ export enum ChainID {
   ckb_dev,
 }
 
+/**
+ * The default main class of pw-core
+ */
 export default class PWCore {
   static config: Config;
   static chainId: ChainID;
@@ -25,6 +28,9 @@ export default class PWCore {
     this._rpc = new RPC(nodeUrl);
   }
 
+  /**
+   * Initialize the environment required by pw-core
+   */
   async init(
     provider: Provider,
     defaultCollector: Collector,
@@ -73,10 +79,19 @@ export default class PWCore {
     return this;
   }
 
+  /**
+   * Return a RPC instance defined in package 'ckb-js-toolkit'
+   */
   get rpc(): RPC {
     return this._rpc;
   }
 
+  /**
+   * Transfer CKB to any address
+   * @param address The receiver's address
+   * @param amount The amount of CKB to send
+   * @param feeRate The feeRate (Shannon/KB) for this transaction.
+   */
   async send(
     address: Address,
     amount: Amount,
@@ -87,6 +102,11 @@ export default class PWCore {
     return this.sendTransaction(simpleBuilder, ethSigner);
   }
 
+  /**
+   * Build and send an custom transaction
+   * @param builder
+   * @param signer
+   */
   async sendTransaction(builder: Builder, signer: Signer): Promise<string> {
     return this.rpc.send_transaction(
       transformers.TransformTransaction(

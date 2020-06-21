@@ -1,647 +1,195 @@
-# pw-core
+# pw-core: A Friendly and Powerful SDK for CKB dApps
 
-The front-end SDK of pw-sdk
+> pw-core is the front-end sdk of [pw-sdk](https://talk.nervos.org/t/lay2-pw-sdk-build-dapps-on-ckb-and-run-them-everywhere/4289)
 
-> There will be a big update on this document soon.
+## Quick Start
 
----
+### Installation
 
-# Classes
+You can install pw-core to your project with **npm**
 
-## PWCore
-
-### constructor
-
-Create a PWCore instance.
-
-> @params
-
-- **nodeUrl**: string, the CKB node url.
-
-> @return
-
-- A `PWCore` instance.
-
-```typescript
-const pwcore = new PWCore('https://lina.ckb.dev');
+```bash
+# in your project root
+$ npm install @lay2/pw-core --save
 ```
 
-### init
+Or with **yarn**
 
-Initialize the needed ckb environment for pw-core.
-
-> @params
-
-- **_chainId_**: [ChainID](#chainid), optional, id of the ckb network. If not provided, the chainId will be decided by a rpc call to the node provided in the constructor.
-- **_config_**: [Config](#config), optional if `chainId` is `ChainID.ckb` or `ChainID.ckb_testnet`, otherwise this field is required, and an exception will be thrown if not provided.
-
-> @return
-
-- A `Promise<void>` object.
-
-### rpc
-
-Get a RPC handler to communate with the ckb blockchain. Check the full list of [avaliable RPC methods](https://github.com/nervosnetwork/ckb/tree/develop/rpc).
-
-> @return
-
-A readonly [RPC](https://github.com/xxuejie/ckb-js-toolkit#rpc) (from package '[ckb-js-toolkit](https://www.npmjs.com/package/ckb-js-toolkit)') instance.
-
-```typescript
-const info = await rpc.get_blockchain_info();
-// info:
-// {
-//   alerts: [],
-//   chain: 'ckb',
-//   difficulty: '0x5bb23548f6795',
-//   epoch: '0x708047900028b',
-//   is_initial_block_download: true,
-//   median_time: '0x170aee25ea5'
-// }
+```bash
+# in your project root
+$ yarn add @lay2/pw-core
 ```
 
-### send
-
-Send ckb to some address.
-
-> @params
-
-- **address**: Address, the reciever's address.
-- **amount**: Amount, the amount (capacity) of ckb to be sent.
-- **_feeRate_**: string, optional, a string of decimal feeRate value in unit **Shannons / KB**. The minium value is '1000'.
-
-> @return
-
-- A `Promise<string>` object. If succeed the transaction hash will be resolved.
-
-### sendTransaction
-
-Send a fully customizable ckb transaction.
-
-> @params
-
-- **builder**: [Builder](#builder), the builder used to build the raw transaction.
-- **signer**: [Signer](#signer), the signer used to sign the raw transaction.
-
-> @return
-
-- A `Promise<string>` object. If succeed the transaction hash will be resolved.
-
-### getBalance
-
-Get balance of any address.
-
-> @params
-
-- **address**: [Address](#address), the address to be checked.
-- **_collector_**: [Collector](#collector), optional, the cell collector to be used. If not provided, the RPC collector will be applied.
-
-> @return
-
-- An [Amount](#amount) object, the balance of the above address.
-
-## Builder
-
-An abstract class to build raw transaction.
-
-### constructor
-
-> @params
-
-- **outputs**: [ReceivePair](#receivepair)[], an array contains the output information.
-- **feeRate**: string, a string of decimal feeRate value in unit **Shannons / KB**. The minium value is '1000'.
-- **collector**: [Collector](#collector), the cell collector used to get unspent cells for inputs.
-
-### build
-
-An abstract method which actually builds the raw transaction.
-
-> @return
-
-- A `Promise<RawTransaction>` object. If succeed, the built [RawTransaction](#rawtransaction) instance will be resolved.
-
-Below is a sample builder implementation to help you start easier.
-
-```typescript
- class SimpleBuilder extends Builder {
-  constructor(
-    address: Address,
-    amount: Amount,
-    collector: CellCollector,
-    feeRate?: string
-  ) {
-    super([{ address, amount }], feeRate, collector);
-  }
-
-  async build(): Promise<RawTransaction> {
-    const rawTx: RawTransaction = {
-      version: '0x0',
-      cell_deps: [PWCore.config.pwLock.cell_dep],
-      header_deps: [],
-      inputs: [],
-      outputs: [],
-      outputs_data: ['0x'],
-    };
-
-    const output: CellOutput = {
-      capacity: this.outputs[0].amount.toHexString(),
-      lock: this.outputs[0].address.toLockScript(),
-    };
-    rawTx.outputs.push(output);
-
-    const neededAmount = Amount.ADD(this.outputs[0].amount, MIN_CHANGE);
-
-    let inputSum = new Amount('0');
-    for await (const cell of this.collector.collect()) {
-      rawTx.inputs.push(cell.out_point as CellInput);
-      inputSum = Amount.ADD(
-        inputSum,
-        new Amount((cell.cell_output as CellOutput).capacity)
-      );
-      if (Amount.GTE(inputSum, neededAmount)) break;
-    }
-
-    if (Amount.LT(inputSum, this.outputs[0].amount)) {
-      throw new Error(
-        `input capacity not enough, need ${this.outputs[0].amount.toString(
-          AmountUnit.ckb
-        )}, got ${inputSum.toString(AmountUnit.ckb)}`
-      );
-    }
-
-    const fee = Builder.calcFee(
-      { raw: rawTx, witness: dummyWitness },
-      this.feeRate
-    ).toHexString();
-
-    return rawTx;
-  }
-```
-
-## Signer
-
-An abstract class to sign a raw transaction and return the sendable transaction.
-
-### constructor
-
-> @params
-
-- **fromAddress**: [Address](#address), the sender's address.
-
-### toBytes
-
-A method helps you to transform raw transaction to signable byte array. You can use it in your sign function.
-
-> @return
-
-- An `Uint8Array` which contains the serialized and transformed raw transaction data.
-
-### sign
-
-A abstract method to sign the raw transaction.
-
-> @params
-
-- **rawTx**: [RawTransaction](#rawtransaction), the raw transaction built by a builder.
-
-> @return
-
-- A `Promise <Transaction>` object. If succeed, the signed Transaction instance will be resolved.
-
-## Collector
-
-An abstract class to retrieval unspent cells for inputs.
-
-### constructor
-
-> @params
-
-- **amount**: [Amount](#amount), the total capacity of unspent cells needed.
-
-### collect
-
-An abstract method which collects the needed unspent cells.
-
-> @return
-
-- A `Promise<Cell[] | undefined>` object. If the requirements are all met, the collected [Cell](#cell) instances will be resolved.
-
-## Cell
-
-### constructor
-
-> @params
-
-- **capacity**: [Amount](#amount), capacity of the cell.
-- **_lock_**: [Script](#script), optional, lock script of the cell. If not provided, pw-lock will be applied.
-- **_type_**: [Script](#script), optional, type script of the cell.
-- **_outPoint_**: [OutPoint](#outpoint), optional, info to locate the cell.
-- **_data_**: string, optional, data of the cell.
-
-### loadFromBlockchain [static]
-
-Load a cell by out point with rpc call.
-
-> @params
-
-- **outPoint**: [OutPoint](#outpoint), info to locate the cell.
-
-> @return
-
-- A `Promise<Cell | undefined>` object. If the out point exists on the blockchain, a [Cell](#cell) instance filled with on-chain data will be resolved.
-
-### setData
-
-Set the content of cell's `data` field. You can pass the raw string content and leave the hex tranformation to be done by this method.
-
-> @params
-
-- data: string, the content of the data, will be transformed into hex format automatically.
-
-> @return
-
-- The actual content set in the `data` field.
-
-## Address
-
-### constructor
-
-> @params
-
-- **address**: string, the address string.
-- **type**: [AddressType](#addresstype), the format of the address above, such as ckb, eth, etc.
-
-> @return
-
-- An `Address` instance.
-
-### fromLockScript [static]
-
-Create an Address instance from a lock script.
-
-> @params
-
-- **lockScript**: [Script](#script), the lock script used to create a ckb address.
-
-> @return
-
-- An `Address` instance.
-
-### toCKBAddress
-
-Get a ckb format address.
-
-> @return
-
-- A ckb address string. If `type` of the instance is `AddressType.ckb`, the original string will be returned; Otherwise a [full-payload address](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0021-ckb-address-format/0021-ckb-address-format.md#full-payload-format) string will be returned.
-
-```typescript
-const address1 = new Address(
-  '0x90C132C127916B458d096D429477e108B4180D1D',
-  AddressType.eth
+### Hello World
+
+Let's see how to send CKB with pw-core.
+
+```javascript
+import PWCore, {
+  EthProvider,
+  PwCollector,
+  ChainID,
+  Address,
+  Amount,
+  AddressType,
+} from '@lay2/pw-core';
+
+// insdie an async scope
+
+const pwcore = await new PWCore('https://ckb-node-url').init(
+  new EthProvider(), // a built-in Provider for Ethereum env.
+  new PwCollector() // a custom Collector to retrive cells from cache server.
 );
 
-const ckbAddress1 = address1.toCKBAddress();
-
-// ckbAddress1 (testnet): ckt1qsp6sv9mzzjlx3r9g0yxjthn83qe7pxwx8ppfcta3jg9ejrt8fwanyxpxtqj0yttgkxsjm2zj3m7zz95rqx36m858ne
-
-const address2 = new Address(
-  'ckb1qyqv5sdzfnfcy4rstumjvqgsfcrecem70ers7a0frk',
-  AddressType.ckb
+const txHash = await pwcore.send(
+  new Address('0x26C5F390FF2033CbB44377361c63A3Dd2DE3121d', AddressType.eth),
+  new Amount('100')
 );
-
-const ckbAddress2 = address2.toCKBAddress();
-
-// ckbAddress2 (main-net): ckb1qyqv5sdzfnfcy4rstumjvqgsfcrecem70ers7a0frk
 ```
 
-### toLockScript
+That's it! If CKB transaction (with Ethereum wallets, e.g. MetaMask) is the only thing you need, you can already start your integration with pw-core.
 
-Get a lock script object.
+### One Step Further
 
-> @return
-
-- A [Script](#script) object which represents the lock script corresponding to this address.
+However, if you need more features, such as adding multiple outputs, setting data, or adding custom lock/type scripts, you can always implement you own builder extends the `Builder` class. If you have more requirements with retriving unspent cells, a custom cell collector based on `Collector` is a good choice. The same approach applies to `Signer` / `Hasher` / `Provider`. In fact, you will find that almost every aspect of buiding a transaction can be customized to meet your demands. This is because we have well encapsulated the transaction process as **build -> sign -> send**, and any kind of transaction can be created and sent given a builder and a signer. For example, the basic `send` method used in the Hello World example is implented like this:
 
 ```typescript
-const address = new Address('0x90C132C127916B458d096D429477e108B4180D1D');
+// code from: https://github.com/lay2dev/pw-core/blob/master/src/core.ts#L80
 
-const lockScript = address.toLockScript();
+import { transformers } from 'ckb-js-toolkit'
+import { Address, Amount } from './models'
+import { SimpleBuilder } from './builders'
+import { EthSigner } from './signers'
 
-//	lockScript: {
-//		code_hash: '0xac8a4bc065...f8bb58682f', // truncated
-//		args: '0x90C132C127916B458d096D429477e108B4180D1D',
-//		hash_type: 'type'
-//	}
-```
+async send(address: Address, amount: Amount, feeRate?: number): Promise<string> {
+  const simpleBuilder = new SimpleBuilder(address, amount, feeRate);
+  const = new EthSigner(address.addressString);
+  return this.sendTransaction(simpleBuilder, ethSigner);
+}
 
-### toLockScriptHash
-
-Get the hash string of the LockScript object provided above.
-
-> @return
-
-- A blake2b hash string of the lock script corresponding to this address.
-
-```typescript
-const address = new Address('0x90C132C127916B458d096D429477e108B4180D1D');
-
-const lockHash = address.toLockScriptHash();
-
-// lockHash:
-```
-
-## Amount
-
-### constructor
-
-> @params
-
-- **amount**: string, decimal value in string format.
-- **unit:** [AmountUnit](#amountunit), optional, default value is `AmountUnit.ckb`.
-
-> @return
-
-- An `Amount` instance.
-
-### toString
-
-> @params
-
-- **unit**: [AmountUnit](@amountunit), indicates which unit will be used when generating the string.
-- **options**: [FormatOptions](@formatoptions), optional, indicates additional format options when generating the string.
-
-> @return
-
-- A string of the amount value according to requirements of unit and options.
-
-```typescript
-const ckb1 = new Amount('1', AmountUnit.ckb);
-const shannon1 = new Amount('1', AmountUnit.shannon);
-const shannon1M = new Amount('1000000', AmountUnit.shannon);
-const shannon1T = new Amount('1000000000000', AmountUnit.shannon);
-
-const ckb1String = ckb1.toString(AmountUnit.shannon);
-// ckb1String: '1000000000'
-
-const shannon1String = shannon1.toString(AmountUnit.ckb);
-// shannon1String: '1'
-
-const shannon1MString = shannon1M.toString(AmountUnit.ckb);
-// shannon1MString: '0.01'
-
-const shannon1MPaddedString = shannon1M.toString(AmountUnit.ckb, { pad: true });
-// shannon1MPaddedString: '0.01000000'
-
-const shannon1TString = shannon1T.toString(AmountUnit.ckb, { commify: true });
-// shannon1TString = '10,000'
-```
-
-### toBigInt
-
-> @return
-
-- A `JSBI.BigInt` instance, with the shannon value.
-
-```typescript
-const amount = new Amount('1', AmountUnit.ckb);
-const amountBN = amount.toBigInt();
-const result = JSBI.EQ(amountBN, JSBI.BigInt('100000000'));
-// result: true
-```
-
-### toHexString
-
-> @return
-
-- A hex string of the shannon value, with '0x' prefix.
-
-```typescript
-const amount = new Amount('1', A);
-const amountHexString = amount.toHexString();
-// amountHexString: '0x5f5e100'
-```
-
-### static functions for calculation and comparison
-
-A bunch of functions for calculation and comparison between Amount instances, including:
-
-- **ADD** / **SUB**, for add and substract calculations. They all take two Amount instances as parameters and will return an Amount instance with value of the calculation result.
-- **GT** / **GTE** / **LT** / **LTE** / **EQ**, for comparison actions. They all take two Amount instances as parameters and will return a boolean value which indicates the comparison result.
-
-```typescript
-const amount1 = new Amount('1', AmountUnit.ckb);
-const amount2 = new Amount('2', AmountUnit.ckb);
-
-const sum = Amount.ADD(amount1, amount2).toString(AmountUnit.ckb);
-// sum: '3'
-
-const sub = Amount.SUB(amount2, amount1).toString(AmountUnit.ckb);
-// sub: '1'
-
-const gt = Amount.GT(amount1, amount2);
-// gt: false
-
-const lte = Amount.LTE(amount1, amount1);
-// lte: true
-```
-
----
-
-# Interfaces
-
-## Config
-
-Config object which contains need environment variables, such as the type script of Nervos DAO, the default lock script, etc. The content is defined in [ConfigItem](#configitem) interface.
-
-```typescript
-interface Config {
-  daoType: ConfigItem;
-  defaultLock: ConfigItem;
-  multiSigLock: ConfigItem;
-  pwLock: ConfigItem;
+async sendTransaction(builder: Builder, signer: Signer): Promise<string> {
+  return this.rpc.send_transaction(
+    transformers.TransformTransaction(
+      await signer.sign((await builder.build()).validate())
+    )
+  );
 }
 ```
 
-The sdk will preset the Config object of ckb main-net (Lina) and testnet (Aggron). If you are using a self-ran dev-chain, you should provide your own Config object in the [init](#init) function.
+Finally, here is an [example project](https://github.com/lay2dev/simplestdapp) which shows how to implement custom classes to achieve certain features. The `SDCollector` can collect unspent cells with a [ckb-indexer](https://github.com/quake/ckb-indexer), while the `SDBuilder` can build transactions for creating / updating / deleting cells. More over, the built-in `EthProvider` and `EthSigner` (along with `Keccak256Hasher`) are used to make this dApp runnable in Ethereum enviromment (such as MetaMask).
 
-## ConfigItem
+## Highlights
 
-Content item object of Config. For example, if we have a ConfigItem object named `pwLock`, which represents the information we needed to use pw-lock, then `pwLock.cell_dep` tells which cell should we refer in `cell_deps` field of the transaction, and `pwLock.script` will give you the `code_hash` and `hash_type` of pw-lock, while you can replace the default '0x' value of `args` with your actual value.
+- ### Concise API
 
-```typescript
-interface ConfigItem {
-  cell_dep: CellDep;
-  script: Script;
-}
-```
+  We only provide two types of interfaces, one is the most commonly used and the other is fully customizable. For example, you can use `pwcore.send` to just send some CKB, and use `pwcore.sendTransaction` to send any type of transactions. More over, you can even use `pwcore.rpc` to get direct access to ckb rpc calls, which enables abilities far beyond sending transactions.
 
-A sample ConfigItem object for pwLock:
+* ### Thoughtful Models
 
-```typescript
-pwLock: {
-	cell_dep: {
-  	dep_type: DepType.code,
-  	out_point: {
-    	index: '0x0',
-      tx_hash: '0x07a824df04...7b57c05856', // truncated
-  	},
-	},
-  script: {
-    args: '0x',
-    code_hash: '0xac8a4bc065...f8bb58682f', // truncated
-    hash_type: HashType.type,
-  },
-}
-```
+  Talk is cheap, let's show some code.
 
-## CellDep
+  ```typescript
+  /* Address */
+  const addressCkb = new Address('ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs', AddressType.ckb);
 
-```typescript
-interface CellDep {
-  dep_type: DepType;
-  out_point: OutPoint;
-}
-```
+  const addressEth = new Address('0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc', AddressType.eth);
 
-## Script
+  const addressCkbFull = new Address('ckt1qjmk32srs9nx345sgj0xrcq6slzx5ta3vt8azm4py95aalx7qq2agvh5ct04panc49rqn6v03mnllv2tv7vmc2z5pkp', AddressType.ckb);
 
-```typescript
-interface Script {
-  code_hash: string;
-  args: string;
-  hash_type: HashType;
-}
-```
+  console.log(addressEth.toCKBAddress());
+  //'ckt1qjmk32srs9nx345sgj0xrcq6slzx5ta3vt8azm4py95aalx7qq2agvh5ct04panc49rqn6v03mnllv2tv7vmc2z5pkp'
 
-## OutPoint
 
-```typescript
-interface OutPoint {
-  tx_hash: string;
-  index: string;
-}
-```
+  /* Script */
+  const lockScript = addressCkb.toLockScript().toHash();
+  const lockScriptHash = lockScript.toHash();
+  const address1 = Address.fromLockScript(lockScript);
+  const address2 = lockScript.toAddress();
 
-## FormatOptions
+  console.log(addressEth.toLockScript().sameWith(addressCkbFull.toLockScript()));
+  //true
 
-```typescript
-interface FormatOptions {
-  section?: 'full' | 'whole' | 'fraction';
-  pad?: boolean;
-  commify?: boolean;
-}
-```
 
----
+  /* Amount */
+  const ckb100 = new Amount('100');
+  const ckb1M = new Amount('1000000');
+  const shannon1k = new Amount('1000', AmountUnit.shannon);
+  const shannon10B = new Amount('10000000000', AmountUnit.shannon);
 
-# Enums
+  console.log(ckb100.eq(shannon10B)); //true
+  console.log(ckb100.lt(shannon1k)); //false
 
-## ChainID
+  const result = ckb1M.add(ckb100).sub(shannon1k);
+  console.log(result.eq(new Amount('1000099.99999'))); //true
 
-Defines the valid chainId values.
+  console.log(ckb100.toString(AmountUnit.shannon)); //'10000000000'
+  console.log(ckb100.toHexString()); //'0x2540be400'
 
-```typescript
-enum ChainID {
-  ckb = 'ckb',
-  ckb_testnet = 'ckb_testnet',
-  ckb_dev = 'ckb_dev',
-}
-```
+  console.log(result.toString(AmountUnit.ckb, {
+    section: 'full', pad: true, commify: true
+  })); //'1,000,099.99999000'
 
-## DepType
+  console.log(result.toString(Amount), { section: 'whole' })); //'1000099'
+  console.log(result.toString(Amount), { section: 'whole', commify: true })); //'1,000,099'
+  console.log(result.toString(Amount), { section: 'fraction' })); //'99999'
+  console.log(result.toString(Amount), { section: 'fraction', pad: true })); //'99999000'
 
-```typescript
-enum DepType {
-  code = 'code',
-  depGroup = 'depGroup',
-}
-```
+  /* Cell */
+  const cell = new Cell(new Amount('100'), PWCore.provider.address.toLockScript());
 
-## HashType
+  cell.setData('Hello from Lay2');
+  console.log(cell.getHexData()); //'0x48656c6c6f2066726f6d204c617932'
+  cell.setHexData('0x48656c6c6f204261636b');
+  console.log(cell.getData()); //'Hello Back'
 
-```typescript
-enum HashType {
-  data = 'data',
-  type = 'type',
-}
-```
+  cell.setData('a looooooooooooooooooooooong data');
+  cell.resize(); // cell.capacity will be adjusted to the actual space usage.
+  ```
 
-## AddressType
+- ### Simple and Clear Structure
 
-```typescript
-enum AddressType {
-  ckb,
-  btc,
-  eth,
-  eos,
-}
-```
+  CKB dApp development is mostly about manipulating cells. However, when we actually try to design a dApp, it turns out that we are always dealing with transactions. If you ever tried to build a CKB transaction, you'll definitely be impressed (or most likely, confused) by the bunch of fields. Questions may be asked like:
 
-## AmountUnit
+  > There are data structures like 'CellInput' and 'CellOutput', but where is 'Cell' ?
+  >
+  > How to calculate the transaction fee? How to adjust the change output?
+  >
+  > What kind of unit ( CKB or Shannon) and format (mostly hex string) to use?
 
-```typescript
-enum AmountUnit {
-  ckb,
-  shannon,
-}
-```
+  Things are different with pw-core. Let's see the actual constructor of `RawTransaction`
 
-## ReceivePair
+  ```typescript
+  // code from: https://github.com/lay2dev/pw-core/blob/master/src/models/raw-transaction.ts#L7
 
-```typescript
-interface ReceivePair {
-  address: Address;
-  amount: Amount;
-}
-```
+  export class RawTransaction implements CKBModel {
+    constructor(
+      public inputCells: Cell[],
+      public outputs: Cell[],
+      public cellDeps: CellDep[] = [
+        PWCore.config.defaultLock.cellDep,
+        PWCore.config.pwLock.cellDep,
+      ],
+      public headerDeps: string[] = [],
+      public readonly version: string = '0x0'
+    ) {
+      this.inputs = inputCells.map((i) => i.toCellInput());
+      this.outputsData = this.outputs.map((o) => o.getHexData());
+    }
 
-## RawTransaction
+    // ...
+  }
+  ```
 
-```typescript
-interface RawTransaction {
-  version: string;
-  cell_deps: CellDep[];
-  header_deps: string[];
-  inputs: CellInput[];
-  outputs: CellOutput[];
-  outputs_data: string[];
-}
-```
+  It's easy to findout that both inputs and outputs are Array of cells, and the low-level details and transformations are done silently. And yes, we have the 'Cell' structure.
 
-## Transaction
+* ### Work With or Without pw-lock
 
-```typescript
-interface Transaction {
-  raw: RawTransaction;
-  witness: string[];
-}
-```
+  Although pw-core works closely with pw-lock (both projects are components of pw-sdk), you can still use the default blake2b lock or your own lock, as long as the corresponding builder, signer and hasher are implemented. In fact, the `Blake2bHasher` is already built-in, and a `CkbSigner` is very likely to be added in the near future. With the progress of pw-sdk, more algorithm be added to the built-in collections, such as `Sha256Hasher` and `P256Signer`.
 
-## CellInput
+## API Document
 
-```typescript
-interface CellInput {
-  since: string;
-  previous_output: OutPoint;
-}
-```
+You can find a detailed [API Document Here](https://docs.lay2.dev).
 
-## CellOutput
+## Get Involved
 
-```typescript
-interface CellOutput {
-  capacity: string;
-  lock: Script;
-  type?: Script;
-}
-```
-
-## OutPoint
-
-```typescript
-interface OutPoint {
-  tx_hash: string;
-  index: string;
-}
-```
+Currently pw-core is still at a very early stage, and all kinds of suggestions and bug reports are very much welcomed. Feel free to open an issue, or join our [Discord](https://discord.gg/ZuFQGCx) server to talk directly to us. And of couse, a **star** is very much appreciated :).
