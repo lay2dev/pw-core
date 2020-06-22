@@ -1,41 +1,63 @@
-import test from 'ava';
+import anyTest, { TestInterface } from 'ava';
 import PWCore, { ChainID } from '../core';
-import { Address, AddressType } from './address';
-import { DummyCollector } from '../collectors/dummy-collector';
-import { Script } from '.';
-import { HashType } from '../interfaces';
+import { Address, AddressType, Script } from '.';
 import { validators } from 'ckb-js-toolkit';
 import { DummyProvider } from '../providers/dummy-provider';
+import { DummyCollector } from '../collectors/dummy-collector';
 
+const test = anyTest as TestInterface<{
+  lockScript: Script;
+  ethLockScript: Script;
+}>;
 const address = new Address(
   'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs',
   AddressType.ckb
 );
 
-const lockScript = new Script(
-  '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
-  '0x60f493579533db6ab3cf717da49c8a5565107bba',
-  HashType.type
+const ethAddress = new Address(
+  '0x26C5F390FF2033CbB44377361c63A3Dd2DE3121d',
+  AddressType.eth
 );
 
-test.before(async () => {
+test.before(async (t) => {
   await new PWCore('https://aggron.ckb.dev').init(
     new DummyProvider(),
     new DummyCollector(),
     ChainID.ckb_testnet
   );
+
+  t.context.lockScript = new Script(
+    PWCore.config.defaultLock.script.codeHash,
+    '0x60f493579533db6ab3cf717da49c8a5565107bba',
+    PWCore.config.defaultLock.script.hashType
+  );
+
+  t.context.ethLockScript = new Script(
+    PWCore.config.pwLock.script.codeHash,
+    '0x26C5F390FF2033CbB44377361c63A3Dd2DE3121d',
+    PWCore.config.pwLock.script.hashType
+  );
 });
 
 test('validate', (t) => {
-  t.notThrows(() => validators.ValidateScript(lockScript.serializeJson()));
+  t.notThrows(() =>
+    validators.ValidateScript(t.context.lockScript.serializeJson())
+  );
 });
 
 test('sameWith', (t) => {
-  t.true(lockScript.sameWith(lockScript), 'the two lockscripts are the same');
+  t.true(
+    t.context.lockScript.sameWith(t.context.lockScript),
+    'the t.context.two lock scripts are the same'
+  );
 });
 
 test('toAddress', (t) => {
-  t.deepEqual(lockScript.toAddress(), address);
+  t.is(t.context.lockScript.toAddress().toCKBAddress(), address.toCKBAddress());
+  t.is(
+    t.context.ethLockScript.toAddress().toCKBAddress(),
+    ethAddress.toCKBAddress()
+  );
 });
 
 test.todo('toHash');

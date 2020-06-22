@@ -3,18 +3,17 @@ import { validators, Reader } from 'ckb-js-toolkit';
 import bech32 from 'bech32';
 import { FormatOptions } from '.';
 
-const BigInt = JSBI.BigInt;
-
 const BASE = '100000000';
-const ZERO = BigInt(0);
-const base = BigInt(BASE);
+const ZERO = JSBI.BigInt(0);
+const base = JSBI.BigInt(BASE);
 const baseLen = BASE.length - 1;
+const BECH32_LIMIT = 1023;
 
 export const shannonToCKB = (
   shannonAmount: string,
   options: FormatOptions = { section: 'full' }
 ): string => {
-  let amount = BigInt(shannonAmount);
+  let amount = JSBI.BigInt(shannonAmount);
   const negative = JSBI.LT(amount, ZERO);
 
   if (negative) {
@@ -68,8 +67,8 @@ export const ckbToShannon = (ckbAmount: string): string => {
   }
 
   const comps = amount.split('.');
-  const whole = BigInt(comps[0]);
-  const fraction = BigInt(comps[1]);
+  const whole = JSBI.BigInt(comps[0]);
+  const fraction = JSBI.BigInt(comps[1]);
 
   let result = JSBI.add(JSBI.multiply(whole, base), fraction);
 
@@ -171,6 +170,18 @@ export function hexToByteArray(h: string) {
   return array;
 }
 
+export function toBigUInt64LE(num: number | string) {
+  const bn = BigInt(num);
+  const buf = Buffer.alloc(8);
+  buf.writeBigUInt64LE(bn);
+  return `0x${buf.toString('hex')}`;
+}
+
+export function readBigUInt64LE(hex: string) {
+  const buf = Buffer.from(hex.slice(2), 'hex');
+  return buf.readBigUInt64LE();
+}
+
 export function minimalCellCapacity(fullCell, { validate = true } = {}): JSBI {
   if (validate) {
     validators.ValidateCellOutput(fullCell);
@@ -188,30 +199,30 @@ export function minimalCellCapacity(fullCell, { validate = true } = {}): JSBI {
   if (fullCell.getHexData()) {
     bytes += new Reader(fullCell.getHexData()).length();
   }
-  return JSBI.multiply(BigInt(bytes), BigInt(100000000));
+  return JSBI.multiply(JSBI.BigInt(bytes), JSBI.BigInt(100000000));
 }
 
-export function generateAddress(script, { config = LINA } = {}): string {
+export function generateAddress(script: any, { config = LINA } = {}): string {
   const scriptTemplate = Object.values(config.SCRIPTS).find(
     (s) =>
       s.SCRIPT.code_hash === script.code_hash &&
       s.SCRIPT.hash_type === script.hash_type
   );
   const data = [];
-  if (scriptTemplate) {
+  if (scriptTemplate && scriptTemplate.SHORT_ID !== undefined) {
     data.push(1, scriptTemplate.SHORT_ID);
     data.push(...hexToByteArray(script.args));
   } else {
     data.push(script.hash_type === 'type' ? 4 : 2);
     data.push(...hexToByteArray(script.code_hash));
-    data.push(...hexToByteArray(script.hash_type));
+    data.push(...hexToByteArray(script.args));
   }
   const words = bech32.toWords(data);
-  return bech32.encode(config.PREFIX, words);
+  return bech32.encode(config.PREFIX, words, BECH32_LIMIT);
 }
 
-export function parseAddress(address, { config = LINA } = {}) {
-  const { prefix, words } = bech32.decode(address, 100);
+export function parseAddress(address: string, { config = LINA } = {}) {
+  const { prefix, words } = bech32.decode(address, BECH32_LIMIT);
   if (prefix !== config.PREFIX) {
     throw Error(
       `Invalid prefix! Expected: ${config.PREFIX}, actual: ${prefix}`
