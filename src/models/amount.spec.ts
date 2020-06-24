@@ -64,6 +64,46 @@ test('formatting test set', (t) => {
     shannonFull.toString(AmountUnit.ckb, { section: 'fraction', pad: true }),
     '03400500'
   );
+
+  t.is(shannonFull.toString(AmountUnit.ckb, { fixed: 1 }), '10020.0');
+  t.is(shannonFull.toString(AmountUnit.ckb, { fixed: 2 }), '10020.03');
+  t.is(shannonFull.toString(AmountUnit.ckb, { fixed: 3 }), '10020.034');
+  t.is(shannonFull.toString(AmountUnit.ckb, { fixed: 4 }), '10020.0340');
+  t.is(shannonFull.toString(AmountUnit.ckb, { fixed: 5 }), '10020.03401');
+  t.is(shannonFull.toString(AmountUnit.ckb, { fixed: 6 }), '10020.034005');
+  t.is(
+    shannonFull.toString(AmountUnit.ckb, { section: 'fraction', fixed: 1 }),
+    '0'
+  );
+  t.is(
+    shannonFull.toString(AmountUnit.ckb, { section: 'fraction', fixed: 2 }),
+    '03'
+  );
+  t.is(
+    shannonFull.toString(AmountUnit.ckb, { section: 'fraction', fixed: 3 }),
+    '034'
+  );
+  t.is(
+    shannonFull.toString(AmountUnit.ckb, { section: 'fraction', fixed: 4 }),
+    '0340'
+  );
+  t.is(
+    shannonFull.toString(AmountUnit.ckb, { section: 'fraction', fixed: 5 }),
+    '03401'
+  );
+  t.is(
+    shannonFull.toString(AmountUnit.ckb, { section: 'fraction', fixed: 6 }),
+    '034005'
+  );
+
+  t.is(
+    shannonFull.toString(AmountUnit.ckb, {
+      section: 'fraction',
+      fixed: 5,
+      pad: true,
+    }),
+    '03401'
+  );
 });
 
 test('calculation test set', (t) => {

@@ -11,6 +11,7 @@ export interface FormatOptions {
   section?: 'full' | 'whole' | 'fraction';
   pad?: boolean;
   commify?: boolean;
+  fixed?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 }
 
 export class Amount {

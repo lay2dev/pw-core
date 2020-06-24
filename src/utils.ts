@@ -38,6 +38,11 @@ export const shannonToCKB = (
 
   let result = `${whole}${fraction === '0' ? '' : `.${fraction}`}`;
 
+  if (options && options.fixed) {
+    fraction = Number(`0.${fraction}`).toFixed(options.fixed).split('.')[1];
+    result = `${whole}.${fraction}`;
+  }
+
   if (options && options.section === 'whole') {
     result = whole;
   }
