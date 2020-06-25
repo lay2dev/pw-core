@@ -20,8 +20,8 @@ test.before(async (t) => {
   t.context = { pw, address };
 });
 
-// test.skip('send simple tx', async (t) => {
-test.serial('send simple tx', async (t) => {
+test.skip('send simple tx', async (t) => {
+  // test.serial('send simple tx', async (t) => {
   const { pw, address } = t.context;
   const amount61 = new Amount('61');
   const txHash = await pw.send(address, amount61);
