@@ -1,15 +1,11 @@
-// import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
-// import { mergeTypedArraysUnsafe } from '../utils';
 import { Transaction } from '..';
 import { Hasher, Blake2bHasher } from '../hashers';
 import { normalizers, Reader, transformers } from 'ckb-js-toolkit';
-import JSBI from 'jsbi';
+// import JSBI from 'jsbi';
 import {
   SerializeWitnessArgs,
   SerializeRawTransaction,
 } from '@ckb-lumos/types/lib/core';
-// import { ValidateCollectorCell, serializeBigInt } from '../utils';
-// import { SerializeRawTransaction } from 'ckb-js-toolkit-contrib/src/blockchain';
 
 export interface Message {
   index: number;
@@ -34,7 +30,7 @@ export abstract class Signer {
     ).serializeJson();
     FillSignedWitnesses(tx, messages, witnesses);
 
-    console.log('[signer] signed tx: ', tx);
+    // console.log('[signer] signed tx: ', JSON.stringify(tx));
     return tx;
   }
 
@@ -109,8 +105,8 @@ function FillSignedWitnesses(
   return tx;
 }
 
-function serializeBigInt(i: number | JSBI) {
+function serializeBigInt(i: number) {
   const view = new DataView(new ArrayBuffer(8));
-  view.setBigUint64(0, BigInt(i), true);
+  view.setUint32(0, i, true);
   return view.buffer;
 }

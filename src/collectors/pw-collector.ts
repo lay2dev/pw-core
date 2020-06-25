@@ -3,15 +3,16 @@ import { Collector } from './collector';
 import { Cell, Address, Amount, AmountUnit, OutPoint } from '..';
 
 export class PwCollector extends Collector {
-  constructor() {
+  constructor(public apiBase: string) {
     super();
+    this.apiBase = apiBase;
   }
 
   async getBalance(address: Address): Promise<Amount> {
     const res = await axios.get(
-      `https://cellapi.ckb.pw/cell/getCapacityByLockHash?lockHash=${address
-        .toLockScript()
-        .toHash()}`
+      `${
+        this.apiBase
+      }/cell/getCapacityByLockHash?lockHash=${address.toLockScript().toHash()}`
     );
     return new Amount(res.data, AmountUnit.shannon);
   }
@@ -20,7 +21,9 @@ export class PwCollector extends Collector {
     const cells: Cell[] = [];
 
     const res = await axios.get(
-      `https://cellapi.ckb.pw/cell/unSpent?lockHash=${address
+      `${
+        this.apiBase
+      }/cell/unSpent?lockHash=${address
         .toLockScript()
         .toHash()}&capacity=${neededAmount.toHexString()}`
     );

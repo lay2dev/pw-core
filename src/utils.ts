@@ -175,18 +175,6 @@ export function hexToByteArray(h: string) {
   return array;
 }
 
-export function toBigUInt64LE(num: number | string) {
-  const bn = BigInt(num);
-  const buf = Buffer.alloc(8);
-  buf.writeBigUInt64LE(bn);
-  return `0x${buf.toString('hex')}`;
-}
-
-export function readBigUInt64LE(hex: string) {
-  const buf = Buffer.from(hex.slice(2), 'hex');
-  return buf.readBigUInt64LE();
-}
-
 export function minimalCellCapacity(fullCell, { validate = true } = {}): JSBI {
   if (validate) {
     validators.ValidateCellOutput(fullCell);
