@@ -63,6 +63,7 @@ export class EthSigner extends Signer {
             reject(result.error);
           }
           result = result.result;
+          let v = Number.parseInt(result.slice(-2), 16);
           if (v >= 27) v -= 27;
           result = result.slice(0, -2) + v.toString(16).padStart(2, '0');
           resolve([result]);

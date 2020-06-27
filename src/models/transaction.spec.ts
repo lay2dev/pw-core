@@ -10,6 +10,7 @@ import PWCore, {
 } from '..';
 import { DummyCollector } from '../collectors/dummy-collector';
 import { DummyProvider } from '../providers/dummy-provider';
+import { Builder } from '../builders';
 
 const test = anyTest as TestInterface<{ tx: Transaction }>;
 
@@ -44,7 +45,10 @@ test.before(async (t) => {
   const outputs = cells.slice(1);
   const cellDeps = [new CellDep(DepType.depGroup, outPoint4)];
 
-  t.context.tx = new Transaction(new RawTransaction(inputs, outputs, cellDeps));
+  t.context.tx = new Transaction(
+    new RawTransaction(inputs, outputs, cellDeps),
+    [Builder.WITNESS_ARGS.Secp256k1]
+  );
 });
 
 test('validate', (t) => {

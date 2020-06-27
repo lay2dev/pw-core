@@ -7,6 +7,18 @@ const FEE_BASE = 1000;
 export abstract class Builder {
   static readonly MIN_FEE_RATE = 1000;
   static readonly MIN_CHANGE = new Amount('61', AmountUnit.ckb);
+  static readonly WITNESS_ARGS = {
+    Secp256k1: {
+      lock: '0x' + '0'.repeat(130),
+      input_type: '',
+      output_type: '',
+    },
+    Secp256r1: {
+      lock: '0x' + '0'.repeat(600),
+      input_type: '',
+      output_type: '',
+    },
+  };
 
   static calcFee(
     tx: Transaction,

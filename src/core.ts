@@ -98,7 +98,7 @@ export default class PWCore {
     feeRate?: number
   ): Promise<string> {
     const simpleBuilder = new SimpleBuilder(address, amount, feeRate);
-    const ethSigner = new EthSigner(address.addressString);
+    const ethSigner = new EthSigner(PWCore.provider.address.addressString);
     return this.sendTransaction(simpleBuilder, ethSigner);
   }
 

@@ -1,23 +1,32 @@
-import { CKBModel } from '../interfaces';
+import { CKBModel, WitnessArgs } from '../interfaces';
 import { ECDSA_WITNESS_LEN } from '../constants';
-import { validators, normalizers, transformers } from 'ckb-js-toolkit';
-// import { SerializeTransaction } from 'ckb-js-toolkit-contrib/src/blockchain';
-// import { signer } from 'ckb-js-toolkit-contrib/src';
-import { SerializeTransaction } from '@ckb-lumos/types/lib/core';
+import { validators, normalizers, transformers, Reader } from 'ckb-js-toolkit';
+import {
+  SerializeTransaction,
+  SerializeWitnessArgs,
+} from '@ckb-lumos/types/lib/core';
 import { RawTransaction } from '.';
 
 export class Transaction implements CKBModel {
-  // TODO: add WitnessArgs to adapt different transaction structures
   public witnesses: string[];
 
   constructor(
     public raw: RawTransaction,
-    witnessesLength: number[] = [ECDSA_WITNESS_LEN]
+    public witnessArgs: WitnessArgs[],
+    witnessLengths: number[] = [ECDSA_WITNESS_LEN]
   ) {
-    // fill witnesses with actural length to make tx size accurate
     this.witnesses = raw.inputs.map((_) => '0x');
-    for (let i = 0; i < witnessesLength.length; i++) {
-      this.witnesses[i] = '0x' + '0'.repeat(witnessesLength[i] - 2);
+    for (let i = 0; i < witnessLengths.length; i++) {
+      this.witnesses[i] = '0x' + '0'.repeat(witnessLengths[i] - 2);
+    }
+    if (!Array.isArray(witnessArgs))
+      throw new Error('[Transaction] - witnessArgs must be an Array!');
+    for (let i = 0; i < witnessArgs.length; i++) {
+      this.witnesses[i] = new Reader(
+        SerializeWitnessArgs(
+          normalizers.NormalizeWitnessArgs(this.witnessArgs[i])
+        )
+      ).serializeJson();
     }
   }
 

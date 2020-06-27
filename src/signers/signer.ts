@@ -18,17 +18,19 @@ export abstract class Signer {
   protected abstract async signMessages(messages: Message[]): Promise<string[]>;
 
   async sign(tx: Transaction): Promise<Transaction> {
-    tx.witnesses[0] = `0x5500000010000000550000005500000041000000${'0'.repeat(
-      130
-    )}`;
+    console.log('[signer] tx before: ', tx);
     const messages = this.toMessages(tx);
     const witnesses = await this.signMessages(messages);
     witnesses[0] = new Reader(
       SerializeWitnessArgs(
-        normalizers.NormalizeWitnessArgs({ lock: witnesses[0] })
+        normalizers.NormalizeWitnessArgs({
+          ...tx.witnessArgs[0],
+          lock: witnesses[0],
+        })
       )
     ).serializeJson();
-    FillSignedWitnesses(tx, messages, witnesses);
+    tx = FillSignedWitnesses(tx, messages, witnesses);
+    console.log('[signer] tx after: ', tx);
 
     return tx;
   }
