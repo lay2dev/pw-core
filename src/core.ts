@@ -6,6 +6,7 @@ import { EthSigner, Signer } from './signers';
 import { Collector } from './collectors';
 import { SimpleBuilder, Builder } from './builders';
 import { Provider } from './providers';
+import { Transaction } from '@ckb-lumos/types/lib/core';
 
 export enum ChainID {
   ckb,
@@ -102,16 +103,31 @@ export default class PWCore {
     return this.sendTransaction(simpleBuilder, ethSigner);
   }
 
-  /**
-   * Build and send an custom transaction
+  /** * Send an built transaction
    * @param builder
    * @param signer
    */
-  async sendTransaction(builder: Builder, signer: Signer): Promise<string> {
+  async sendTransaction(tx: Transaction, signer: Signer): Promise<string>;
+
+  /** * Build and send an custom transaction
+   * @param builder
+   * @param signer
+   */
+  async sendTransaction(builder: Builder, signer: Signer): Promise<string>;
+
+  async sendTransaction(
+    a: Transaction | Builder,
+    signer: Signer
+  ): Promise<string> {
+    let tx = null;
+    if (a instanceof Builder) {
+      tx = await a.build();
+    } else {
+      tx = a;
+    }
+    tx.validate();
     return this.rpc.send_transaction(
-      transformers.TransformTransaction(
-        await signer.sign((await builder.build()).validate())
-      )
+      transformers.TransformTransaction(await signer.sign(tx))
     );
   }
 }
