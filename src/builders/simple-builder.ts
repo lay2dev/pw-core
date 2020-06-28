@@ -37,9 +37,9 @@ export class SimpleBuilder extends Builder {
       if (inputSum.gt(neededAmount)) break;
     }
 
-    if (inputSum.lt(this.amount)) {
+    if (inputSum.lt(neededAmount)) {
       throw new Error(
-        `input capacity not enough, need ${outputCell.capacity.toString(
+        `input capacity not enough, need ${neededAmount.toString(
           AmountUnit.ckb
         )}, got ${inputSum.toString(AmountUnit.ckb)}`
       );

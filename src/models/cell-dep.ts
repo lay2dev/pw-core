@@ -3,8 +3,8 @@ import { DepType, CKBModel } from '..';
 import { validators, transformers } from 'ckb-js-toolkit';
 
 export class CellDep implements CKBModel {
-  static fromRPC(data: any): CellDep {
-    if (!data) return null;
+  static fromRPC(data: any): CellDep | undefined {
+    if (!data) return undefined;
     validators.ValidateCellDep(data);
     return new CellDep(data.dep_type, data.out_point);
   }

@@ -10,8 +10,8 @@ import { generateAddress, LumosConfigs } from '../utils';
 import { validators, transformers } from 'ckb-js-toolkit';
 
 export class Script implements CKBModel {
-  static fromRPC(data: any): Script | null {
-    if (!data) return null;
+  static fromRPC(data: any): Script | undefined {
+    if (!data) return undefined;
     validators.ValidateScript(data);
     return new Script(data.code_hash, data.args, data.hash_type);
   }

@@ -2,8 +2,8 @@ import { validators, transformers } from 'ckb-js-toolkit';
 import { CKBModel } from '..';
 
 export class OutPoint implements CKBModel {
-  static fromRPC(data: any): OutPoint | null {
-    if (!data) return null;
+  static fromRPC(data: any): OutPoint | undefined {
+    if (!data) return undefined;
     validators.ValidateOutPoint(data);
     return new OutPoint(data.tx_hash, data.index);
   }
