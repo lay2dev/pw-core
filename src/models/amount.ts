@@ -15,6 +15,8 @@ export interface FormatOptions {
 }
 
 export class Amount {
+  static ZERO = new Amount('0');
+
   add(val: Amount): Amount {
     const res = JSBI.add(this.toBigInt(), val.toBigInt()).toString();
     return new Amount(res, AmountUnit.shannon);
