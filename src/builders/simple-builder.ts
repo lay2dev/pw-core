@@ -55,7 +55,7 @@ export class SimpleBuilder extends Builder {
       [Builder.WITNESS_ARGS.Secp256k1]
     );
 
-    this.fee = Builder.calcFee(tx);
+    this.fee = Builder.calcFee(tx, this.feeRate);
 
     if (changeCell.capacity.gte(Builder.MIN_CHANGE.add(this.fee))) {
       changeCell.capacity = changeCell.capacity.sub(this.fee);
