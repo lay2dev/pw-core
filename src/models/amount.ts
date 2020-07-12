@@ -1,5 +1,5 @@
 import JSBI from 'jsbi';
-import { ckbToShannon, shannonToCKB } from '../utils';
+import { ckbToShannon, shannonToCKB, BASE } from '../utils';
 import { HexStringToBigInt } from 'ckb-js-toolkit';
 
 export enum AmountUnit {
@@ -28,7 +28,10 @@ export class Amount {
   }
 
   mul(val: Amount): Amount {
-    const res = JSBI.multiply(this.toBigInt(), val.toBigInt()).toString();
+    const res = JSBI.divide(
+      JSBI.multiply(this.toBigInt(), val.toBigInt()),
+      JSBI.BigInt(BASE)
+    ).toString();
     return new Amount(res, AmountUnit.shannon);
   }
 
@@ -81,7 +84,7 @@ export class Amount {
     this.unit = unit;
   }
 
-  toString(unit: AmountUnit, options?: FormatOptions): string {
+  toString(unit = AmountUnit.ckb, options?: FormatOptions): string {
     if (unit === AmountUnit.shannon) {
       return this.unit === AmountUnit.shannon
         ? this.amount

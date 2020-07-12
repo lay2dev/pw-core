@@ -20,7 +20,7 @@ export class SimpleBuilder extends Builder {
     super(feeRate, collector);
   }
 
-  async build(fee: Amount = new Amount('0')): Promise<Transaction> {
+  async build(fee: Amount = Amount.ZERO): Promise<Transaction> {
     const outputCell = new Cell(this.amount, this.address.toLockScript());
     const neededAmount = this.amount.add(Builder.MIN_CHANGE).add(fee);
     let inputSum = new Amount('0');

@@ -3,7 +3,7 @@ import { validators, Reader } from 'ckb-js-toolkit';
 import bech32 from 'bech32';
 import { FormatOptions } from '.';
 
-const BASE = '100000000';
+export const BASE = '100000000';
 const ZERO = JSBI.BigInt(0);
 const base = JSBI.BigInt(BASE);
 const baseLen = BASE.length - 1;
