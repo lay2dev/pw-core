@@ -1,5 +1,6 @@
 import { Provider, Platform } from './provider';
 import { Address, AddressType } from '..';
+import ENS from 'ethereum-ens'
 
 export class EthProvider extends Provider {
   onAddressChanged: any;
@@ -23,6 +24,14 @@ export class EthProvider extends Provider {
       throw new Error(
         'window.ethereum is undefined, Ethereum environment is required.'
       );
+    }
+  }
+
+  async ensResolver(ens: string): Promise<string> {
+    try {
+      return await new ENS(window.web3.currentProvider).resolver(ens).addr();
+    } catch(e) {
+      return 'Unknown ENS Name'
     }
   }
 }
