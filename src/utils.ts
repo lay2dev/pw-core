@@ -1,5 +1,4 @@
 import JSBI from 'jsbi';
-import { validators, Reader } from 'ckb-js-toolkit';
 import bech32 from 'bech32';
 import { FormatOptions } from '.';
 
@@ -175,26 +174,6 @@ export function hexToByteArray(h: string) {
   return array;
 }
 
-export function minimalCellCapacity(fullCell, { validate = true } = {}): JSBI {
-  if (validate) {
-    validators.ValidateCellOutput(fullCell);
-  }
-  // Capacity field itself
-  let bytes = 8;
-  bytes += new Reader(fullCell.lock.codeHash).length();
-  bytes += new Reader(fullCell.lock.args).length();
-  bytes += 1;
-  if (fullCell.type) {
-    bytes += new Reader(fullCell.type.codeHash).length();
-    bytes += new Reader(fullCell.type.args).length();
-    bytes += 1;
-  }
-  if (fullCell.getHexData()) {
-    bytes += new Reader(fullCell.getHexData()).length();
-  }
-  return JSBI.multiply(JSBI.BigInt(bytes), JSBI.BigInt(100000000));
-}
-
 export function generateAddress(script: any, { config = LINA } = {}): string {
   const scriptTemplate = Object.values(config.SCRIPTS).find(
     (s) =>
@@ -254,4 +233,18 @@ export function parseAddress(address: string, { config = LINA } = {}) {
       };
   }
   throw Error(`Invalid payload format type: ${data[0]}`);
+}
+
+export function verifyCkbAddress(address: string): boolean {
+  try {
+    const config = address.startsWith('ckb') ? LINA : AGGRON4;
+    parseAddress(address, { config });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+export function verifyEthAddress(address: string): boolean {
+  return /^0x[a-fA-F0-9]{40}$/.test(address);
 }

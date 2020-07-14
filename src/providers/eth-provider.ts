@@ -1,9 +1,9 @@
 import { Provider, Platform } from './provider';
 import { Address, AddressType } from '..';
-import ENS from 'ethereum-ens'
+import ENS from 'ethereum-ens';
 
 export class EthProvider extends Provider {
-  onAddressChanged: any;
+  onAddressChanged: (newAddress: Address) => void;
   constructor(onAddressChanged?: (newAddress: Address) => void) {
     super(Platform.eth);
     this.onAddressChanged = onAddressChanged;
@@ -13,11 +13,15 @@ export class EthProvider extends Provider {
       window.ethereum.autoRefreshOnNetworkChange = false;
       const accounts = await window.ethereum.enable();
       this.address = new Address(accounts[0], AddressType.eth);
-      window.ethereum.on &&
-        window.ethereum.on('accountsChanged', (accounts: string[]) => {
-          this.address = new Address(accounts[0], AddressType.eth);
-          this.onAddressChanged && this.onAddressChanged(this.address);
+
+      if (window.ethereum.on !== undefined) {
+        window.ethereum.on('accountsChanged', (newAccounts: string[]) => {
+          this.address = new Address(newAccounts[0], AddressType.eth);
+          if (this.onAddressChanged !== undefined) {
+            this.onAddressChanged(this.address);
+          }
         });
+      }
 
       return this;
     } else {
@@ -30,8 +34,8 @@ export class EthProvider extends Provider {
   async ensResolver(ens: string): Promise<string> {
     try {
       return await new ENS(window.web3.currentProvider).resolver(ens).addr();
-    } catch(e) {
-      return 'Unknown ENS Name'
+    } catch (e) {
+      return 'Unknown ENS Name';
     }
   }
 }

@@ -2,7 +2,13 @@ import { Script } from '.';
 import PWCore, { ChainID } from '../core';
 import { HashType } from '../interfaces';
 // import { validators, transformers } from 'ckb-js-toolkit';
-import { parseAddress, generateAddress, LumosConfigs } from '../utils';
+import {
+  parseAddress,
+  generateAddress,
+  LumosConfigs,
+  verifyCkbAddress,
+  verifyEthAddress,
+} from '../utils';
 import {
   fullPayloadToAddress,
   AddressType as AType,
@@ -50,6 +56,17 @@ export class Address {
     readonly addressType: AddressType
   ) {
     this.addressString = addressString.toLowerCase();
+  }
+
+  valid(): boolean {
+    switch (this.addressType) {
+      case AddressType.ckb:
+        return verifyCkbAddress(this.addressString);
+      case AddressType.eth:
+        return verifyEthAddress(this.addressString);
+      default:
+        return true;
+    }
   }
 
   toCKBAddress(): string {
