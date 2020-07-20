@@ -63,6 +63,8 @@ export class Amount {
       throw new Error(`Amount ${amount} is not a valid ${unit} value`);
     }
 
+    amount = `${amount}`;
+
     if (amount.startsWith('0x')) {
       amount = HexStringToBigInt(amount).toString();
     }

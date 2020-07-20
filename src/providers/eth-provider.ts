@@ -14,10 +14,10 @@ export class EthProvider extends Provider {
       const accounts = await window.ethereum.enable();
       this.address = new Address(accounts[0], AddressType.eth);
 
-      if (window.ethereum.on !== undefined) {
+      if (!!window.ethereum.on) {
         window.ethereum.on('accountsChanged', (newAccounts: string[]) => {
           this.address = new Address(newAccounts[0], AddressType.eth);
-          if (this.onAddressChanged !== undefined) {
+          if (!!this.onAddressChanged) {
             this.onAddressChanged(this.address);
           }
         });
