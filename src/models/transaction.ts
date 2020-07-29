@@ -53,6 +53,10 @@ export class Transaction implements CKBModel {
     return this;
   }
 
+  transform(): object {
+    return transformers.TransformTransaction(this.serializeJson());
+  }
+
   serializeJson(): object {
     return {
       ...this.raw,
