@@ -58,12 +58,12 @@ export const CHAIN_SPECS = {
       cellDep: new CellDep(
         DepType.code,
         new OutPoint(
-          '0x07a824df0419adf4c92ca563085525e7224b014ecc97cf3de684dd7b57c05856',
+          '0xafb4962ca75801340fdf56667e9d7a8e8bd3e56025108c6c76776b96ee68d5ca',
           '0x0'
         )
       ),
       script: new Script(
-        '0x07a824df0419adf4c92ca563085525e7224b014ecc97cf3de684dd7b57c05856',
+        '0xbf43c3602455798c1a61a596e0d95278864c552fafe231c063b3fabf97a8febc',
         '0x',
         HashType.type
       ),
