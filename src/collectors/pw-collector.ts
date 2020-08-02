@@ -14,7 +14,7 @@ export class PwCollector extends Collector {
         this.apiBase
       }/cell/getCapacityByLockHash?lockHash=${address.toLockScript().toHash()}`
     );
-    return new Amount(res.data, AmountUnit.shannon);
+    return new Amount(res.data.data, AmountUnit.shannon);
   }
 
   async collect(address: Address, neededAmount: Amount): Promise<Cell[]> {
@@ -28,7 +28,7 @@ export class PwCollector extends Collector {
         .toHash()}&capacity=${neededAmount.toHexString()}`
     );
 
-    for (let { capacity, outPoint } of res.data) {
+    for (let { capacity, outPoint } of res.data.data) {
       capacity = new Amount(capacity, AmountUnit.shannon);
       outPoint = new OutPoint(outPoint.txHash, outPoint.index);
       cells.push(new Cell(capacity, address.toLockScript(), null, outPoint));
