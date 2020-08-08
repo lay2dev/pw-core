@@ -24,6 +24,17 @@ export class EthProvider extends Provider {
       }
 
       return this;
+    } else if (!!window.web3) {
+      console.log('[eth-provider] try window.web3');
+      const accounts = await new Promise((resolve, reject) => {
+        window.web3.eth.getAccounts((err, result) => {
+          err && reject(err);
+          resolve(result);
+        });
+      });
+      this.address = new Address(accounts[0], AddressType.eth);
+
+      return this;
     } else {
       throw new Error(
         'window.ethereum is undefined, Ethereum environment is required.'
