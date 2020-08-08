@@ -96,6 +96,8 @@ test('formatting test set', (t) => {
     '034005'
   );
 
+  t.is(new Amount('1.99').toString(AmountUnit.ckb, { fixed: 1 }), '2.0');
+
   t.is(
     shannonFull.toString(AmountUnit.ckb, {
       section: 'fraction',

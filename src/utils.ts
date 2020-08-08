@@ -38,7 +38,9 @@ export const shannonToCKB = (
   let result = `${whole}${fraction === '0' ? '' : `.${fraction}`}`;
 
   if (options && options.fixed) {
-    fraction = Number(`0.${fraction}`).toFixed(options.fixed).split('.')[1];
+    const fixed = Number(`0.${fraction}`).toFixed(options.fixed).split('.');
+    whole = fixed[0] === '0' ? whole : `${Number(whole) + 1}`;
+    fraction = fixed[1];
     result = `${whole}.${fraction}`;
   }
 
