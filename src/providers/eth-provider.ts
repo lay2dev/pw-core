@@ -28,7 +28,9 @@ export class EthProvider extends Provider {
       console.log('[eth-provider] try window.web3');
       const accounts = await new Promise((resolve, reject) => {
         window.web3.eth.getAccounts((err, result) => {
-          err && reject(err);
+          if (!!err) {
+            reject(err);
+          }
           resolve(result);
         });
       });

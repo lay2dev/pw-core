@@ -59,8 +59,10 @@ export class Amount {
   private unit: AmountUnit;
 
   constructor(amount: string, unit: AmountUnit = AmountUnit.ckb) {
-    if (Number.isNaN(Number(amount))) {
-      throw new Error(`Amount ${amount} is not a valid ${unit} value`);
+    if (Number.isNaN(amount)) {
+      throw new Error(
+        `Amount ${amount} is not a valid ${AmountUnit[unit]} value`
+      );
     }
 
     amount = `${amount}`;

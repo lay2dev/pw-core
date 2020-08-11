@@ -31,18 +31,19 @@ export const shannonToCKB = (
 
   let whole = JSBI.divide(amount, base).toString(10);
 
-  if (options && options.commify) {
-    whole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }
-
-  let result = `${whole}${fraction === '0' ? '' : `.${fraction}`}`;
-
   if (options && options.fixed) {
     const fixed = Number(`0.${fraction}`).toFixed(options.fixed).split('.');
     whole = fixed[0] === '0' ? whole : `${Number(whole) + 1}`;
     fraction = fixed[1];
-    result = `${whole}.${fraction}`;
   }
+
+  if (options && options.commify) {
+    whole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  let result = `${whole}${
+    fraction === '0' && !options.fixed ? '' : `.${fraction}`
+  }`;
 
   if (options && options.section === 'whole') {
     result = whole;
@@ -60,7 +61,7 @@ export const shannonToCKB = (
 };
 
 export const ckbToShannon = (ckbAmount: string): string => {
-  if (Number.isNaN(Number(ckbAmount))) {
+  if (Number.isNaN(ckbAmount)) {
     throw new Error(`ckb amount ${ckbAmount} is not a number`);
   }
 
