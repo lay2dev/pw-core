@@ -58,7 +58,7 @@ export const CHAIN_SPECS = {
       cellDep: new CellDep(
         DepType.code,
         new OutPoint(
-          '0xafb4962ca75801340fdf56667e9d7a8e8bd3e56025108c6c76776b96ee68d5ca',
+          '0x1d60cb8f4666e039f418ea94730b1a8c5aa0bf2f7781474406387462924d15d4',
           '0x0'
         )
       ),
