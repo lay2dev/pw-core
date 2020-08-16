@@ -117,12 +117,12 @@ export const CHAIN_SPECS = {
       cellDep: new CellDep(
         DepType.code,
         new OutPoint(
-          '0x760a6db1efb79eeed0675c18afa75ecba1f723d48aeb7cca48e7f34843fb5182',
+          '0x4f254814b972421789fafef49d4fee94116863138f72ab1e6392daf3decfaec1',
           '0x0'
         )
       ),
       script: new Script(
-        '0xb768aa03816668d690449e61e01a87c46a2fb162cfd16ea12169defcde0015d4',
+        '0x58c5f491aba6d61678b7cf7edf4910b1f5e00ec0cde2f42e0abb4fd9aff25a63',
         '0x',
         HashType.type
       ),
