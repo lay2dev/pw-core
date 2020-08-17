@@ -107,53 +107,51 @@ Finally, here is an [example project](https://github.com/lay2dev/simplestdapp) w
 
   console.log(addressEth.toCKBAddress());
   //'ckt1qjmk32srs9nx345sgj0xrcq6slzx5ta3vt8azm4py95aalx7qq2agvh5ct04panc49rqn6v03mnllv2tv7vmc2z5pkp'
+
+  /* Script */
+  const lockScript = addressCkb.toLockScript();
+  const lockScriptHash = lockScript.toHash();
+  const address1 = Address.fromLockScript(lockScript);
+  const address2 = lockScript.toAddress();
+
+  console.log(addressEth.toLockScript().sameWith(addressCkbFull.toLockScript()));
+  //true
+
+  /* Amount */
+  const ckb100 = new Amount('100');
+  const ckb1M = new Amount('1000000');
+  const shannon1k = new Amount('1000', AmountUnit.shannon);
+  const shannon10B = new Amount('10000000000', AmountUnit.shannon);
+
+  console.log(ckb100.eq(shannon10B)); //true
+  console.log(ckb100.lt(shannon1k)); //false
+
+  const result = ckb1M.add(ckb100).sub(shannon1k);
+  console.log(result.eq(new Amount('1000099.99999'))); //true
+
+  console.log(ckb100.toString(AmountUnit.shannon)); //'10000000000'
+  console.log(ckb100.toHexString()); //'0x2540be400'
+
+  console.log(result.toString(AmountUnit.ckb, {
+  section: 'full', pad: true, commify: true
+  })); //'1,000,099.99999000'
+
+  console.log(result.toString(Amount), { section: 'whole' })); //'1000099'
+  console.log(result.toString(Amount), { section: 'whole', commify: true })); //'1,000,099'
+  console.log(result.toString(Amount), { section: 'fraction' })); //'99999'
+  console.log(result.toString(Amount), { section: 'fraction', pad: true })); //'99999000'
+
+  /* Cell */
+  const cell = new Cell(new Amount('100'), PWCore.provider.address.toLockScript());
+
+  cell.setData('Hello from Lay2');
+  console.log(cell.getHexData()); //'0x48656c6c6f2066726f6d204c617932'
+  cell.setHexData('0x48656c6c6f204261636b');
+  console.log(cell.getData()); //'Hello Back'
+
+  cell.setData('a looooooooooooooooooooooong data');
+  cell.resize(); // cell.capacity will be adjusted to the actual space usage.
   ```
-
-/_ Script _/
-const lockScript = addressCkb.toLockScript();
-const lockScriptHash = lockScript.toHash();
-const address1 = Address.fromLockScript(lockScript);
-const address2 = lockScript.toAddress();
-
-console.log(addressEth.toLockScript().sameWith(addressCkbFull.toLockScript()));
-//true
-
-/_ Amount _/
-const ckb100 = new Amount('100');
-const ckb1M = new Amount('1000000');
-const shannon1k = new Amount('1000', AmountUnit.shannon);
-const shannon10B = new Amount('10000000000', AmountUnit.shannon);
-
-console.log(ckb100.eq(shannon10B)); //true
-console.log(ckb100.lt(shannon1k)); //false
-
-const result = ckb1M.add(ckb100).sub(shannon1k);
-console.log(result.eq(new Amount('1000099.99999'))); //true
-
-console.log(ckb100.toString(AmountUnit.shannon)); //'10000000000'
-console.log(ckb100.toHexString()); //'0x2540be400'
-
-console.log(result.toString(AmountUnit.ckb, {
-section: 'full', pad: true, commify: true
-})); //'1,000,099.99999000'
-
-console.log(result.toString(Amount), { section: 'whole' })); //'1000099'
-console.log(result.toString(Amount), { section: 'whole', commify: true })); //'1,000,099'
-console.log(result.toString(Amount), { section: 'fraction' })); //'99999'
-console.log(result.toString(Amount), { section: 'fraction', pad: true })); //'99999000'
-
-/_ Cell _/
-const cell = new Cell(new Amount('100'), PWCore.provider.address.toLockScript());
-
-cell.setData('Hello from Lay2');
-console.log(cell.getHexData()); //'0x48656c6c6f2066726f6d204c617932'
-cell.setHexData('0x48656c6c6f204261636b');
-console.log(cell.getData()); //'Hello Back'
-
-cell.setData('a looooooooooooooooooooooong data');
-cell.resize(); // cell.capacity will be adjusted to the actual space usage.
-
-````
 
 - ### Simple and Clear Structure
 
@@ -187,7 +185,7 @@ export class RawTransaction implements CKBModel {
 
   // ...
 }
-````
+```
 
 It's easy to findout that both inputs and outputs are Array of cells, and the low-level details and transformations are done silently. And yes, we have the 'Cell' structure.
 
