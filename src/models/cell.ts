@@ -1,10 +1,10 @@
-import { CKBModel } from '../interfaces';
-import { Amount, Script, OutPoint } from '.';
+import { CKBModel, HashType } from '../interfaces';
+import { Script } from './script';
+import { OutPoint } from './out-point';
 import { CellInput } from './cell-input';
 // import { minimalCellCapacity } from '../utils';
-import { AmountUnit } from './amount';
+import { AmountUnit, Amount } from './amount';
 import { RPC, validators, transformers } from 'ckb-js-toolkit';
-import { HashType } from '..';
 import { byteArrayToHex, hexToByteArray } from '../utils';
 
 export class Cell implements CKBModel {

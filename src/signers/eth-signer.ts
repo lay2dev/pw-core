@@ -1,4 +1,4 @@
-import { Signer, Message } from '.';
+import { Signer, Message } from './signer';
 import { Keccak256Hasher } from '../hashers';
 import { Platform } from '../providers';
 // import {

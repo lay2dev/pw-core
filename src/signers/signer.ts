@@ -1,4 +1,4 @@
-import { Transaction } from '..';
+import { Transaction } from '../models';
 import { Hasher, Blake2bHasher } from '../hashers';
 import { normalizers, Reader, transformers } from 'ckb-js-toolkit';
 // import JSBI from 'jsbi';

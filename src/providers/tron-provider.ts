@@ -1,5 +1,5 @@
 import { Provider, Platform } from './provider';
-import { Address, AddressType } from '..';
+import { Address, AddressType } from '../models';
 
 export class TronProvider extends Provider {
   onAddressChanged: (newAddress: Address) => void;

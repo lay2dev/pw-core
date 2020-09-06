@@ -1,5 +1,5 @@
 import { Collector } from './collector';
-import { Cell, Address, Amount, OutPoint } from '..';
+import { Cell, Address, Amount, OutPoint } from '../models';
 
 export class DummyCollector extends Collector {
   getBalance(): Promise<Amount> {

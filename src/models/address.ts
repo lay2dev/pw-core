@@ -1,4 +1,4 @@
-import { Script } from '.';
+import { Script } from './script';
 import PWCore, { ChainID } from '../core';
 import { HashType } from '../interfaces';
 // import { validators, transformers } from 'ckb-js-toolkit';

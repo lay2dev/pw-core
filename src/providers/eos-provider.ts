@@ -1,5 +1,5 @@
 import { Provider, Platform } from './provider';
-import { Address, AddressType } from '..';
+import { Address, AddressType } from '../models';
 import ScatterJS from '@scatterjs/core';
 import ScatterEOS from '@scatterjs/eosjs2';
 import { getCKBLockArgsForEosAccount } from '../utils';

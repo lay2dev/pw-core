@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Collector } from './collector';
-import { Cell, Address, Amount, AmountUnit, OutPoint } from '..';
+import { Cell, Address, Amount, AmountUnit, OutPoint } from '../models';
 
 export class PwCollector extends Collector {
   constructor(public apiBase: string) {

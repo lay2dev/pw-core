@@ -1,5 +1,5 @@
 import { validators, transformers } from 'ckb-js-toolkit';
-import { CKBModel } from '..';
+import { CKBModel } from '../interfaces';
 
 export class OutPoint implements CKBModel {
   static fromRPC(data: any): OutPoint | undefined {

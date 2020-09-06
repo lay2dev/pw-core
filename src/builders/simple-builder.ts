@@ -8,7 +8,7 @@ import {
   RawTransaction,
   Transaction,
 } from '../models';
-import PWCore from '..';
+import PWCore from '../core';
 
 export class SimpleBuilder extends Builder {
   constructor(

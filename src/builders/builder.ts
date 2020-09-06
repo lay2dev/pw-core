@@ -1,6 +1,6 @@
 import { Collector } from '../collectors/collector';
 import { Amount, AmountUnit, Transaction } from '../models';
-import PWCore from '..';
+import PWCore from '../core';
 
 const FEE_BASE = 1000;
 

@@ -1,6 +1,6 @@
 import JSBI from 'jsbi';
 import bech32 from 'bech32';
-import { FormatOptions } from '.';
+import { FormatOptions } from './models/amount';
 import ecc from 'eosjs-ecc';
 import { Reader } from 'ckb-js-toolkit';
 import { Keccak256Hasher } from './hashers';

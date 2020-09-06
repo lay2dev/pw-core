@@ -1,4 +1,4 @@
-import { Address } from '..';
+import { Address } from '../models';
 
 export enum Platform {
   ckb = 0,

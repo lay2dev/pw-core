@@ -1,4 +1,4 @@
-import { Hasher } from '.';
+import { Hasher } from './hasher';
 import { Reader } from 'ckb-js-toolkit';
 import keccak from 'keccak';
 

@@ -1,5 +1,5 @@
 import { Provider, Platform } from './provider';
-import { Address, AddressType } from '..';
+import { Address, AddressType } from '../models';
 import ENS from 'ethereum-ens';
 
 export class EthProvider extends Provider {

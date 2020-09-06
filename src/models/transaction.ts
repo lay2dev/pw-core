@@ -5,7 +5,7 @@ import {
   SerializeTransaction,
   SerializeWitnessArgs,
 } from '@ckb-lumos/types/lib/core';
-import { RawTransaction } from '.';
+import { RawTransaction } from './raw-transaction';
 
 export class Transaction implements CKBModel {
   public witnesses: string[];
