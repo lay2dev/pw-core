@@ -5,7 +5,9 @@ import { Address, Amount, Transaction } from './models';
 import { EthSigner, Signer } from './signers';
 import { Collector } from './collectors';
 import { SimpleBuilder, Builder } from './builders';
-import { Provider } from './providers';
+import { Provider, Platform } from './providers';
+import { EosSigner } from './signers/eos-signer';
+import { TronSigner } from './signers/tron-signer';
 
 export enum ChainID {
   ckb,
@@ -98,8 +100,24 @@ export default class PWCore {
     feeRate?: number
   ): Promise<string> {
     const simpleBuilder = new SimpleBuilder(address, amount, feeRate);
-    const ethSigner = new EthSigner(PWCore.provider.address.addressString);
-    return this.sendTransaction(simpleBuilder, ethSigner);
+
+    let signer: Signer;
+    switch (PWCore.provider.platform) {
+      case Platform.eth:
+        signer = new EthSigner(PWCore.provider.address.addressString);
+        break;
+      case Platform.eos:
+        signer = new EosSigner(PWCore.provider.address.addressString);
+        break;
+      case Platform.tron:
+        signer = new TronSigner(PWCore.provider.address.addressString);
+        break;
+      default:
+        signer = new EthSigner(PWCore.provider.address.addressString);
+        break;
+    }
+
+    return this.sendTransaction(simpleBuilder, signer);
   }
 
   /**

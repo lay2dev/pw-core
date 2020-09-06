@@ -1,5 +1,6 @@
 import { Signer, Message } from '.';
 import { Keccak256Hasher } from '../hashers';
+import { Platform } from '../providers';
 // import {
 //   ecsign,
 //   bufferToHex,
@@ -34,8 +35,11 @@ import { Keccak256Hasher } from '../hashers';
 // }
 
 export class EthSigner extends Signer {
+  currentPlatform: Platform;
+
   constructor(public readonly from: string) {
     super(new Keccak256Hasher());
+    this.currentPlatform = Platform.eth;
   }
 
   signMessages(messages: Message[]): Promise<string[]> {
@@ -65,7 +69,11 @@ export class EthSigner extends Signer {
           result = result.result;
           let v = Number.parseInt(result.slice(-2), 16);
           if (v >= 27) v -= 27;
-          result = result.slice(0, -2) + v.toString(16).padStart(2, '0');
+          result =
+            '0x' +
+            this.currentPlatform.toString(16).padStart(2, '0') +
+            result.slice(2, -2) +
+            v.toString(16).padStart(2, '0');
           resolve([result]);
         }
       );

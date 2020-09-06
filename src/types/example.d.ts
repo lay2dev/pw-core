@@ -22,6 +22,8 @@ declare interface SymbolConstructor {
 interface Window {
   web3: any;
   ethereum: any;
+  tronWeb: any;
+  scatter: any;
 }
 
 // declare module 'ckb-js-toolkit-contrib';

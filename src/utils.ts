@@ -1,6 +1,10 @@
 import JSBI from 'jsbi';
 import bech32 from 'bech32';
 import { FormatOptions } from '.';
+import ecc from 'eosjs-ecc';
+import { Reader } from 'ckb-js-toolkit';
+import { Keccak256Hasher } from './hashers';
+import axios from 'axios';
 
 export const BASE = '100000000';
 const ZERO = JSBI.BigInt(0);
@@ -250,4 +254,46 @@ export function verifyCkbAddress(address: string): boolean {
 
 export function verifyEthAddress(address: string): boolean {
   return /^0x[a-fA-F0-9]{40}$/.test(address);
+}
+
+export function verifyEosAddress(address: string): boolean {
+  console.log('address', address);
+  return true;
+}
+
+export function verifyTronAddress(address: string): boolean {
+  console.log('address', address);
+  return true;
+}
+
+export async function getEosPublicKey(account: string) {
+  const res = await axios.post(
+    `https://nodes.get-scatter.com/v1/chain/get_account`,
+    { account_name: account }
+  );
+  const data = res.data;
+
+  const pubkey = data.permissions[0].required_auth.keys[0].key;
+  return pubkey;
+}
+
+export async function getCKBLockArgsForEosAccount(account: string) {
+  const pubkey = await getEosPublicKey(account);
+
+  const publicKeyHex = ecc.PublicKey(pubkey).toUncompressed().toHex();
+
+  const publicHash = new Keccak256Hasher()
+    .hash(new Reader(`0x${publicKeyHex.slice(2)}`))
+    .serializeJson();
+  const address = '0x' + publicHash.slice(-40);
+  return address;
+}
+
+export function spliceStr(
+  original: string,
+  idx: number,
+  rem: number,
+  str: string
+) {
+  return original.slice(0, idx) + str + original.slice(idx + Math.abs(rem));
 }

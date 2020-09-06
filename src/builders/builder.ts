@@ -9,7 +9,7 @@ export abstract class Builder {
   static readonly MIN_CHANGE = new Amount('61', AmountUnit.ckb);
   static readonly WITNESS_ARGS = {
     Secp256k1: {
-      lock: '0x' + '0'.repeat(130),
+      lock: '0x' + '0'.repeat(132),
       input_type: '',
       output_type: '',
     },

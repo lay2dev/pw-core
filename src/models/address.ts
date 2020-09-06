@@ -8,12 +8,15 @@ import {
   LumosConfigs,
   verifyCkbAddress,
   verifyEthAddress,
+  verifyEosAddress,
+  verifyTronAddress,
 } from '../utils';
 import {
   fullPayloadToAddress,
   AddressType as AType,
   AddressPrefix as APrefix,
 } from '@nervosnetwork/ckb-sdk-utils';
+import bs58 from 'bs58';
 
 export enum AddressPrefix {
   ckb,
@@ -23,9 +26,8 @@ export enum AddressPrefix {
 export enum AddressType {
   ckb,
   eth,
-  // btc,
-  // eos,
-  // tron,
+  eos,
+  tron,
   // libra,
 }
 
@@ -53,9 +55,30 @@ export class Address {
 
   constructor(
     readonly addressString: string,
-    readonly addressType: AddressType
+    readonly addressType: AddressType,
+    readonly lockArgs?: string
   ) {
-    this.addressString = addressString.toLowerCase();
+    if (!lockArgs) {
+      switch (addressType) {
+        case AddressType.eth:
+          this.addressString = addressString.toLowerCase();
+          this.lockArgs = this.addressString;
+          break;
+        case AddressType.eos:
+          throw new Error('lock args must provided for eos address');
+        case AddressType.tron:
+          this.lockArgs =
+            '0x' +
+            Buffer.from(bs58.decode(addressString)).toString('hex', 1, 21);
+          break;
+        case AddressType.ckb:
+          const lock = parseAddress(this.addressString, {
+            config: LumosConfigs[getDefaultPrefix()],
+          });
+          this.lockArgs = lock.args;
+          break;
+      }
+    }
   }
 
   valid(): boolean {
@@ -64,6 +87,10 @@ export class Address {
         return verifyCkbAddress(this.addressString);
       case AddressType.eth:
         return verifyEthAddress(this.addressString);
+      case AddressType.eos:
+        return verifyEosAddress(this.addressString);
+      case AddressType.tron:
+        return verifyTronAddress(this.addressString);
       default:
         return true;
     }
@@ -91,7 +118,7 @@ export class Address {
   toLockScript(): Script {
     if (this.addressType !== AddressType.ckb) {
       const { codeHash, hashType } = PWCore.config.pwLock.script;
-      return new Script(codeHash, this.addressString, hashType);
+      return new Script(codeHash, this.lockArgs, hashType);
     }
 
     const lock = parseAddress(this.addressString, {
