@@ -51,4 +51,31 @@ export class EthProvider extends Provider {
       return 'Unknown ENS Name';
     }
   }
+
+  async sign(message: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const from = this.address.addressString;
+      const params = [message, from];
+      const method = 'personal_sign';
+
+      window.web3.currentProvider.sendAsync(
+        { method, params, from },
+        (err, result) => {
+          if (err) {
+            reject(err);
+          }
+          if (result.error) {
+            reject(result.error);
+          }
+          result = result.result;
+          let v = Number.parseInt(result.slice(-2), 16);
+          if (v >= 27) v -= 27;
+          result = result.slice(0, -2) + v.toString(16).padStart(2, '0');
+          resolve(result);
+        }
+      );
+    });
+  }
+
+  async close() {}
 }
