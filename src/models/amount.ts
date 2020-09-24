@@ -1,6 +1,7 @@
 import JSBI from 'jsbi';
 import { ckbToShannon, shannonToCKB, BASE } from '../utils';
 import { HexStringToBigInt } from 'ckb-js-toolkit';
+import { utils } from '@ckb-lumos/base';
 
 export enum AmountUnit {
   ckb,
@@ -113,5 +114,16 @@ export class Amount {
 
   toHexString() {
     return `0x${this.toBigInt().toString(16)}`;
+  }
+
+  toUInt128LE(): string {
+    return utils.toBigUInt128LE(BigInt(this.toHexString()));
+  }
+
+  static fromUInt128LE(hex) {
+    return new Amount(
+      utils.readBigUInt128LE(hex).toString(16),
+      AmountUnit.shannon
+    );
   }
 }

@@ -69,6 +69,11 @@ export class Address {
     }
   }
 
+  // TODO need check code_hash is in the acplock list
+  isAcp() {
+    return true;
+  }
+
   toCKBAddress(): string {
     if (this.addressType === AddressType.ckb) {
       return this.addressString;

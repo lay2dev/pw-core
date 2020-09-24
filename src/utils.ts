@@ -251,3 +251,29 @@ export function verifyCkbAddress(address: string): boolean {
 export function verifyEthAddress(address: string): boolean {
   return /^0x[a-fA-F0-9]{40}$/.test(address);
 }
+
+export const hexDataOccupiedBytes = (hexString) => {
+  // Exclude 0x prefix, and every 2 hex digits are one byte
+  return (hexString.length - 2) / 2;
+};
+
+export const scriptOccupiedBytes = (script) => {
+  if (script !== undefined && script !== null) {
+    return (
+      1 +
+      hexDataOccupiedBytes(script.codeHash) +
+      hexDataOccupiedBytes(script.args)
+      //   script.args.map(hexDataOccupiedBytes).reduce((x, y) => x + y, 0)
+    );
+  }
+  return 0;
+};
+
+export const cellOccupiedBytes = (cell) => {
+  return (
+    8 +
+    hexDataOccupiedBytes(cell.data) +
+    scriptOccupiedBytes(cell.lock) +
+    scriptOccupiedBytes(cell.type)
+  );
+};

@@ -26,6 +26,20 @@ export const CHAIN_SPECS = {
         HashType.type
       ),
     },
+    sudtType: {
+      cellDep: new CellDep(
+        DepType.code,
+        new OutPoint(
+          '0xc7813f6a415144643970c2e88e0bb6ca6a8edc5dd7c1022746f628284a9936d5',
+          '0x0'
+        )
+      ),
+      script: new Script(
+        '0x5e7a36a77e68eecc013dfa2fe6a23f3b6c344b04005808694ae6dd45eea4cfd5',
+        '0x',
+        HashType.type
+      ),
+    },
     defaultLock: {
       cellDep: new CellDep(
         DepType.depGroup,
@@ -99,6 +113,20 @@ export const CHAIN_SPECS = {
         HashType.type
       ),
     },
+    sudtType: {
+      cellDep: new CellDep(
+        DepType.code,
+        new OutPoint(
+          '0xc1b2ae129fad7465aaa9acc9785f842ba3e6e8b8051d899defa89f5508a77958',
+          '0x0'
+        )
+      ),
+      script: new Script(
+        '0x48dbf59b4c7ee1547238021b4869bceedf4eea6b43772e5d66ef8865b6ae7212',
+        '0x',
+        HashType.data
+      ),
+    },
     multiSigLock: {
       cellDep: new CellDep(
         DepType.depGroup,
@@ -142,6 +170,20 @@ export const CHAIN_SPECS = {
         '0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e',
         '0x',
         HashType.type
+      ),
+    },
+    sudtType: {
+      cellDep: new CellDep(
+        DepType.code,
+        new OutPoint(
+          '0xc1b2ae129fad7465aaa9acc9785f842ba3e6e8b8051d899defa89f5508a77958',
+          '0x0'
+        )
+      ),
+      script: new Script(
+        '0x48dbf59b4c7ee1547238021b4869bceedf4eea6b43772e5d66ef8865b6ae7212',
+        '0x',
+        HashType.data
       ),
     },
     defaultLock: {

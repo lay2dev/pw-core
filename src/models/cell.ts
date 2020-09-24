@@ -5,7 +5,7 @@ import { CellInput } from './cell-input';
 import { AmountUnit } from './amount';
 import { RPC, validators, transformers } from 'ckb-js-toolkit';
 import { HashType } from '..';
-import { byteArrayToHex, hexToByteArray } from '../utils';
+import { byteArrayToHex, cellOccupiedBytes, hexToByteArray } from '../utils';
 
 export class Cell implements CKBModel {
   static fromRPC(data: any): Cell {
@@ -53,6 +53,16 @@ export class Cell implements CKBModel {
     this.spaceCheck();
   }
 
+  clone() {
+    return new Cell(
+      this.capacity,
+      this.lock,
+      this.type,
+      this.outPoint,
+      this.data
+    );
+  }
+
   sameWith(cell: Cell): boolean {
     if (!cell || !cell.outPoint || !this.outPoint) {
       throw new Error('to be compared, cells must have outPoint value');
@@ -72,9 +82,25 @@ export class Cell implements CKBModel {
   }
 
   spaceCheck() {
-    // TODO: check if current cell can be filled in to the capacity provided
-    // if not, throw an exception
+    if (this.capacity.lt(this.occupiedCapacity())) {
+      throw new Error(
+        `cell capacity ${this.capacity.toString(
+          AmountUnit.ckb
+        )} less than the min capacity ${this.occupiedCapacity().toString(
+          AmountUnit.ckb
+        )}`
+      );
+    }
+
     return true;
+  }
+
+  occupiedCapacity(): Amount {
+    return new Amount(cellOccupiedBytes(this).toString(), AmountUnit.ckb);
+  }
+
+  availableFee(): Amount {
+    return this.capacity.sub(this.occupiedCapacity());
   }
 
   toCellInput(since: string = '0x0'): CellInput | undefined {
@@ -127,6 +153,15 @@ export class Cell implements CKBModel {
 
   getHexData(): string {
     return this.data.trim();
+  }
+
+  setSUDTAmount(amount: Amount) {
+    this.data = amount.toUInt128LE() + this.data.slice(34);
+  }
+
+  getSUDTAmount(): Amount {
+    const sudtAmountData = this.data.slice(0, 34);
+    return Amount.fromUInt128LE(sudtAmountData);
   }
 
   isEmpty(): boolean {

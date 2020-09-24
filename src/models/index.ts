@@ -7,3 +7,4 @@ export * from './raw-transaction';
 export * from './transaction';
 export * from './cell-dep';
 export * from './cell-input';
+export * from './sudt';
