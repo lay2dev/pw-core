@@ -62,7 +62,7 @@ export class SimpleSUDTBuilder extends Builder {
       this.amount
     );
 
-    // build a tx including sender and receiver sudt cell only
+    // First step: build a tx including sender and receiver sudt cell only
     for (const inputCell of unspentSUDTCells) {
       const outputCell = inputCell.clone();
 
@@ -102,7 +102,7 @@ export class SimpleSUDTBuilder extends Builder {
 
     const availableCKBFee = senderInputCKBSum.sub(minSenderOccupiedCKBSum);
 
-    // if sudt cell can not pay the transaction fee, fetch pure ckb cells to pay the fee.
+    // Second step:  if sudt cell can not pay the transaction fee, fetch pure ckb cells to pay the fee.
     if (this.fee.gt(availableCKBFee)) {
       const unspentCKBCells = await this.collector.collect(
         PWCore.provider.address,
@@ -134,7 +134,7 @@ export class SimpleSUDTBuilder extends Builder {
       }
     }
 
-    // subtract tx fee from outputs' capacity
+    // Third step: subtract tx fee from outputs' capacity
     tx = this.subtractFee(inputCells, outputCells);
 
     return tx;

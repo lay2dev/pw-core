@@ -2,7 +2,7 @@ import { RPC, transformers } from 'ckb-js-toolkit';
 import { CHAIN_SPECS } from './constants';
 import { Config } from './interfaces';
 import { Address, Amount, SUDT, Transaction } from './models';
-import { EthSigner, Signer } from './signers';
+import { DefaultSigner, Signer } from './signers';
 import { Collector } from './collectors';
 import { SimpleBuilder, Builder, SimpleSUDTBuilder } from './builders';
 import { Provider } from './providers';
@@ -98,8 +98,7 @@ export default class PWCore {
     feeRate?: number
   ): Promise<string> {
     const simpleBuilder = new SimpleBuilder(address, amount, feeRate);
-    const ethSigner = new EthSigner(PWCore.provider.address.addressString);
-    return this.sendTransaction(simpleBuilder, ethSigner);
+    return this.sendTransaction(simpleBuilder);
   }
 
   /**
@@ -109,10 +108,15 @@ export default class PWCore {
    */
   async sendTransaction(
     toSend: Transaction | Builder,
-    signer: Signer
+    signer?: Signer
   ): Promise<string> {
     const tx = toSend instanceof Builder ? await toSend.build() : toSend;
     tx.validate();
+
+    if (!signer) {
+      signer = new DefaultSigner(PWCore.provider);
+    }
+
     return this.rpc.send_transaction(
       transformers.TransformTransaction(await signer.sign(tx))
     );
@@ -138,8 +142,8 @@ export default class PWCore {
       amount,
       feeRate
     );
-    const ethSigner = new EthSigner(PWCore.provider.address.addressString);
+    const signer = new DefaultSigner(PWCore.provider);
 
-    return this.sendTransaction(simpleSUDTBuild, ethSigner);
+    return this.sendTransaction(simpleSUDTBuild, signer);
   }
 }

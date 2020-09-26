@@ -1,7 +1,7 @@
 src
 test
-tsconfig.json
-tsconfig.module.json
+#tsconfig.json
+#tsconfig.module.json
 tslint.json
 .travis.yml
 .github
