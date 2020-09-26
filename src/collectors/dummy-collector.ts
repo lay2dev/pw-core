@@ -1,6 +1,5 @@
-import { Collector, CollectorOptions } from './collector';
+import { Collector } from './collector';
 import { Cell, Address, Amount, OutPoint } from '..';
-import { SUDT } from '../models/sudt';
 
 export class DummyCollector extends Collector {
   getBalance(): Promise<Amount> {
@@ -28,16 +27,11 @@ export class DummyCollector extends Collector {
     return [cell];
   }
 
-  getSUDTBalance(sudt: SUDT, address: Address): Promise<Amount> {
+  async getSUDTBalance(): Promise<Amount> {
     throw new Error('Method not implemented.');
   }
 
-  collectSUDT(
-    sudt: SUDT,
-    address: Address,
-    neededAmount?: Amount,
-    options?: CollectorOptions
-  ): Promise<Cell[]> {
+  async collectSUDT(): Promise<Cell[]> {
     throw new Error('Method not implemented.');
   }
 }

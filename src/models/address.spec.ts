@@ -7,7 +7,7 @@ import { DummyProvider } from '../providers/dummy-provider';
 const eth = '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc';
 const ckb = 'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs';
 const ckbFull =
-  'ckt1qjmk32srs9nx345sgj0xrcq6slzx5ta3vt8azm4py95aalx7qq2agvh5ct04panc49rqn6v03mnllv2tv7vmc2z5pkp';
+  'ckt1q3vvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxvh5ct04panc49rqn6v03mnllv2tv7vmc9kkmjq';
 
 const ckbAddress = new Address(ckb, AddressType.ckb);
 const ckbFullAddress = new Address(ckbFull, AddressType.ckb);

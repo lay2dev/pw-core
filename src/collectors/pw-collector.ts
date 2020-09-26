@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Collector, CollectorOptions } from './collector';
+import { Collector } from './collector';
 import { Cell, Address, Amount, AmountUnit, OutPoint } from '..';
 import { SUDT } from '../models/sudt';
 

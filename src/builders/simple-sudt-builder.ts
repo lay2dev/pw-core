@@ -22,7 +22,7 @@ export class SimpleSUDTBuilder extends Builder {
     super(feeRate, collector);
   }
 
-  async build(fee: Amount = Amount.ZERO): Promise<Transaction> {
+  async build(): Promise<Transaction> {
     if (!this.address.isAcp()) {
       throw new Error("The receiver's address is not any-one-can-pay cell");
     }

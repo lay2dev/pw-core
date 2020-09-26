@@ -77,5 +77,7 @@ export class EthProvider extends Provider {
     });
   }
 
-  async close() {}
+  async close() {
+    console.log('do nothing');
+  }
 }
