@@ -6,10 +6,12 @@ import {
   SerializeWitnessArgs,
   SerializeRawTransaction,
 } from '@ckb-lumos/types/lib/core';
+import { Script } from '../models';
 
 export interface Message {
   index: number;
   message: string;
+  lock: Script;
 }
 
 export abstract class Signer {

@@ -77,8 +77,8 @@ export class SimpleSUDTBuilder extends Builder {
         restNeededSUDT = restNeededSUDT.sub(inputSUDTAmount);
         outputCell.setSUDTAmount(new Amount('0'));
       } else {
-        restNeededSUDT = new Amount('0');
         outputCell.setSUDTAmount(inputSUDTAmount.sub(restNeededSUDT));
+        restNeededSUDT = new Amount('0');
       }
 
       inputCells.push(inputCell);
@@ -124,11 +124,11 @@ export class SimpleSUDTBuilder extends Builder {
       if (this.fee.gt(availableCKBFee.add(ckbFeeInputCell.availableFee()))) {
         outputCells.pop();
 
-        const senderOutputCell = outputCells.shift();
+        const senderOutputCell = outputCells.pop();
         senderOutputCell.capacity = senderOutputCell.capacity.add(
           ckbFeeInputCell.capacity
         );
-        outputCells.unshift(senderOutputCell);
+        outputCells.push(senderOutputCell);
 
         tx = this.rectifyTx(inputCells, outputCells);
       }

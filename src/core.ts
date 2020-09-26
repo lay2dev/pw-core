@@ -134,6 +134,7 @@ export default class PWCore {
     sudt: SUDT,
     address: Address,
     amount: Amount,
+    signer?: Signer,
     feeRate?: number
   ): Promise<string> {
     const simpleSUDTBuild = new SimpleSUDTBuilder(
@@ -142,7 +143,10 @@ export default class PWCore {
       amount,
       feeRate
     );
-    const signer = new DefaultSigner(PWCore.provider);
+
+    if (!signer) {
+      signer = new DefaultSigner(PWCore.provider);
+    }
 
     return this.sendTransaction(simpleSUDTBuild, signer);
   }

@@ -50,7 +50,6 @@
     "node": ">=8.9"
   },
   "dependencies": {
-    "@ckb-lumos/base": "^0.12.0",
     "@ckb-lumos/types": "^0.2.4",
     "@nervosnetwork/ckb-sdk-utils": "^0.32.0",
     "axios": "^0.19.2",
