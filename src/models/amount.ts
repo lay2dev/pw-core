@@ -122,7 +122,7 @@ export class Amount {
 
   static fromUInt128LE(hex) {
     return new Amount(
-      utils.readBigUInt128LE(hex).toString(16),
+      `0x${utils.readBigUInt128LE(hex).toString(16)}`,
       AmountUnit.shannon
     );
   }

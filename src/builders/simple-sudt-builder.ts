@@ -141,9 +141,10 @@ export class SimpleSUDTBuilder extends Builder {
   }
 
   private subtractFee(inputCells: Cell[], outputCells: Cell[]) {
-    let remainFee = new Amount(this.fee.toString());
+    let remainFee = new Amount(this.fee.toHexString(), AmountUnit.shannon);
     for (const cell of outputCells.slice(1)) {
-      if (remainFee.lt(cell.availableFee())) {
+      // throw new Error(`remainFee ${remainFee} ${cell.availableFee()}`);
+      if (remainFee.gt(cell.availableFee())) {
         remainFee = remainFee.sub(cell.availableFee());
         cell.capacity = cell.occupiedCapacity();
       } else {
