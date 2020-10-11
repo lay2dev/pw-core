@@ -2,12 +2,6 @@ import { Provider, Platform } from './provider';
 import { Address, AddressType } from '../models';
 
 export class TronProvider extends Provider {
-  sign(): Promise<string> {
-    throw new Error('Method not implemented.');
-  }
-  close() {
-    throw new Error('Method not implemented.');
-  }
   onAddressChanged: (newAddress: Address) => void;
   constructor(onAddressChanged?: (newAddress: Address) => void) {
     super(Platform.tron);
@@ -34,5 +28,22 @@ export class TronProvider extends Provider {
         'window.tronWeb is undefined, Tron environment is required.'
       );
     }
+  }
+
+  async sign(message: string): Promise<string> {
+    let result = await window.tronWeb.trx.sign(message);
+    let v = Number.parseInt(result.slice(-2), 16);
+    if (v >= 27) v -= 27;
+    result =
+      '0x' +
+      this.platform.toString(16).padStart(2, '0') +
+      result.slice(2, -2) +
+      v.toString(16).padStart(2, '0');
+
+    return result;
+  }
+
+  close() {
+    throw new Error('Method not implemented.');
   }
 }

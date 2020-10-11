@@ -2,8 +2,8 @@ import test from 'ava';
 import PWCore, { ChainID } from '../core';
 import { Address, AddressType } from './address';
 import { DummyCollector } from '../collectors/dummy-collector';
+import { EosProvider } from '../providers';
 import { DummyProvider } from '../providers/dummy-provider';
-import { getCKBLockArgsForEosAccount } from '../utils';
 
 const eth = '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc';
 const ckb = 'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs';
@@ -23,18 +23,28 @@ const ethAddress = new Address(eth, AddressType.eth);
 let eosAddress;
 const tronAddress = new Address(tron, AddressType.tron);
 
+const network = {
+  blockchain: 'eos',
+  chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
+  host: 'eospush.tokenpocket.pro',
+  port: 80,
+  protocol: 'http',
+};
+let eosProvider;
+
 test.before(async () => {
   await new PWCore('https://aggron.ckb.dev').init(
     new DummyProvider(),
     new DummyCollector(),
     ChainID.ckb_testnet
   );
-  const lockArgs = await getCKBLockArgsForEosAccount(eos);
+  eosProvider = new EosProvider(network);
+  const lockArgs = await eosProvider.getCKBLockArgsForEosAccount(eos);
   eosAddress = new Address(eos, AddressType.eos, lockArgs);
 });
 
 test('get lock args for eos', async (t) => {
-  const lockArgs = await getCKBLockArgsForEosAccount(eos);
+  const lockArgs = await eosProvider.getCKBLockArgsForEosAccount(eos);
   t.is(lockArgs, '0x6f58cadcc89fb31668a60a762ec476e1d094e15b');
 });
 
