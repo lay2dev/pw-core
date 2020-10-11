@@ -2,6 +2,10 @@ import { Provider, Platform } from './provider';
 import { Address, AddressType } from '../models';
 
 export class DummyProvider extends Provider {
+  sign(message: string): Promise<string> {
+    console.log('message', message);
+    throw new Error('Method not implemented.');
+  }
   constructor(platform: Platform = Platform.eth) {
     super(platform);
   }
@@ -18,5 +22,8 @@ export class DummyProvider extends Provider {
       );
     }
     return this;
+  }
+  async close() {
+    return true;
   }
 }

@@ -2,12 +2,10 @@ import { RPC, transformers } from 'ckb-js-toolkit';
 import { CHAIN_SPECS } from './constants';
 import { Config } from './interfaces';
 import { Address, Amount, Transaction } from './models';
-import { EthSigner, Signer } from './signers';
+import { DefaultSigner, Signer } from './signers';
 import { Collector } from './collectors';
 import { SimpleBuilder, Builder } from './builders';
-import { Provider, Platform } from './providers';
-import { EosSigner } from './signers/eos-signer';
-import { TronSigner } from './signers/tron-signer';
+import { Provider } from './providers';
 
 export enum ChainID {
   ckb,
@@ -100,24 +98,7 @@ export default class PWCore {
     feeRate?: number
   ): Promise<string> {
     const simpleBuilder = new SimpleBuilder(address, amount, feeRate);
-
-    let signer: Signer;
-    switch (PWCore.provider.platform) {
-      case Platform.eth:
-        signer = new EthSigner(PWCore.provider.address.addressString);
-        break;
-      case Platform.eos:
-        signer = new EosSigner(PWCore.provider.address.addressString);
-        break;
-      case Platform.tron:
-        signer = new TronSigner(PWCore.provider.address.addressString);
-        break;
-      default:
-        signer = new EthSigner(PWCore.provider.address.addressString);
-        break;
-    }
-
-    return this.sendTransaction(simpleBuilder, signer);
+    return this.sendTransaction(simpleBuilder);
   }
 
   /**
@@ -127,10 +108,15 @@ export default class PWCore {
    */
   async sendTransaction(
     toSend: Transaction | Builder,
-    signer: Signer
+    signer?: Signer
   ): Promise<string> {
     const tx = toSend instanceof Builder ? await toSend.build() : toSend;
     tx.validate();
+
+    if (!signer) {
+      signer = new DefaultSigner(PWCore.provider);
+    }
+
     return this.rpc.send_transaction(
       transformers.TransformTransaction(await signer.sign(tx))
     );

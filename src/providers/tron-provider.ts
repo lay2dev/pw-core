@@ -2,6 +2,12 @@ import { Provider, Platform } from './provider';
 import { Address, AddressType } from '../models';
 
 export class TronProvider extends Provider {
+  sign(): Promise<string> {
+    throw new Error('Method not implemented.');
+  }
+  close() {
+    throw new Error('Method not implemented.');
+  }
   onAddressChanged: (newAddress: Address) => void;
   constructor(onAddressChanged?: (newAddress: Address) => void) {
     super(Platform.tron);

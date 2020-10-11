@@ -5,6 +5,12 @@ import ScatterEOS from '@scatterjs/eosjs2';
 import { getCKBLockArgsForEosAccount } from '../utils';
 
 export class EosProvider extends Provider {
+  sign(): Promise<string> {
+    throw new Error('Method not implemented.');
+  }
+  close() {
+    throw new Error('Method not implemented.');
+  }
   onAddressChanged: (newAddress: Address) => void;
   constructor(onAddressChanged?: (newAddress: Address) => void) {
     super(Platform.eos);

@@ -21,7 +21,7 @@ export abstract class Provider {
 
   abstract async init(): Promise<Provider>;
 
-  async sign(): Promise<string> {
-    return '';
-  }
+  abstract async sign(message: string): Promise<string>;
+
+  abstract async close();
 }
