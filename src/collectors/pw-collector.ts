@@ -59,7 +59,7 @@ export class PwCollector extends Collector {
     const res = await axios.get(
       `${
         this.apiBase
-      }/cell/unSpent?lockHash=${lockHash}&typeHash=${typeHash}&sudtAmount=${neededAmount.toHexString()}`
+      }/cell/unSpent?lockHash=${lockHash}&capacity=0x0&typeHash=${typeHash}&sudtAmount=${neededAmount.toHexString()}`
     );
 
     for (let { capacity, outPoint, type, data } of res.data.data) {

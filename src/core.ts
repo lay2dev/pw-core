@@ -4,7 +4,12 @@ import { Config } from './interfaces';
 import { Address, Amount, SUDT, Transaction } from './models';
 import { DefaultSigner, Signer } from './signers';
 import { Collector } from './collectors';
-import { SimpleBuilder, Builder, SimpleSUDTBuilder } from './builders';
+import {
+  SimpleBuilder,
+  Builder,
+  SimpleSUDTBuilder,
+  SimpleSUDTCreateACPBuilder,
+} from './builders';
 import { Provider } from './providers';
 
 export enum ChainID {
@@ -134,20 +139,14 @@ export default class PWCore {
     sudt: SUDT,
     address: Address,
     amount: Amount,
+    createAcp?: boolean,
     signer?: Signer,
     feeRate?: number
   ): Promise<string> {
-    const simpleSUDTBuild = new SimpleSUDTBuilder(
-      sudt,
-      address,
-      amount,
-      feeRate
-    );
+    const builder = createAcp
+      ? new SimpleSUDTCreateACPBuilder(sudt, address, amount, feeRate)
+      : new SimpleSUDTBuilder(sudt, address, amount, feeRate);
 
-    if (!signer) {
-      signer = new DefaultSigner(PWCore.provider);
-    }
-
-    return this.sendTransaction(simpleSUDTBuild, signer);
+    return this.sendTransaction(builder, signer);
   }
 }
