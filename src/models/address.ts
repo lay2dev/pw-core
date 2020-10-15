@@ -1,6 +1,7 @@
 import { Script } from './script';
 import PWCore, { ChainID } from '../core';
 import { HashType } from '../interfaces';
+import ecc from 'eosjs-ecc';
 // import { validators, transformers } from 'ckb-js-toolkit';
 import {
   parseAddress,
@@ -18,6 +19,9 @@ import {
 } from '@nervosnetwork/ckb-sdk-utils';
 import bs58 from 'bs58';
 import axios from 'axios';
+import ScatterJS from '@scatterjs/core';
+import { Keccak256Hasher } from '../hashers';
+import { Reader } from 'ckb-js-toolkit';
 
 export enum AddressPrefix {
   ckb,
@@ -54,14 +58,23 @@ export class Address {
     return new Address(addressString, AddressType.ckb);
   }
 
-  static async getEosPublicKey(baseUrl: string, account: string) {
+  static async getEosLockArgs(networkJSON: any, account: string) {
+    const network = ScatterJS.Network.fromJson(networkJSON);
+    const baseUrl = network.fullhost();
+
     const res = await axios.post(`${baseUrl}/v1/chain/get_account`, {
       account_name: account,
     });
     const data = res.data;
-
     const pubkey = data.permissions[0].required_auth.keys[0].key;
-    return pubkey;
+
+    const publicKeyHex = ecc.PublicKey(pubkey).toUncompressed().toHex();
+    const publicHash = new Keccak256Hasher()
+      .hash(new Reader(`0x${publicKeyHex.slice(2)}`))
+      .serializeJson();
+
+    const lockArgs = '0x' + publicHash.slice(-40);
+    return lockArgs;
   }
 
   constructor(
