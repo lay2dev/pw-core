@@ -20,11 +20,8 @@ import {
 import bs58 from 'bs58';
 import axios from 'axios';
 import ScatterJS from '@scatterjs/core';
-<<<<<<< HEAD
 import { Keccak256Hasher } from '../hashers';
 import { Reader } from 'ckb-js-toolkit';
-=======
->>>>>>> f1ef03212035e17dbfc053119c6c080d5392a6da
 
 export enum AddressPrefix {
   ckb,
