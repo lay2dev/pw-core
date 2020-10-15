@@ -70,7 +70,12 @@ export class EthProvider extends Provider {
           result = result.result;
           let v = Number.parseInt(result.slice(-2), 16);
           if (v >= 27) v -= 27;
-          result = result.slice(0, -2) + v.toString(16).padStart(2, '0');
+          result =
+            '0x' +
+            this.platform.toString(16).padStart(2, '0') +
+            result.slice(2, -2) +
+            v.toString(16).padStart(2, '0');
+
           resolve(result);
         }
       );
