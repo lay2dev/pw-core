@@ -17,6 +17,7 @@ import {
   AddressPrefix as APrefix,
 } from '@nervosnetwork/ckb-sdk-utils';
 import bs58 from 'bs58';
+import axios from 'axios';
 
 export enum AddressPrefix {
   ckb,
@@ -51,6 +52,16 @@ export class Address {
     });
 
     return new Address(addressString, AddressType.ckb);
+  }
+
+  static async getEosPublicKey(baseUrl: string, account: string) {
+    const res = await axios.post(`${baseUrl}/v1/chain/get_account`, {
+      account_name: account,
+    });
+    const data = res.data;
+
+    const pubkey = data.permissions[0].required_auth.keys[0].key;
+    return pubkey;
   }
 
   constructor(
