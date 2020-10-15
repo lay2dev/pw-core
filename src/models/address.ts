@@ -18,6 +18,7 @@ import {
 } from '@nervosnetwork/ckb-sdk-utils';
 import bs58 from 'bs58';
 import axios from 'axios';
+import ScatterJS from '@scatterjs/core';
 
 export enum AddressPrefix {
   ckb,
@@ -54,7 +55,10 @@ export class Address {
     return new Address(addressString, AddressType.ckb);
   }
 
-  static async getEosPublicKey(baseUrl: string, account: string) {
+  static async getEosPubKey(networkJSON: any, account: string) {
+    const network = ScatterJS.Network.fromJson(networkJSON);
+    const baseUrl = network.fullhost();
+
     const res = await axios.post(`${baseUrl}/v1/chain/get_account`, {
       account_name: account,
     });
