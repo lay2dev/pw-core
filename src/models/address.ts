@@ -11,6 +11,7 @@ import {
   verifyEthAddress,
   verifyEosAddress,
   verifyTronAddress,
+  cellOccupiedBytes,
 } from '../utils';
 import {
   fullPayloadToAddress,
@@ -22,6 +23,7 @@ import axios from 'axios';
 import ScatterJS from '@scatterjs/core';
 import { Keccak256Hasher } from '../hashers';
 import { Reader } from 'ckb-js-toolkit';
+import { Amount, AmountUnit } from './amount';
 
 export enum AddressPrefix {
   ckb,
@@ -120,9 +122,25 @@ export class Address {
     }
   }
 
-  // TODO need check code_hash is in the acplock list
-  isAcp() {
-    return true;
+  minPaymentAmount(): Amount {
+    if (this.isAcp()) {
+      return new Amount('1', AmountUnit.shannon);
+    }
+    const bytes = cellOccupiedBytes({
+      lock: this.toLockScript(),
+      type: null,
+      data: '0x',
+    });
+    return new Amount(bytes.toString());
+  }
+
+  isAcp(): boolean {
+    const script = this.toLockScript();
+    const { codeHash, hashType } = script;
+    const acpLock = PWCore.config.acpLockList.filter(
+      (x) => x.codeHash === codeHash && x.hashType === hashType
+    );
+    return acpLock && acpLock.length > 0;
   }
 
   toCKBAddress(): string {

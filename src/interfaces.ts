@@ -33,4 +33,5 @@ export interface Config {
   multiSigLock: ConfigItem;
   pwLock: ConfigItem;
   sudtType: ConfigItem;
+  acpLockList: Script[];
 }

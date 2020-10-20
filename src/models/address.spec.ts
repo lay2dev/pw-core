@@ -105,3 +105,39 @@ test('to lock script', (t) => {
     hash_type: PWCore.config.pwLock.script.hashType,
   });
 });
+
+test('is acp address', (t) => {
+  t.true(
+    new Address(
+      'ckt1qjr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykykn2zrv2y5rex4nnyfs2tqkde8zmayrls6d3kwa5',
+      AddressType.ckb
+    ).isAcp()
+  );
+  t.false(
+    new Address(
+      'ckt1q35y83078t9h7nwzyvpe9qfuh8qjm08d2ktlegc22tcn4fgem6xnxwlwq4vae7nqgpkl6s59znsqmh9jkrtjhwct56efh7uep9y2xr04d4augtnmauya4s2cdvn0s6nxw9m6k7ndhf2l0un2g0tr7f88fegqns00nq',
+      AddressType.ckb
+    ).isAcp()
+  );
+});
+
+test('minimal pay amount', (t) => {
+  t.is(
+    new Address(
+      'ckt1q35y83078t9h7nwzyvpe9qfuh8qjm08d2ktlegc22tcn4fgem6xnxwlwq4vae7nqgpkl6s59znsqmh9jkrtjhwct56efh7uep9y2xr04d4augtnmauya4s2cdvn0s6nxw9m6k7ndhf2l0un2g0tr7f88fegqns00nq',
+      AddressType.ckb
+    )
+      .minPaymentAmount()
+      .toString(),
+    '105'
+  );
+  t.is(
+    new Address(
+      'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs',
+      AddressType.ckb
+    )
+      .minPaymentAmount()
+      .toString(),
+    '61'
+  );
+});
