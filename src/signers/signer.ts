@@ -1,4 +1,4 @@
-import { Transaction } from '../models';
+import { Transaction, Script } from '../models';
 import { Hasher, Blake2bHasher } from '../hashers';
 import { normalizers, Reader, transformers } from 'ckb-js-toolkit';
 // import JSBI from 'jsbi';
@@ -10,6 +10,7 @@ import {
 export interface Message {
   index: number;
   message: string;
+  lock: Script;
 }
 
 export abstract class Signer {

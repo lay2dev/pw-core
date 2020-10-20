@@ -1,5 +1,5 @@
 import { Collector } from './collector';
-import { Cell, Address, Amount, OutPoint } from '../models';
+import { Cell, Address, Amount, OutPoint, SUDT } from '../models';
 
 export class DummyCollector extends Collector {
   getBalance(): Promise<Amount> {
@@ -11,6 +11,7 @@ export class DummyCollector extends Collector {
   constructor() {
     super();
   }
+
   public async collect(address: Address): Promise<Cell[]> {
     const outPoint = new OutPoint(
       '0x79221866125b9aff33c4303a6c35bde25d235e7e10025a86ca2a5d6ad657f51f',
@@ -21,6 +22,26 @@ export class DummyCollector extends Collector {
       address.toLockScript(),
       null,
       outPoint
+    );
+    cell.validate();
+    return [cell];
+  }
+
+  async getSUDTBalance(): Promise<Amount> {
+    throw new Error('Method not implemented.');
+  }
+
+  async collectSUDT(sudt: SUDT, address: Address): Promise<Cell[]> {
+    const outPoint = new OutPoint(
+      '0x79221866125b9aff33c4303a6c35bde25d235e7e10025a86ca2a5d6ad657f51f',
+      '0x0'
+    );
+    const cell = new Cell(
+      new Amount('1000000'),
+      address.toLockScript(),
+      sudt.toTypeScript(),
+      outPoint,
+      new Amount('1000').toUInt128LE()
     );
     cell.validate();
     return [cell];

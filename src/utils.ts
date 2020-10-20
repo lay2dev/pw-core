@@ -1,6 +1,7 @@
 import JSBI from 'jsbi';
 import bech32 from 'bech32';
 import { FormatOptions } from './models/amount';
+import { toUint64Le } from '@nervosnetwork/ckb-sdk-utils';
 
 export const BASE = '100000000';
 const ZERO = JSBI.BigInt(0);
@@ -269,4 +270,81 @@ export function spliceStr(
   str: string
 ) {
   return original.slice(0, idx) + str + original.slice(idx + Math.abs(rem));
+}
+
+export const hexDataOccupiedBytes = (hexString) => {
+  // Exclude 0x prefix, and every 2 hex digits are one byte
+  return (hexString.length - 2) / 2;
+};
+
+export const scriptOccupiedBytes = (script) => {
+  if (script !== undefined && script !== null) {
+    return (
+      1 +
+      hexDataOccupiedBytes(script.codeHash) +
+      hexDataOccupiedBytes(script.args)
+      //   script.args.map(hexDataOccupiedBytes).reduce((x, y) => x + y, 0)
+    );
+  }
+  return 0;
+};
+
+export const cellOccupiedBytes = (cell) => {
+  return (
+    8 +
+    hexDataOccupiedBytes(cell.data) +
+    scriptOccupiedBytes(cell.lock) +
+    scriptOccupiedBytes(cell.type)
+  );
+};
+export function readBigUInt32LE(hex): bigint {
+  if (hex.slice(0, 2) !== '0x') {
+    throw new Error('hex must start with 0x');
+  }
+  const dv = new DataView(new ArrayBuffer(4));
+  dv.setUint32(0, Number(hex.slice(0, 10)), true);
+  return BigInt(dv.getUint32(0, false));
+}
+
+export function toBigUInt64LE(num) {
+  return toUint64Le(num);
+}
+
+export function readBigUInt64LE(hex) {
+  if (hex.slice(0, 2) !== '0x') {
+    throw new Error('hex must start with 0x');
+  }
+  const buf = hex.slice(2).padEnd(16, 0);
+
+  const viewRight = `0x${buf.slice(0, 8)}`;
+  const viewLeft = `0x${buf.slice(8, 16)}`;
+
+  const numLeft = readBigUInt32LE(viewLeft).toString(16).padStart(8, '0');
+  const numRight = readBigUInt32LE(viewRight).toString(16).padStart(8, '0');
+
+  return BigInt(`0x${numLeft}${numRight}`);
+}
+
+export function toBigUInt128LE(u128) {
+  // tslint:disable-next-line: no-bitwise
+  const viewRight = toBigUInt64LE(u128 >> BigInt(64));
+  // tslint:disable-next-line: no-bitwise
+  const viewLeft = toBigUInt64LE(u128 & BigInt('0xFFFFFFFFFFFFFFFF'));
+
+  return `${viewLeft}${viewRight.slice(2)}`;
+}
+
+export function readBigUInt128LE(hex) {
+  if (hex.slice(0, 2) !== '0x') {
+    throw new Error('hex must start with 0x');
+  }
+  const buf = hex.slice(2).padEnd(32, 0);
+
+  const viewRight = `0x${buf.slice(0, 16)}`;
+  const viewLeft = `0x${buf.slice(16, 32)}`;
+
+  const numLeft = readBigUInt64LE(viewLeft).toString(16).padStart(16, '0');
+  const numRight = readBigUInt64LE(viewRight).toString(16).padStart(16, '0');
+
+  return BigInt(`0x${numLeft}${numRight}`);
 }

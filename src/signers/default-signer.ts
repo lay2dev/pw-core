@@ -8,6 +8,17 @@ export class DefaultSigner extends Signer {
   }
 
   async signMessages(messages: Message[]): Promise<string[]> {
-    return [await this.provider.sign(messages[0].message)];
+    const sigs = [];
+    for (const message of messages) {
+      if (
+        this.provider.address.toLockScript().toHash() === message.lock.toHash()
+      ) {
+        sigs.push(await this.provider.sign(message.message));
+      } else {
+        sigs.push('0x');
+      }
+    }
+
+    return sigs;
   }
 }

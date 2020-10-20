@@ -27,7 +27,9 @@ export class Web3ModalProvider extends Provider {
         'accountsChanged',
         async (newAccounts: string[]) => {
           this.address = new Address(newAccounts[0], AddressType.eth);
-          this.onAddressChanged(this.address);
+          if (this.onAddressChanged) {
+            this.onAddressChanged(this.address);
+          }
         }
       );
     }

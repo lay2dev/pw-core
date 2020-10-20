@@ -1,5 +1,11 @@
 import JSBI from 'jsbi';
-import { ckbToShannon, shannonToCKB, BASE } from '../utils';
+import {
+  ckbToShannon,
+  shannonToCKB,
+  BASE,
+  toBigUInt128LE,
+  readBigUInt128LE,
+} from '../utils';
 import { HexStringToBigInt } from 'ckb-js-toolkit';
 
 export enum AmountUnit {
@@ -113,5 +119,16 @@ export class Amount {
 
   toHexString() {
     return `0x${this.toBigInt().toString(16)}`;
+  }
+
+  toUInt128LE(): string {
+    return toBigUInt128LE(BigInt(this.toHexString()));
+  }
+
+  static fromUInt128LE(hex) {
+    return new Amount(
+      `0x${readBigUInt128LE(hex).toString(16)}`,
+      AmountUnit.shannon
+    );
   }
 }

@@ -32,4 +32,5 @@ export interface Config {
   defaultLock: ConfigItem;
   multiSigLock: ConfigItem;
   pwLock: ConfigItem;
+  sudtType: ConfigItem;
 }

@@ -23,6 +23,7 @@ export class DummyProvider extends Provider {
     }
     return this;
   }
+
   async close() {
     return true;
   }

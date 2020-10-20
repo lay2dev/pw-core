@@ -1,10 +1,15 @@
 import { RPC, transformers } from 'ckb-js-toolkit';
 import { CHAIN_SPECS } from './constants';
 import { Config } from './interfaces';
-import { Address, Amount, Transaction } from './models';
+import { Address, Amount, SUDT, Transaction } from './models';
 import { DefaultSigner, Signer } from './signers';
 import { Collector } from './collectors';
-import { SimpleBuilder, Builder } from './builders';
+import {
+  SimpleBuilder,
+  Builder,
+  SimpleSUDTBuilder,
+  SimpleSUDTCreateACPBuilder,
+} from './builders';
 import { Provider } from './providers';
 
 export enum ChainID {
@@ -120,5 +125,28 @@ export default class PWCore {
     return this.rpc.send_transaction(
       transformers.TransformTransaction(await signer.sign(tx))
     );
+  }
+
+  /**
+   * Transfer sudt to any address
+   * @param sudt The sudt definition
+   * @param address the receiver's address
+   * @param amount the aount of sudt to send
+   * @param feeRate the feeRate (Shannon/CKB) for this transation
+   * @returns the transaction hash
+   */
+  async sendSUDT(
+    sudt: SUDT,
+    address: Address,
+    amount: Amount,
+    createAcp?: boolean,
+    signer?: Signer,
+    feeRate?: number
+  ): Promise<string> {
+    const builder = createAcp
+      ? new SimpleSUDTCreateACPBuilder(sudt, address, amount, feeRate)
+      : new SimpleSUDTBuilder(sudt, address, amount, feeRate);
+
+    return this.sendTransaction(builder, signer);
   }
 }
