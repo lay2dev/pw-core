@@ -3,9 +3,9 @@ import PWCore, { Address, AddressType, Amount, ChainID } from '..';
 import { DummyCollector } from '../collectors/dummy-collector';
 import { SUDT } from '../models';
 import { DummyProvider } from '../providers/dummy-provider';
-import { SimpleSUDTBuilder } from './simple-sudt-builder';
+import { SimpleSUDTACPBuilder } from './simple-sudt-acp-builder';
 
-const test = anyTest as TestInterface<{ builder: SimpleSUDTBuilder }>;
+const test = anyTest as TestInterface<{ builder: SimpleSUDTACPBuilder }>;
 
 test.before(async (t) => {
   const address = new Address(
@@ -23,7 +23,7 @@ test.before(async (t) => {
     ChainID.ckb_testnet
   );
 
-  t.context.builder = new SimpleSUDTBuilder(sudt, address, amount);
+  t.context.builder = new SimpleSUDTACPBuilder(sudt, address, amount);
 });
 
 test('build a tx', async (t) => {

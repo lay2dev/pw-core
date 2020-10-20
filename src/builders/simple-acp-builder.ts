@@ -8,33 +8,44 @@ import {
   RawTransaction,
   Transaction,
 } from '../models';
-import PWCore from '../core';
-import { SimpleACPBuilder } from './simple-acp-builder';
+import PWCore from '..';
 
-export class SimpleBuilder extends Builder {
-  simpleACPBuilder: Builder;
+export class SimpleACPBuilder extends Builder {
+  receiverInputCell: Cell;
+  receiverOutputCell: Cell;
 
   constructor(
-    private address: Address,
-    private amount: Amount,
+    protected address: Address,
+    protected amount: Amount,
     feeRate?: number,
     collector?: Collector
   ) {
     super(feeRate, collector);
-    this.simpleACPBuilder = new SimpleACPBuilder(
-      this.address,
-      this.amount,
-      this.feeRate,
-      this.collector
-    );
   }
 
-  async build(fee: Amount = Amount.ZERO): Promise<Transaction> {
-    if (this.amount.lt(Builder.MIN_CHANGE)) {
-      return this.simpleACPBuilder.build();
+  async build(): Promise<Transaction> {
+    if (!this.address.isAcp()) {
+      throw new Error("The Receiver's address is not anyone-can-pay cell");
     }
 
-    const outputCell = new Cell(this.amount, this.address.toLockScript());
+    const receiverACPCells = await this.collector.collect(
+      this.address,
+      new Amount('1', AmountUnit.shannon)
+    );
+    if (!receiverACPCells || receiverACPCells.length === 0) {
+      throw new Error('The receiver has no sudt cell');
+    }
+
+    this.receiverInputCell = receiverACPCells[0];
+    this.receiverOutputCell = this.receiverInputCell.clone();
+
+    this.receiverOutputCell.capacity = this.receiverOutputCell.capacity.add(
+      this.amount
+    );
+    return this.buildSenderCells();
+  }
+
+  async buildSenderCells(fee: Amount = Amount.ZERO): Promise<Transaction> {
     const neededAmount = this.amount.add(Builder.MIN_CHANGE).add(fee);
     let inputSum = new Amount('0');
     const inputCells: Cell[] = [];
@@ -59,12 +70,15 @@ export class SimpleBuilder extends Builder {
     }
 
     const changeCell = new Cell(
-      inputSum.sub(outputCell.capacity),
+      inputSum.sub(this.amount),
       PWCore.provider.address.toLockScript()
     );
 
     const tx = new Transaction(
-      new RawTransaction(inputCells, [outputCell, changeCell]),
+      new RawTransaction(
+        [...inputCells, this.receiverInputCell],
+        [this.receiverOutputCell, changeCell]
+      ),
       [Builder.WITNESS_ARGS.Secp256k1]
     );
 
@@ -77,7 +91,7 @@ export class SimpleBuilder extends Builder {
       return tx;
     }
 
-    return this.build(this.fee);
+    return this.buildSenderCells(this.fee);
   }
 
   getCollector() {
