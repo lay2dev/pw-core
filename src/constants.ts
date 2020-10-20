@@ -82,6 +82,18 @@ export const CHAIN_SPECS = {
         HashType.type
       ),
     },
+    acpLockList: [
+      new Script(
+        '0xbf43c3602455798c1a61a596e0d95278864c552fafe231c063b3fabf97a8febc',
+        '0x',
+        HashType.type
+      ),
+      new Script(
+        '0x0fb343953ee78c9986b091defb6252154e0bb51044fd2879fde5b27314506111',
+        '0x',
+        HashType.data
+      ),
+    ],
   },
 
   Aggron: {
@@ -155,6 +167,18 @@ export const CHAIN_SPECS = {
         HashType.type
       ),
     },
+    acpLockList: [
+      new Script(
+        '0x58c5f491aba6d61678b7cf7edf4910b1f5e00ec0cde2f42e0abb4fd9aff25a63',
+        '0x',
+        HashType.type
+      ),
+      new Script(
+        '0x86a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
+        '0x',
+        HashType.type
+      ),
+    ],
   },
   // dev - lay2.ckb.dev
   Lay2: {
@@ -228,5 +252,12 @@ export const CHAIN_SPECS = {
         HashType.type
       ),
     },
+    acpLockList: [
+      new Script(
+        '0xc9eb3097397836e4d5b8fabed3c0cddd14fefe483caf238ca2e3095a111add0b',
+        '0x',
+        HashType.type
+      ),
+    ],
   },
 };

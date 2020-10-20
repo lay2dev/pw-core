@@ -9,7 +9,7 @@ const test = anyTest as TestInterface<{ builder: SimpleSUDTBuilder }>;
 
 test.before(async (t) => {
   const address = new Address(
-    'ckt1qyqv4yga3pgw2h92hcnur7lepdfzmvg8wj7qn44vz8',
+    'ckt1qjr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykykn2zrv2y5rex4nnyfs2tqkde8zmayrls6d3kwa5',
     AddressType.ckb
   );
   const amount = new Amount('100');

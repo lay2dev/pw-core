@@ -8,12 +8,14 @@ import {
   LumosConfigs,
   verifyCkbAddress,
   verifyEthAddress,
+  cellOccupiedBytes,
 } from '../utils';
 import {
   fullPayloadToAddress,
   AddressType as AType,
   AddressPrefix as APrefix,
 } from '@nervosnetwork/ckb-sdk-utils';
+import { Amount, AmountUnit } from './amount';
 
 export enum AddressPrefix {
   ckb,
@@ -69,9 +71,25 @@ export class Address {
     }
   }
 
-  // TODO need check code_hash is in the acplock list
-  isAcp() {
-    return true;
+  minPaymentAmount(): Amount {
+    if (this.isAcp()) {
+      return new Amount('1', AmountUnit.shannon);
+    }
+    const bytes = cellOccupiedBytes({
+      lock: this.toLockScript(),
+      type: null,
+      data: '0x',
+    });
+    return new Amount(bytes.toString());
+  }
+
+  isAcp(): boolean {
+    const script = this.toLockScript();
+    const { codeHash, hashType } = script;
+    const acpLock = PWCore.config.acpLockList.filter(
+      (x) => x.codeHash === codeHash && x.hashType === hashType
+    );
+    return acpLock && acpLock.length > 0;
   }
 
   toCKBAddress(): string {
