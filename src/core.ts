@@ -7,8 +7,8 @@ import { Collector } from './collectors';
 import {
   SimpleBuilder,
   Builder,
+  SimpleSUDTACPBuilder,
   SimpleSUDTBuilder,
-  SimpleSUDTCreateACPBuilder,
 } from './builders';
 import { Provider } from './providers';
 
@@ -144,8 +144,8 @@ export default class PWCore {
     feeRate?: number
   ): Promise<string> {
     const builder = createAcp
-      ? new SimpleSUDTCreateACPBuilder(sudt, address, amount, feeRate)
-      : new SimpleSUDTBuilder(sudt, address, amount, feeRate);
+      ? new SimpleSUDTBuilder(sudt, address, amount, feeRate)
+      : new SimpleSUDTACPBuilder(sudt, address, amount, feeRate);
 
     return this.sendTransaction(builder, signer);
   }

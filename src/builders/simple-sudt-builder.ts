@@ -12,6 +12,11 @@ import {
 import PWCore from '..';
 
 export class SimpleSUDTBuilder extends Builder {
+  fee: Amount;
+
+  inputCells: Cell[] = [];
+  outputCells: Cell[] = [];
+
   constructor(
     private sudt: SUDT,
     private address: Address,
@@ -20,55 +25,59 @@ export class SimpleSUDTBuilder extends Builder {
     collector?: Collector
   ) {
     super(feeRate, collector);
+    this.fee = new Amount('0');
   }
 
   async build(): Promise<Transaction> {
-    if (!this.address.isAcp()) {
-      throw new Error("The receiver's address is not any-one-can-pay cell");
-    }
+    const { tx, neededCKB } = await this.buildSudtCells();
+    if (tx) return tx;
 
-    const receiverSUDTCells = await this.collector.collectSUDT(
-      this.sudt,
-      this.address,
-      new Amount('1', AmountUnit.shannon)
-    );
-    if (!receiverSUDTCells || receiverSUDTCells.length === 0) {
-      throw new Error('The receiver has no sudt cell');
-    }
+    const tx2 = await this.buildCKBCells(neededCKB);
+    return tx2;
+  }
 
-    const receiverInputCell = receiverSUDTCells[0];
-    const receiverOuputCell = receiverInputCell.clone();
-
-    receiverOuputCell.setSUDTAmount(
-      this.amount.add(receiverOuputCell.getSUDTAmount())
-    );
-
+  /**
+   * build a transaction with only sudt cells
+   */
+  async buildSudtCells(): Promise<{ tx: Transaction; neededCKB: Amount }> {
     let senderInputSUDTSum = new Amount('0');
     let senderInputCKBSum = new Amount('0');
     let minSenderOccupiedCKBSum = new Amount('0');
+
+    const receiverAmount = new Amount('142');
+    const receiverOutputCell = new Cell(
+      receiverAmount,
+      this.address.toLockScript(),
+      this.sudt.toTypeScript(),
+      null,
+      this.amount.toUInt128LE()
+    );
+
+    // acp cell with zero sudt
+    if (this.amount.eq(new Amount('0'))) {
+      this.outputCells.push(receiverOutputCell);
+      return { tx: null, neededCKB: receiverAmount };
+    }
 
     let restNeededSUDT = new Amount(
       this.amount.toHexString(),
       AmountUnit.shannon
     );
 
-    const inputCells: Cell[] = [];
-    const outputCells: Cell[] = [];
-
-    // fill the inputs and the outputs
     const unspentSUDTCells = await this.collector.collectSUDT(
       this.sudt,
       PWCore.provider.address,
       this.amount
     );
 
-    // First step: build a tx including sender and receiver sudt cell only
+    // build a tx including sender and receiver sudt cell only
     for (const inputCell of unspentSUDTCells) {
       const outputCell = inputCell.clone();
 
       const inputSUDTAmount = inputCell.getSUDTAmount();
       senderInputSUDTSum = senderInputSUDTSum.add(inputSUDTAmount);
       senderInputCKBSum = senderInputCKBSum.add(inputCell.capacity);
+
       minSenderOccupiedCKBSum = minSenderOccupiedCKBSum.add(
         outputCell.occupiedCapacity()
       );
@@ -81,8 +90,8 @@ export class SimpleSUDTBuilder extends Builder {
         restNeededSUDT = new Amount('0');
       }
 
-      inputCells.push(inputCell);
-      outputCells.unshift(outputCell);
+      this.inputCells.push(inputCell);
+      this.outputCells.unshift(outputCell);
 
       if (senderInputSUDTSum.gte(this.amount)) break;
     }
@@ -95,74 +104,111 @@ export class SimpleSUDTBuilder extends Builder {
       );
     }
 
-    inputCells.push(receiverInputCell);
-    outputCells.unshift(receiverOuputCell);
+    this.outputCells.unshift(receiverOutputCell);
+    this.rectifyTx();
 
-    let tx = this.rectifyTx(inputCells, outputCells);
+    const availableCKB = senderInputCKBSum.sub(minSenderOccupiedCKBSum);
 
-    const availableCKBFee = senderInputCKBSum.sub(minSenderOccupiedCKBSum);
+    if (receiverAmount.add(this.fee).lt(availableCKB)) {
+      const tx = this.extractCKBFromOutputs(receiverAmount.add(this.fee));
+      return { tx, neededCKB: new Amount('0') };
+    } else {
+      this.extractCKBFromOutputs(receiverAmount);
+      return { tx: null, neededCKB: receiverAmount.sub(availableCKB) };
+    }
+  }
 
-    // Second step:  if sudt cell can not pay the transaction fee, fetch pure ckb cells to pay the fee.
-    if (this.fee.gt(availableCKBFee)) {
-      const unspentCKBCells = await this.collector.collect(
-        PWCore.provider.address,
-        this.fee.sub(availableCKBFee).add(Builder.MIN_CHANGE)
+  /**
+   * Fetch pure CKB cells to fullfill the need CKB amount
+   * @param ckbAmount  needed CKB amount
+   */
+  async buildCKBCells(ckbAmount): Promise<Transaction> {
+    // fetch pure ckb cells to pay the fee.
+    const neededAmount = ckbAmount.add(Builder.MIN_CHANGE).add(this.fee);
+    let inputSum = new Amount('0');
+
+    const unspentCKBCells = await this.collector.collect(
+      PWCore.provider.address,
+      neededAmount
+    );
+
+    if (!unspentCKBCells || unspentCKBCells.length === 0) {
+      throw new Error('no avaiable CKB');
+    }
+
+    for (const ckbCell of unspentCKBCells) {
+      this.inputCells.push(ckbCell);
+      inputSum = inputSum.add(ckbCell.capacity);
+
+      if (inputSum.gt(neededAmount)) break;
+    }
+
+    if (inputSum.lt(ckbAmount.add(this.fee))) {
+      throw new Error('no enough CKB to create acp cell 1');
+    }
+
+    // with changeCell
+    if (inputSum.gt(neededAmount)) {
+      const changeCell = new Cell(
+        inputSum.sub(ckbAmount),
+        PWCore.provider.address.toLockScript()
       );
+      this.outputCells.push(changeCell);
 
-      if (!unspentCKBCells || unspentCKBCells.length === 0) {
-        throw new Error('not enough CKB to pay the transaction fee');
-      }
+      this.rectifyTx();
 
-      // append the fee cell to tx's inputs and outputs
-      const ckbFeeInputCell = unspentCKBCells[0];
-      inputCells.push(ckbFeeInputCell);
-      outputCells.push(ckbFeeInputCell.clone());
-
-      tx = this.rectifyTx(inputCells, outputCells);
-
-      // if fee change cell's capacity less than occuiped capacity, merge the fee cell to sender's input sudt cell.
-      if (this.fee.gt(availableCKBFee.add(ckbFeeInputCell.availableFee()))) {
-        outputCells.pop();
-
-        const senderOutputCell = outputCells.pop();
-        senderOutputCell.capacity = senderOutputCell.capacity.add(
-          ckbFeeInputCell.capacity
-        );
-        outputCells.push(senderOutputCell);
-
-        tx = this.rectifyTx(inputCells, outputCells);
+      if (this.fee.add(Builder.MIN_CHANGE).lte(changeCell.capacity)) {
+        changeCell.capacity = changeCell.capacity.sub(this.fee);
+        return this.rectifyTx();
+      } else {
+        // pop changeCell
+        this.outputCells.pop();
       }
     }
 
-    // Third step: subtract tx fee from outputs' capacity
-    tx = this.subtractFee(inputCells, outputCells);
+    // no change cell, merge rest CKB to last output cell
+    const lastCell = this.outputCells.pop();
+    lastCell.capacity = lastCell.capacity.add(inputSum.sub(ckbAmount));
+    this.outputCells.push(lastCell);
 
-    return tx;
+    this.rectifyTx();
+
+    if (this.fee.add(lastCell.occupiedCapacity()).gt(lastCell.capacity)) {
+      throw new Error('no enough CKB to create acp cell 2');
+    }
+
+    lastCell.capacity = lastCell.capacity.sub(this.fee);
+    return this.rectifyTx();
   }
 
-  private subtractFee(inputCells: Cell[], outputCells: Cell[]) {
-    let remainFee = new Amount(this.fee.toHexString(), AmountUnit.shannon);
-    for (const cell of outputCells.slice(1)) {
-      // throw new Error(`remainFee ${remainFee} ${cell.availableFee()}`);
-      if (remainFee.gt(cell.availableFee())) {
-        remainFee = remainFee.sub(cell.availableFee());
+  /**
+   * subtract specified ckb amount from sender's outputs
+   * @param ckbAmount
+   */
+  private extractCKBFromOutputs(ckbAmount) {
+    for (const cell of this.outputCells.slice(1)) {
+      if (ckbAmount.gt(cell.availableFee())) {
+        ckbAmount = ckbAmount.sub(cell.availableFee());
         cell.capacity = cell.occupiedCapacity();
       } else {
-        cell.capacity = cell.capacity.sub(remainFee);
+        cell.capacity = cell.capacity.sub(ckbAmount);
         break;
       }
     }
-    return this.rectifyTx(inputCells, outputCells);
+    return this.rectifyTx();
   }
 
-  private rectifyTx(inputCells: Cell[], outputCells: Cell[]) {
+  /**
+   * build tx based on inputs and outputs, and calculate the tx fee
+   */
+  private rectifyTx() {
     const sudtCellDeps = [
       PWCore.config.defaultLock.cellDep,
       PWCore.config.pwLock.cellDep,
       PWCore.config.sudtType.cellDep,
     ];
     const tx = new Transaction(
-      new RawTransaction(inputCells, outputCells, sudtCellDeps),
+      new RawTransaction(this.inputCells, this.outputCells, sudtCellDeps),
       [Builder.WITNESS_ARGS.Secp256k1]
     );
 
