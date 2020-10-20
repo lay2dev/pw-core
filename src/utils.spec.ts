@@ -4,6 +4,8 @@ import {
   readBigUInt32LE,
   readBigUInt64LE,
   toBigUInt128LE,
+  verifyEosAddress,
+  verifyTronAddress,
 } from './utils';
 
 // import { utils } from '@ckb-lumos/base';
@@ -55,4 +57,15 @@ test('toBigUInt128LE', (t) => {
 
   const numLE = toBigUInt128LE(BigInt(hexBE));
   t.deepEqual(numLE, hexLE, 'self toBigUInt128LE');
+});
+
+test('verifyEosAddress', (t) => {
+  t.is(verifyEosAddress('sking1234567'), false);
+  t.is(verifyEosAddress('sking123456'), false);
+  t.is(verifyEosAddress('sking1234511'), true);
+});
+
+test('verifyTronAddress', (t) => {
+  t.is(verifyTronAddress('TNV2p8Zmy5JcZWbtn59Qee8jTdGmCRC6e8'), true);
+  t.is(verifyTronAddress('TNV2p8Zmy5JcZWbtn59Qee8jTdGmCRC6e'), false);
 });

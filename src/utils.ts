@@ -254,13 +254,14 @@ export function verifyEthAddress(address: string): boolean {
 }
 
 export function verifyEosAddress(address: string): boolean {
-  console.log('address', address);
-  return true;
+  return /(^[a-z1-5.]{0,11}[a-z1-5]$)|(^[a-z1-5.]{12}[a-j1-5]$)/.test(address);
 }
 
 export function verifyTronAddress(address: string): boolean {
-  console.log('address', address);
-  return true;
+  // TNV2p8Zmy5JcZWbtn59Qee8jTdGmCRC6e8
+  return /^T[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{33}$/.test(
+    address
+  );
 }
 
 export function spliceStr(
