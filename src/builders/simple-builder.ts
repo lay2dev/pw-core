@@ -40,10 +40,9 @@ export class SimpleBuilder extends Builder {
     const inputCells: Cell[] = [];
 
     // fill the inputs
-    const cells = await this.collector.collect(
-      PWCore.provider.address,
-      neededAmount
-    );
+    const cells = await this.collector.collect(PWCore.provider.address, {
+      neededAmount,
+    });
     for (const cell of cells) {
       inputCells.push(cell);
       inputSum = inputSum.add(cell.capacity);

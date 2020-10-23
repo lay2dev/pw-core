@@ -2,89 +2,93 @@ import JSBI from 'jsbi';
 import bech32 from 'bech32';
 import { FormatOptions } from '.';
 import { toUint64Le } from '@nervosnetwork/ckb-sdk-utils';
+import Decimal from 'decimal.js';
 
-export const BASE = '100000000';
-const ZERO = JSBI.BigInt(0);
-const base = JSBI.BigInt(BASE);
-const baseLen = BASE.length - 1;
 const BECH32_LIMIT = 1023;
 
 export const shannonToCKB = (
   shannonAmount: string,
-  options: FormatOptions = { section: 'full' }
-): string => {
-  let amount = JSBI.BigInt(shannonAmount);
-  const negative = JSBI.LT(amount, ZERO);
+  options: FormatOptions
+): string => bnStringToRationalNumber(shannonAmount, 8, options);
 
-  if (negative) {
-    amount = JSBI.unaryMinus(amount);
+export const ckbToShannon = (ckbAmount: string): string =>
+  rationalNumberToBnString(ckbAmount, 8);
+
+export const bnStringToRationalNumber = (
+  bn: string,
+  decimal: number,
+  options: FormatOptions
+) => {
+  if (!Number.isInteger(decimal) || decimal < 0) {
+    throw new Error("value of 'decimal' must be a positive integer");
   }
 
-  let fraction = JSBI.remainder(amount, base).toString(10);
-
-  while (fraction.length < baseLen) {
-    fraction = `0${fraction}`;
+  const n = new Decimal(bn);
+  if (n.isNeg()) {
+    bn = bn.slice(1);
   }
 
-  if (options && !options.pad) {
-    fraction = fraction.match(/^([0-9]*[1-9]|0)(0*)/)[1];
+  let int = bn;
+  let dec = '';
+  if (decimal > 0) {
+    const intLen = bn.length - decimal;
+    int = intLen > 0 ? bn.substr(0, intLen) : '0';
+    dec = intLen > 0 ? bn.slice(intLen) : `${'0'.repeat(-intLen)}${bn}`;
+    dec = new Decimal(`0.${dec}`).toFixed().slice(2);
   }
 
-  let whole = JSBI.divide(amount, base).toString(10);
-
-  if (options && options.fixed) {
-    const fixed = Number(`0.${fraction}`).toFixed(options.fixed).split('.');
-    whole = fixed[0] === '0' ? whole : `${Number(whole) + 1}`;
-    fraction = fixed[1];
+  if (options) {
+    if (options.fixed) {
+      if (
+        !Number.isInteger(options.fixed) ||
+        options.fixed < 1 ||
+        options.fixed > decimal
+      ) {
+        throw new Error(
+          `value of \'fixed\' must be a positive integer and not bigger than decimal value ${decimal}`
+        );
+      }
+      const res = new Decimal(`0.${dec}`).toFixed(options.fixed).split('.');
+      dec = res[1];
+      if (res[0] === '1') {
+        int = JSBI.add(JSBI.BigInt(int), JSBI.BigInt(1)).toString();
+      }
+    } else if (options.pad && dec.length < decimal) {
+      dec = `${dec}${'0'.repeat(decimal - dec.length)}`;
+    }
+    if (options.commify) {
+      int = int.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+    if (options.section === 'decimal') {
+      return dec;
+    }
+    if (options.section === 'integer') {
+      return n.isNeg() ? `-${int}` : int;
+    }
   }
 
-  if (options && options.commify) {
-    whole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  if (n.isNeg()) {
+    int = `-${int}`;
   }
 
-  let result = `${whole}${
-    fraction === '0' && !options.fixed ? '' : `.${fraction}`
-  }`;
-
-  if (options && options.section === 'whole') {
-    result = whole;
-  }
-
-  if (negative) {
-    result = `-${result}`;
-  }
-
-  if (options && options.section === 'fraction') {
-    result = fraction;
-  }
-
-  return result;
+  if (dec.length) return `${int}.${dec}`;
+  return int;
 };
 
-export const ckbToShannon = (ckbAmount: string): string => {
-  if (Number.isNaN(ckbAmount)) {
-    throw new Error(`ckb amount ${ckbAmount} is not a number`);
+export const rationalNumberToBnString = (rational: string, decimal: number) => {
+  if (!Number.isInteger(decimal) || decimal < 0) {
+    throw new Error("value of 'decimal' must be a positive integer");
+  }
+  if (decimal === 0) return rational;
+
+  const r = new Decimal(rational);
+  if (r.dp() > decimal) {
+    throw new Error(
+      `Decimal ${decimal} is smaller than the digits number of ${rational}`
+    );
   }
 
-  let amount = Number(ckbAmount).toFixed(8);
-
-  const negative = amount.slice(0, 1) === '-';
-
-  if (negative) {
-    amount = amount.slice(1);
-  }
-
-  const comps = amount.split('.');
-  const whole = JSBI.BigInt(comps[0]);
-  const fraction = JSBI.BigInt(comps[1]);
-
-  let result = JSBI.add(JSBI.multiply(whole, base), fraction);
-
-  if (negative) {
-    result = JSBI.unaryMinus(result);
-  }
-
-  return result.toString();
+  return `${rational.split('.').join('')}${'0'.repeat(decimal - r.dp())}`;
 };
 
 // from @lumos/helper

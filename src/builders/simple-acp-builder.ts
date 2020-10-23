@@ -28,10 +28,9 @@ export class SimpleACPBuilder extends Builder {
       throw new Error("The Receiver's address is not anyone-can-pay cell");
     }
 
-    const receiverACPCells = await this.collector.collect(
-      this.address,
-      new Amount('1', AmountUnit.shannon)
-    );
+    const receiverACPCells = await this.collector.collect(this.address, {
+      neededAmount: new Amount('1', AmountUnit.shannon),
+    });
     if (!receiverACPCells || receiverACPCells.length === 0) {
       throw new Error('The receiver has no sudt cell');
     }
@@ -51,10 +50,9 @@ export class SimpleACPBuilder extends Builder {
     const inputCells: Cell[] = [];
 
     // fill the inputs
-    const cells = await this.collector.collect(
-      PWCore.provider.address,
-      neededAmount
-    );
+    const cells = await this.collector.collect(PWCore.provider.address, {
+      neededAmount,
+    });
     for (const cell of cells) {
       inputCells.push(cell);
       inputSum = inputSum.add(cell.capacity);

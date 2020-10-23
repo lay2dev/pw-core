@@ -1,5 +1,4 @@
 import { Builder } from './builder';
-import { Collector } from '../collectors/collector';
 import {
   Address,
   Amount,
@@ -10,6 +9,7 @@ import {
   SUDT,
 } from '../models';
 import PWCore from '..';
+import { SUDTCollector } from '../collectors/sudt-collector';
 
 export class SimpleSUDTACPBuilder extends Builder {
   constructor(
@@ -17,7 +17,7 @@ export class SimpleSUDTACPBuilder extends Builder {
     private address: Address,
     private amount: Amount,
     feeRate?: number,
-    collector?: Collector
+    collector?: SUDTCollector
   ) {
     super(feeRate, collector);
   }
@@ -26,11 +26,14 @@ export class SimpleSUDTACPBuilder extends Builder {
     if (!this.address.isAcp()) {
       throw new Error("The receiver's address is not anyone-can-pay cell");
     }
+    if (!(this.collector instanceof SUDTCollector)) {
+      throw new Error('this.collector is not a SUDTCollector instance');
+    }
 
     const receiverSUDTCells = await this.collector.collectSUDT(
       this.sudt,
       this.address,
-      new Amount('1', AmountUnit.shannon)
+      { neededAmount: new Amount('1', AmountUnit.shannon) }
     );
     if (!receiverSUDTCells || receiverSUDTCells.length === 0) {
       throw new Error('The receiver has no sudt cell');
@@ -59,7 +62,7 @@ export class SimpleSUDTACPBuilder extends Builder {
     const unspentSUDTCells = await this.collector.collectSUDT(
       this.sudt,
       PWCore.provider.address,
-      this.amount
+      { neededAmount: this.amount }
     );
 
     // First step: build a tx including sender and receiver sudt cell only
@@ -106,7 +109,7 @@ export class SimpleSUDTACPBuilder extends Builder {
     if (this.fee.gt(availableCKBFee)) {
       const unspentCKBCells = await this.collector.collect(
         PWCore.provider.address,
-        this.fee.sub(availableCKBFee).add(Builder.MIN_CHANGE)
+        { neededAmount: this.fee.sub(availableCKBFee).add(Builder.MIN_CHANGE) }
       );
 
       if (!unspentCKBCells || unspentCKBCells.length === 0) {

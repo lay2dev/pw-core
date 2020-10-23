@@ -1,6 +1,7 @@
 import { Collector } from '../collectors/collector';
 import { Amount, AmountUnit, Transaction } from '../models';
 import PWCore from '..';
+import { SUDTCollector } from '../collectors/sudt-collector';
 
 const FEE_BASE = 1000;
 
@@ -36,7 +37,7 @@ export abstract class Builder {
 
   protected constructor(
     protected feeRate: number = Builder.MIN_FEE_RATE,
-    protected collector: Collector = PWCore.defaultCollector
+    protected collector: Collector | SUDTCollector = PWCore.defaultCollector
   ) {}
 
   getFee(): Amount {

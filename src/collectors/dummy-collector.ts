@@ -1,8 +1,8 @@
-import { Collector } from './collector';
 import { Cell, Address, Amount, OutPoint } from '..';
 import { SUDT } from '../models';
+import { SUDTCollector } from './sudt-collector';
 
-export class DummyCollector extends Collector {
+export class DummyCollector extends SUDTCollector {
   getBalance(): Promise<Amount> {
     throw new Error('Method not implemented.');
   }

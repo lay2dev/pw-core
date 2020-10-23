@@ -11,6 +11,7 @@ import {
   SimpleSUDTBuilder,
 } from './builders';
 import { Provider } from './providers';
+import { SUDTCollector } from './collectors/sudt-collector';
 
 export enum ChainID {
   ckb,
@@ -25,7 +26,7 @@ export default class PWCore {
   static config: Config;
   static chainId: ChainID;
   static provider: Provider;
-  static defaultCollector: Collector;
+  static defaultCollector: Collector | SUDTCollector;
 
   private readonly _rpc: RPC;
 
