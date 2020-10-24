@@ -19,7 +19,7 @@ export class PwCollector extends Collector {
   }
 
   async collect(address: Address, options: CollectorOptions): Promise<Cell[]> {
-    if (!options?.neededAmount) {
+    if (!options || !options.neededAmount) {
       throw new Error("'neededAmount' in options must be provided");
     }
     const cells: Cell[] = [];
