@@ -16,11 +16,11 @@ export const ckbToShannon = (ckbAmount: string): string =>
 
 export const bnStringToRationalNumber = (
   bn: string,
-  decimal: number,
+  decimals: number,
   options: FormatOptions
 ) => {
-  if (!Number.isInteger(decimal) || decimal < 0) {
-    throw new Error("value of 'decimal' must be a positive integer");
+  if (!Number.isInteger(decimals) || decimals < 0) {
+    throw new Error("value of 'decimals' must be a natural integer");
   }
 
   const n = new Decimal(bn);
@@ -30,8 +30,8 @@ export const bnStringToRationalNumber = (
 
   let int = bn;
   let dec = '';
-  if (decimal > 0) {
-    const intLen = bn.length - decimal;
+  if (decimals > 0) {
+    const intLen = bn.length - decimals;
     int = intLen > 0 ? bn.substr(0, intLen) : '0';
     dec = intLen > 0 ? bn.slice(intLen) : `${'0'.repeat(-intLen)}${bn}`;
     dec = new Decimal(`0.${dec}`).toFixed().slice(2);
@@ -41,11 +41,12 @@ export const bnStringToRationalNumber = (
     if (options.fixed) {
       if (
         !Number.isInteger(options.fixed) ||
-        options.fixed < 1 ||
-        options.fixed > decimal
+        options.fixed < 1
+        // || options.fixed > decimals
       ) {
         throw new Error(
-          `value of \'fixed\' must be a positive integer and not bigger than decimal value ${decimal}`
+          // `value of \'fixed\' must be a positive integer and not bigger than decimals value ${decimals}`
+          `value of \'fixed\' must be a positive integer`
         );
       }
       const res = new Decimal(`0.${dec}`).toFixed(options.fixed).split('.');
@@ -53,8 +54,8 @@ export const bnStringToRationalNumber = (
       if (res[0] === '1') {
         int = JSBI.add(JSBI.BigInt(int), JSBI.BigInt(1)).toString();
       }
-    } else if (options.pad && dec.length < decimal) {
-      dec = `${dec}${'0'.repeat(decimal - dec.length)}`;
+    } else if (options.pad && dec.length < decimals) {
+      dec = `${dec}${'0'.repeat(decimals - dec.length)}`;
     }
     if (options.commify) {
       int = int.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -75,20 +76,24 @@ export const bnStringToRationalNumber = (
   return int;
 };
 
-export const rationalNumberToBnString = (rational: string, decimal: number) => {
-  if (!Number.isInteger(decimal) || decimal < 0) {
-    throw new Error("value of 'decimal' must be a positive integer");
+export const rationalNumberToBnString = (
+  rational: string,
+  decimals: number
+) => {
+  if (!Number.isInteger(decimals) || decimals < 0) {
+    throw new Error("value of 'decimals' must be a natural integer");
   }
-  if (decimal === 0) return rational;
+  if (decimals === 0) return rational;
 
+  if (rational === '0x') rational = '0';
   const r = new Decimal(rational);
-  if (r.dp() > decimal) {
+  if (r.dp() > decimals) {
     throw new Error(
-      `Decimal ${decimal} is smaller than the digits number of ${rational}`
+      `decimals ${decimals} is smaller than the digits number of ${rational}`
     );
   }
 
-  return `${rational.split('.').join('')}${'0'.repeat(decimal - r.dp())}`;
+  return `${rational.split('.').join('')}${'0'.repeat(decimals - r.dp())}`;
 };
 
 // from @lumos/helper

@@ -3,7 +3,7 @@ import PWCore from '../core';
 
 export interface SudtInfo {
   symbol: string;
-  decimal: number;
+  decimals: number;
   name: string;
 }
 export class SUDT {

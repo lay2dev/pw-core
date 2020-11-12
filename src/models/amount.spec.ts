@@ -3,6 +3,7 @@ import PWCore, { ChainID } from '../core';
 import { DummyCollector } from '../collectors/dummy-collector';
 import { Amount, AmountUnit } from '.';
 import { DummyProvider } from '../providers/dummy-provider';
+import JSBI from 'jsbi';
 
 test.before(async () => {
   await new PWCore('https://aggron.ckb.dev').init(
@@ -127,4 +128,17 @@ test('to hex string', (t) => {
   t.is(shannonFull.toHexString(), '0xe94c0e8734');
 });
 
-test.todo('random decimal test');
+// tests for random decimals
+
+const d0 = new Amount('10', 0);
+const d1 = new Amount('1', 1);
+const d2 = new Amount('0.1', 2);
+const p = new Amount('0.00361', AmountUnit.ckb);
+
+test.only('to BigInt', (t) => {
+  t.is(d0.toBigInt().toString(), JSBI.BigInt(10).toString());
+  t.is(d1.toBigInt().toString(), JSBI.BigInt(10).toString());
+  t.is(d2.toBigInt().toString(), JSBI.BigInt(10).toString());
+  t.is(p.toString(), '0.00361');
+  t.is(p.toString(AmountUnit.shannon), '361000');
+});

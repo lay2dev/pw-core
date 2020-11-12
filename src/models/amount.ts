@@ -2,10 +2,9 @@ import JSBI from 'jsbi';
 import {
   toBigUInt128LE,
   readBigUInt128LE,
-  rationalNumberToBnString,
   bnStringToRationalNumber,
+  rationalNumberToBnString,
 } from '../utils';
-import { HexStringToBigInt } from 'ckb-js-toolkit';
 
 export enum AmountUnit {
   shannon,
@@ -36,7 +35,7 @@ export class Amount {
   mul(val: Amount): Amount {
     const res = JSBI.divide(
       JSBI.multiply(this.toBigInt(), val.toBigInt()),
-      JSBI.BigInt(10 ** (val.decimal + this.decimal))
+      JSBI.BigInt(10 ** (val.decimals + this.decimals))
     ).toString();
     return new Amount(res, AmountUnit.shannon);
   }
@@ -62,52 +61,33 @@ export class Amount {
   }
 
   private amount: string;
-  private decimal: number;
+  private decimals: number;
 
-  constructor(amount: string, unit?: AmountUnit);
-  constructor(amount: string, decimal: number = 8) {
+  constructor(amount: string, decimals: number | AmountUnit = AmountUnit.ckb) {
+    if (!Number.isInteger(decimals) || decimals < 0) {
+      throw new Error(`decimals ${decimals} must be a natural number`);
+    }
+    this.decimals = decimals;
+
     if (Number.isNaN(amount)) {
-      throw new Error(`Amount ${amount} is not a valid number`);
+      throw new Error(`amount ${amount} must be a valid number`);
     }
-    amount = `${amount}`;
-
-    if (!Number.isInteger(decimal) || decimal < 0) {
-      throw new Error(`Decimal ${decimal} must be a natural number`);
-    }
-    this.decimal = decimal;
-
-    if (amount.startsWith('0x')) {
-      amount = HexStringToBigInt(amount).toString();
-    }
-
-    if (decimal === AmountUnit.shannon) {
-      try {
-        amount = amount.match(/^0*(\d*)$/)[1];
-        if (amount === '') {
-          amount = '0';
-        }
-      } catch (e) {
-        throw new Error(`Amount ${amount} is invalid`);
-      }
-    }
-    this.amount = amount;
-    this.decimal = decimal;
+    this.amount = rationalNumberToBnString(amount, decimals);
   }
+
   toString(
-    decimal = AmountUnit.ckb as number,
+    decimals: number | AmountUnit = AmountUnit.ckb,
     options?: FormatOptions
   ): string {
     return bnStringToRationalNumber(
       this.toBigInt().toString(),
-      decimal,
+      decimals,
       options
     );
   }
 
-  toBigInt(decimal?: number) {
-    return JSBI.BigInt(
-      rationalNumberToBnString(this.amount, decimal || this.decimal)
-    );
+  toBigInt() {
+    return JSBI.BigInt(this.amount);
   }
 
   toHexString() {
