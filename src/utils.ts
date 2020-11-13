@@ -93,7 +93,9 @@ export const rationalNumberToBnString = (
     );
   }
 
-  return `${rational.split('.').join('')}${'0'.repeat(decimals - r.dp())}`;
+  rational = `${rational}`.split('.').join('');
+
+  return `${rational}${'0'.repeat(decimals - r.dp())}`;
 };
 
 // from @lumos/helper
