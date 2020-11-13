@@ -1,9 +1,10 @@
 import axios from 'axios';
-import { Collector, CollectorOptions } from './collector';
+import { CollectorOptions } from './collector';
+import { SUDTCollector } from './sudt-collector';
 import { Cell, Address, Amount, AmountUnit, OutPoint } from '..';
 import { SUDT } from '../models/sudt';
 
-export class PwCollector extends Collector {
+export class PwCollector extends SUDTCollector {
   constructor(public apiBase: string) {
     super();
     this.apiBase = apiBase;
@@ -52,8 +53,11 @@ export class PwCollector extends Collector {
   async collectSUDT(
     sudt: SUDT,
     address: Address,
-    neededAmount?: Amount
+    options: CollectorOptions
   ): Promise<Cell[]> {
+    if (!options || !options.neededAmount) {
+      throw new Error("'neededAmount' in options must be provided");
+    }
     const cells: Cell[] = [];
     const lockHash = address.toLockScript().toHash();
     const typeHash = sudt.toTypeScript().toHash();
@@ -61,7 +65,7 @@ export class PwCollector extends Collector {
     const res = await axios.get(
       `${
         this.apiBase
-      }/cell/unSpent?lockHash=${lockHash}&capacity=0x0&typeHash=${typeHash}&sudtAmount=${neededAmount.toHexString()}`
+      }/cell/unSpent?lockHash=${lockHash}&capacity=0x0&typeHash=${typeHash}&sudtAmount=${options.neededAmount.toHexString()}`
     );
 
     for (let { capacity, outPoint, type, data } of res.data.data) {
