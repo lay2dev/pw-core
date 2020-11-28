@@ -95,7 +95,7 @@ export class Amount {
   }
 
   toUInt128LE(): string {
-    return toBigUInt128LE(BigInt(this.toHexString()));
+    return toBigUInt128LE(JSBI.BigInt(this.toHexString()));
   }
 
   static fromUInt128LE(hex) {

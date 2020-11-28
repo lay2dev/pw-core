@@ -289,17 +289,18 @@ export const cellOccupiedBytes = (cell) => {
     scriptOccupiedBytes(cell.type)
   );
 };
-export function readBigUInt32LE(hex): bigint {
+export function readBigUInt32LE(hex) {
   if (hex.slice(0, 2) !== '0x') {
     throw new Error('hex must start with 0x');
   }
   const dv = new DataView(new ArrayBuffer(4));
   dv.setUint32(0, Number(hex.slice(0, 10)), true);
-  return BigInt(dv.getUint32(0, false));
+  return JSBI.BigInt(dv.getUint32(0, false));
+  // return BigInt(dv.getUint32(0, false));
 }
 
 export function toBigUInt64LE(num) {
-  return toUint64Le(num);
+  return toUint64Le(`0x${JSBI.BigInt(num).toString(16)}`);
 }
 
 export function readBigUInt64LE(hex) {
@@ -314,14 +315,16 @@ export function readBigUInt64LE(hex) {
   const numLeft = readBigUInt32LE(viewLeft).toString(16).padStart(8, '0');
   const numRight = readBigUInt32LE(viewRight).toString(16).padStart(8, '0');
 
-  return BigInt(`0x${numLeft}${numRight}`);
+  return JSBI.BigInt(`0x${numLeft}${numRight}`);
 }
 
 export function toBigUInt128LE(u128) {
-  // tslint:disable-next-line: no-bitwise
-  const viewRight = toBigUInt64LE(u128 >> BigInt(64));
-  // tslint:disable-next-line: no-bitwise
-  const viewLeft = toBigUInt64LE(u128 & BigInt('0xFFFFFFFFFFFFFFFF'));
+  const viewRight = toBigUInt64LE(
+    JSBI.signedRightShift(JSBI.BigInt(u128), JSBI.BigInt(64))
+  );
+  const viewLeft = toBigUInt64LE(
+    JSBI.bitwiseAnd(JSBI.BigInt(u128), JSBI.BigInt('0xffffffffffffffff'))
+  );
 
   return `${viewLeft}${viewRight.slice(2)}`;
 }
@@ -338,5 +341,5 @@ export function readBigUInt128LE(hex) {
   const numLeft = readBigUInt64LE(viewLeft).toString(16).padStart(16, '0');
   const numRight = readBigUInt64LE(viewRight).toString(16).padStart(16, '0');
 
-  return BigInt(`0x${numLeft}${numRight}`);
+  return JSBI.BigInt(`0x${numLeft}${numRight}`);
 }

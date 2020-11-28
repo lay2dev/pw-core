@@ -1,3 +1,4 @@
+import { JSBI } from '@nervosnetwork/ckb-sdk-utils';
 import anyTest, { TestInterface } from 'ava';
 import {
   readBigUInt128LE,
@@ -53,6 +54,6 @@ test('toBigUInt128LE', (t) => {
   //   const numLE2 = utils.toBigUInt128LE(BigInt(hexBE));
   //   t.deepEqual(numLE2, hexLE, 'lumos toBigUInt128LE');
 
-  const numLE = toBigUInt128LE(BigInt(hexBE));
+  const numLE = toBigUInt128LE(JSBI.BigInt(hexBE));
   t.deepEqual(numLE, hexLE, 'self toBigUInt128LE');
 });
