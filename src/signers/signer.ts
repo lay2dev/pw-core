@@ -1,7 +1,6 @@
 import { Transaction } from '..';
 import { Hasher, Blake2bHasher } from '../hashers';
 import { normalizers, Reader, transformers } from 'ckb-js-toolkit';
-// import JSBI from 'jsbi';
 import {
   SerializeWitnessArgs,
   SerializeRawTransaction,
@@ -20,7 +19,6 @@ export abstract class Signer {
   protected abstract async signMessages(messages: Message[]): Promise<string[]>;
 
   async sign(tx: Transaction): Promise<Transaction> {
-    console.log('[signer] tx before: ', tx);
     const messages = this.toMessages(tx);
     const witnesses = await this.signMessages(messages);
     witnesses[0] = new Reader(
@@ -32,7 +30,6 @@ export abstract class Signer {
       )
     ).serializeJson();
     tx = FillSignedWitnesses(tx, messages, witnesses);
-    console.log('[signer] tx after: ', tx);
 
     return tx;
   }

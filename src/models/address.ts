@@ -1,7 +1,6 @@
 import { Script } from '.';
 import PWCore, { ChainID } from '../core';
 import { HashType } from '../interfaces';
-// import { validators, transformers } from 'ckb-js-toolkit';
 import {
   parseAddress,
   generateAddress,

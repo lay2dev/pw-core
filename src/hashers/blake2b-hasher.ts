@@ -14,7 +14,18 @@ export class Blake2bHasher extends Hasher {
   }
 
   update(data: string | ArrayBuffer): Hasher {
-    this.h.update(new Uint8Array(new Reader(data).toArrayBuffer()));
+    let array: Buffer;
+    if (data instanceof Reader) {
+      /** Reader type params not enter this branch, it's weired */
+      array = Buffer.from(data.serializeJson().replace('0x', ''));
+    } else if (data instanceof ArrayBuffer) {
+      array = Buffer.from(new Uint8Array(data));
+    } else if (typeof data === 'string') {
+      array = Buffer.from(data);
+    } else {
+      array = Buffer.from(new Uint8Array(new Reader(data).toArrayBuffer()));
+    }
+    this.h.update(array);
     return this;
   }
 

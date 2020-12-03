@@ -134,11 +134,24 @@ const d0 = new Amount('10', 0);
 const d1 = new Amount('1', 1);
 const d2 = new Amount('0.1', 2);
 const p = new Amount('0.00361', AmountUnit.ckb);
+const q = new Amount('213.00', AmountUnit.ckb);
+const r = new Amount('213.12', AmountUnit.ckb);
+
+const s = new Amount('213.1200000', 25);
 
 test.only('to BigInt', (t) => {
   t.is(d0.toBigInt().toString(), JSBI.BigInt(10).toString());
   t.is(d1.toBigInt().toString(), JSBI.BigInt(10).toString());
   t.is(d2.toBigInt().toString(), JSBI.BigInt(10).toString());
   t.is(p.toString(), '0.00361');
+  t.is(p.toString(AmountUnit.ckb), '0.00361');
   t.is(p.toString(AmountUnit.shannon), '361000');
+
+  t.is(q.toString(AmountUnit.shannon), '21300000000');
+  t.is(q.toString(AmountUnit.ckb), '213');
+
+  t.is(r.toString(AmountUnit.ckb), '213.12');
+  t.is(r.toString(AmountUnit.shannon), '21312000000');
+
+  t.is(s.toString(0), '2131200000000000000000000000');
 });

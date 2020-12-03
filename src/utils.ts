@@ -38,7 +38,7 @@ export const bnStringToRationalNumber = (
   }
 
   if (options) {
-    if (options.fixed) {
+    if (options.fixed !== undefined) {
       if (
         !Number.isInteger(options.fixed) ||
         options.fixed < 1
@@ -46,7 +46,7 @@ export const bnStringToRationalNumber = (
       ) {
         throw new Error(
           // `value of \'fixed\' must be a positive integer and not bigger than decimals value ${decimals}`
-          `value of \'fixed\' must be a positive integer`
+          `value of 'fixed' must be a positive integer`
         );
       }
       const res = new Decimal(`0.${dec}`).toFixed(options.fixed).split('.');
@@ -86,16 +86,24 @@ export const rationalNumberToBnString = (
   if (decimals === 0) return rational;
 
   if (rational === '0x') rational = '0';
-  const r = new Decimal(rational);
-  if (r.dp() > decimals) {
+  // const r = new Decimal(rational);
+  // if (r.dp() > decimals) {
+  //   throw new Error(
+  //     `decimals ${decimals} is smaller than the digits number of ${rational}`
+  //   );
+  // }
+
+  const parts = `${rational}`.split('.');
+
+  if (!!parts[1] && parts[1].length > decimals) {
     throw new Error(
       `decimals ${decimals} is smaller than the digits number of ${rational}`
     );
   }
 
-  rational = `${rational}`.split('.').join('');
-
-  return `${rational}${'0'.repeat(decimals - r.dp())}`;
+  return `${parts.join('')}${'0'.repeat(
+    decimals - (!!parts[1] ? parts[1].length : 0)
+  )}`;
 };
 
 // from @lumos/helper

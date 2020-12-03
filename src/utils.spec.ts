@@ -1,4 +1,4 @@
-import { JSBI } from '@nervosnetwork/ckb-sdk-utils';
+import JSBI from 'jsbi';
 import anyTest, { TestInterface } from 'ava';
 import {
   readBigUInt128LE,
