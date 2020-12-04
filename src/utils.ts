@@ -2,89 +2,113 @@ import JSBI from 'jsbi';
 import bech32 from 'bech32';
 import { FormatOptions } from './models/amount';
 import { toUint64Le } from '@nervosnetwork/ckb-sdk-utils';
+import Decimal from 'decimal.js';
 
-export const BASE = '100000000';
-const ZERO = JSBI.BigInt(0);
-const base = JSBI.BigInt(BASE);
-const baseLen = BASE.length - 1;
 const BECH32_LIMIT = 1023;
 
 export const shannonToCKB = (
   shannonAmount: string,
-  options: FormatOptions = { section: 'full' }
-): string => {
-  let amount = JSBI.BigInt(shannonAmount);
-  const negative = JSBI.LT(amount, ZERO);
+  options: FormatOptions
+): string => bnStringToRationalNumber(shannonAmount, 8, options);
 
-  if (negative) {
-    amount = JSBI.unaryMinus(amount);
+export const ckbToShannon = (ckbAmount: string): string =>
+  rationalNumberToBnString(ckbAmount, 8);
+
+export const bnStringToRationalNumber = (
+  bn: string,
+  decimals: number,
+  options: FormatOptions
+) => {
+  if (!Number.isInteger(decimals) || decimals < 0) {
+    throw new Error("value of 'decimals' must be a natural integer");
   }
 
-  let fraction = JSBI.remainder(amount, base).toString(10);
-
-  while (fraction.length < baseLen) {
-    fraction = `0${fraction}`;
+  const n = new Decimal(bn);
+  if (n.isNeg()) {
+    bn = bn.slice(1);
   }
 
-  if (options && !options.pad) {
-    fraction = fraction.match(/^([0-9]*[1-9]|0)(0*)/)[1];
+  let int = bn;
+  let dec = '';
+  if (decimals > 0) {
+    const intLen = bn.length - decimals;
+    int = intLen > 0 ? bn.substr(0, intLen) : '0';
+    dec = intLen > 0 ? bn.slice(intLen) : `${'0'.repeat(-intLen)}${bn}`;
+    dec = new Decimal(`0.${dec}`).toFixed().slice(2);
   }
 
-  let whole = JSBI.divide(amount, base).toString(10);
-
-  if (options && options.fixed) {
-    const fixed = Number(`0.${fraction}`).toFixed(options.fixed).split('.');
-    whole = fixed[0] === '0' ? whole : `${Number(whole) + 1}`;
-    fraction = fixed[1];
+  if (options) {
+    if (options.fixed !== undefined) {
+      if (
+        !Number.isInteger(options.fixed) ||
+        options.fixed < 1
+        // || options.fixed > decimals
+      ) {
+        throw new Error(
+          // `value of \'fixed\' must be a positive integer and not bigger than decimals value ${decimals}`
+          `value of 'fixed' must be a positive integer`
+        );
+      }
+      const res = new Decimal(`0.${dec}`).toFixed(options.fixed).split('.');
+      dec = res[1];
+      if (res[0] === '1') {
+        int = JSBI.add(JSBI.BigInt(int), JSBI.BigInt(1)).toString();
+      }
+    } else if (options.pad && dec.length < decimals) {
+      dec = `${dec}${'0'.repeat(decimals - dec.length)}`;
+    }
+    if (options.commify) {
+      int = int.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+    if (options.section === 'decimal') {
+      return dec;
+    }
+    if (options.section === 'integer') {
+      return n.isNeg() ? `-${int}` : int;
+    }
   }
 
-  if (options && options.commify) {
-    whole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  if (n.isNeg()) {
+    int = `-${int}`;
   }
 
-  let result = `${whole}${
-    fraction === '0' && !options.fixed ? '' : `.${fraction}`
-  }`;
-
-  if (options && options.section === 'whole') {
-    result = whole;
-  }
-
-  if (negative) {
-    result = `-${result}`;
-  }
-
-  if (options && options.section === 'fraction') {
-    result = fraction;
-  }
-
-  return result;
+  if (dec.length) return `${int}.${dec}`;
+  return int;
 };
 
-export const ckbToShannon = (ckbAmount: string): string => {
-  if (Number.isNaN(ckbAmount)) {
-    throw new Error(`ckb amount ${ckbAmount} is not a number`);
+export const rationalNumberToBnString = (
+  rational: string,
+  decimals: number
+) => {
+  if (!Number.isInteger(decimals) || decimals < 0) {
+    throw new Error("value of 'decimals' must be a natural integer");
+  }
+  if (decimals === 0) return rational;
+
+  if (rational === '0x') rational = '0';
+  // const r = new Decimal(rational);
+  // if (r.dp() > decimals) {
+  //   throw new Error(
+  //     `decimals ${decimals} is smaller than the digits number of ${rational}`
+  //   );
+  // }
+
+  if (typeof rational === 'number') {
+    const dp = new Decimal(rational).dp();
+    rational = Number(rational).toFixed(dp);
   }
 
-  let amount = Number(ckbAmount).toFixed(8);
+  const parts = `${rational}`.split('.');
 
-  const negative = amount.slice(0, 1) === '-';
-
-  if (negative) {
-    amount = amount.slice(1);
+  if (!!parts[1] && parts[1].length > decimals) {
+    throw new Error(
+      `decimals ${decimals} is smaller than the digits number of ${rational}`
+    );
   }
 
-  const comps = amount.split('.');
-  const whole = JSBI.BigInt(comps[0]);
-  const fraction = JSBI.BigInt(comps[1]);
-
-  let result = JSBI.add(JSBI.multiply(whole, base), fraction);
-
-  if (negative) {
-    result = JSBI.unaryMinus(result);
-  }
-
-  return result.toString();
+  return `${parts.join('')}${'0'.repeat(
+    decimals - (!!parts[1] ? parts[1].length : 0)
+  )}`;
 };
 
 // from @lumos/helper
@@ -298,17 +322,18 @@ export const cellOccupiedBytes = (cell) => {
     scriptOccupiedBytes(cell.type)
   );
 };
-export function readBigUInt32LE(hex): bigint {
+export function readBigUInt32LE(hex) {
   if (hex.slice(0, 2) !== '0x') {
     throw new Error('hex must start with 0x');
   }
   const dv = new DataView(new ArrayBuffer(4));
   dv.setUint32(0, Number(hex.slice(0, 10)), true);
-  return BigInt(dv.getUint32(0, false));
+  return JSBI.BigInt(dv.getUint32(0, false));
+  // return BigInt(dv.getUint32(0, false));
 }
 
 export function toBigUInt64LE(num) {
-  return toUint64Le(num);
+  return toUint64Le(`0x${JSBI.BigInt(num).toString(16)}`);
 }
 
 export function readBigUInt64LE(hex) {
@@ -323,14 +348,16 @@ export function readBigUInt64LE(hex) {
   const numLeft = readBigUInt32LE(viewLeft).toString(16).padStart(8, '0');
   const numRight = readBigUInt32LE(viewRight).toString(16).padStart(8, '0');
 
-  return BigInt(`0x${numLeft}${numRight}`);
+  return JSBI.BigInt(`0x${numLeft}${numRight}`);
 }
 
 export function toBigUInt128LE(u128) {
-  // tslint:disable-next-line: no-bitwise
-  const viewRight = toBigUInt64LE(u128 >> BigInt(64));
-  // tslint:disable-next-line: no-bitwise
-  const viewLeft = toBigUInt64LE(u128 & BigInt('0xFFFFFFFFFFFFFFFF'));
+  const viewRight = toBigUInt64LE(
+    JSBI.signedRightShift(JSBI.BigInt(u128), JSBI.BigInt(64))
+  );
+  const viewLeft = toBigUInt64LE(
+    JSBI.bitwiseAnd(JSBI.BigInt(u128), JSBI.BigInt('0xffffffffffffffff'))
+  );
 
   return `${viewLeft}${viewRight.slice(2)}`;
 }
@@ -347,5 +374,5 @@ export function readBigUInt128LE(hex) {
   const numLeft = readBigUInt64LE(viewLeft).toString(16).padStart(16, '0');
   const numRight = readBigUInt64LE(viewRight).toString(16).padStart(16, '0');
 
-  return BigInt(`0x${numLeft}${numRight}`);
+  return JSBI.BigInt(`0x${numLeft}${numRight}`);
 }

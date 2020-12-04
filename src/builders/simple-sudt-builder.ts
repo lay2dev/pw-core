@@ -1,5 +1,4 @@
 import { Builder } from './builder';
-import { Collector } from '../collectors/collector';
 import {
   Address,
   Amount,
@@ -10,6 +9,7 @@ import {
   SUDT,
 } from '../models';
 import PWCore from '..';
+import { SUDTCollector } from '../collectors/sudt-collector';
 
 export class SimpleSUDTBuilder extends Builder {
   fee: Amount;
@@ -22,7 +22,7 @@ export class SimpleSUDTBuilder extends Builder {
     private address: Address,
     private amount: Amount,
     feeRate?: number,
-    collector?: Collector
+    collector?: SUDTCollector
   ) {
     super(feeRate, collector);
     this.fee = new Amount('0');
@@ -64,10 +64,14 @@ export class SimpleSUDTBuilder extends Builder {
       AmountUnit.shannon
     );
 
+    if (!(this.collector instanceof SUDTCollector)) {
+      throw new Error('this.collector is not a SUDTCollector instance');
+    }
+
     const unspentSUDTCells = await this.collector.collectSUDT(
       this.sudt,
       PWCore.provider.address,
-      this.amount
+      { neededAmount: this.amount }
     );
 
     // build a tx including sender and receiver sudt cell only

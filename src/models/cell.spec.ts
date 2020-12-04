@@ -13,6 +13,11 @@ import {
 } from '.';
 import { HashType } from '../interfaces';
 import { DummyProvider } from '../providers/dummy-provider';
+import {
+  cellOccupiedBytes,
+  hexDataOccupiedBytes,
+  scriptOccupiedBytes,
+} from '../utils';
 
 const test = anyTest as TestInterface<{ pw: PWCore }>;
 
@@ -84,4 +89,26 @@ test('loadFromBlockchain and validate', async (t) => {
   t.true(loadedCell.outPoint.sameWith(outPoint));
   t.is(loadedCell.getHexData(), hexData);
   t.is(loadedCell.getData(), data);
+});
+
+test('space check', (t) => {
+  const cellData =
+    '0x00e40b5402000000000000000000000081bf212901000000000000000000000000c817a80400000001';
+  const cell = new Cell(
+    new Amount('102', AmountUnit.ckb),
+    address.toLockScript(),
+    null,
+    null,
+    cellData
+  );
+
+  // cell.setHexData(cellData);2
+
+  // throw new Error(cell.getData());
+
+  t.is(cell.getHexData(), cellData);
+  t.is(hexDataOccupiedBytes(cell.getHexData()), 41);
+  t.is(scriptOccupiedBytes(cell.lock), 53);
+  t.is(scriptOccupiedBytes(cell.type), 0);
+  t.is(cellOccupiedBytes(cell), 102);
 });

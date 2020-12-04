@@ -1,44 +1,35 @@
 import JSBI from 'jsbi';
 import {
-  ckbToShannon,
-  shannonToCKB,
-  BASE,
   toBigUInt128LE,
   readBigUInt128LE,
+  bnStringToRationalNumber,
+  rationalNumberToBnString,
 } from '../utils';
-import { HexStringToBigInt } from 'ckb-js-toolkit';
 
 export enum AmountUnit {
-  ckb,
   shannon,
+  ckb = 8,
 }
 
 export interface FormatOptions {
-  section?: 'full' | 'whole' | 'fraction';
+  section?: 'integer' | 'decimal';
   pad?: boolean;
   commify?: boolean;
-  fixed?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  fixed?: number;
 }
 
 export class Amount {
   static ZERO = new Amount('0');
 
   add(val: Amount): Amount {
-    const res = JSBI.add(this.toBigInt(), val.toBigInt()).toString();
-    return new Amount(res, AmountUnit.shannon);
+    return new Amount(JSBI.add(this.toBigInt(), val.toBigInt()).toString(), 0);
   }
 
   sub(val: Amount): Amount {
-    const res = JSBI.subtract(this.toBigInt(), val.toBigInt()).toString();
-    return new Amount(res, AmountUnit.shannon);
-  }
-
-  mul(val: Amount): Amount {
-    const res = JSBI.divide(
-      JSBI.multiply(this.toBigInt(), val.toBigInt()),
-      JSBI.BigInt(BASE)
-    ).toString();
-    return new Amount(res, AmountUnit.shannon);
+    return new Amount(
+      JSBI.subtract(this.toBigInt(), val.toBigInt()).toString(),
+      0
+    );
   }
 
   gt(val: Amount): boolean {
@@ -62,58 +53,30 @@ export class Amount {
   }
 
   private amount: string;
-  private unit: AmountUnit;
 
-  constructor(amount: string, unit: AmountUnit = AmountUnit.ckb) {
+  constructor(amount: string, decimals: number | AmountUnit = AmountUnit.ckb) {
+    if (!Number.isInteger(decimals) || decimals < 0) {
+      throw new Error(`decimals ${decimals} must be a natural number`);
+    }
+
     if (Number.isNaN(amount)) {
-      throw new Error(
-        `Amount ${amount} is not a valid ${AmountUnit[unit]} value`
-      );
+      throw new Error(`amount ${amount} must be a valid number`);
     }
-
-    amount = `${amount}`;
-
-    if (amount.startsWith('0x')) {
-      amount = HexStringToBigInt(amount).toString();
-    }
-
-    if (unit === AmountUnit.shannon) {
-      try {
-        amount = amount.match(/^0*(\d*)$/)[1];
-        if (amount === '') {
-          amount = '0';
-        }
-      } catch (e) {
-        throw new Error(`Amount ${amount} is not a valid ${unit} value`);
-      }
-    } else if (unit !== AmountUnit.ckb) {
-      throw new Error(`Invalid unit ${unit}`);
-    }
-
-    this.amount = amount;
-    this.unit = unit;
+    this.amount = rationalNumberToBnString(amount, decimals);
   }
 
-  toString(unit = AmountUnit.ckb, options?: FormatOptions): string {
-    if (unit === AmountUnit.shannon) {
-      return this.unit === AmountUnit.shannon
-        ? this.amount
-        : ckbToShannon(this.amount);
-    } else if (unit === AmountUnit.ckb) {
-      return shannonToCKB(
-        this.unit === AmountUnit.shannon
-          ? this.amount
-          : ckbToShannon(this.amount),
-        options
-      );
-    }
-    throw new Error(`${unit} is not a valid unit`);
+  toString(
+    decimals: number | AmountUnit = AmountUnit.ckb,
+    options?: FormatOptions
+  ): string {
+    return bnStringToRationalNumber(
+      this.toBigInt().toString(),
+      decimals,
+      options
+    );
   }
 
   toBigInt() {
-    if (this.unit === AmountUnit.ckb) {
-      return JSBI.BigInt(this.toString(AmountUnit.shannon));
-    }
     return JSBI.BigInt(this.amount);
   }
 
@@ -122,7 +85,7 @@ export class Amount {
   }
 
   toUInt128LE(): string {
-    return toBigUInt128LE(BigInt(this.toHexString()));
+    return toBigUInt128LE(JSBI.BigInt(this.toHexString()));
   }
 
   static fromUInt128LE(hex) {

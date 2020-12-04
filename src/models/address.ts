@@ -2,7 +2,6 @@ import { Script } from './script';
 import PWCore, { ChainID } from '../core';
 import { HashType } from '../interfaces';
 import ecc from 'eosjs-ecc';
-// import { validators, transformers } from 'ckb-js-toolkit';
 import {
   parseAddress,
   generateAddress,

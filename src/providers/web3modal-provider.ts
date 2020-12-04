@@ -1,7 +1,6 @@
 import { Provider, Platform } from './provider';
 import { Address, AddressType } from '../models';
 import ENS from 'ethereum-ens';
-// import Web3 from 'web3';
 import { verifyEthAddress } from '../utils';
 
 export class Web3ModalProvider extends Provider {

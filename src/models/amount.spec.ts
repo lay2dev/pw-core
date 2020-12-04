@@ -3,6 +3,7 @@ import PWCore, { ChainID } from '../core';
 import { DummyCollector } from '../collectors/dummy-collector';
 import { Amount, AmountUnit } from '.';
 import { DummyProvider } from '../providers/dummy-provider';
+import JSBI from 'jsbi';
 
 test.before(async () => {
   await new PWCore('https://aggron.ckb.dev').init(
@@ -16,6 +17,7 @@ const K = '1000';
 const M = '1000000';
 const B = '1000000000';
 const T = '1000000000000';
+const T1 = '1,000,000,000,000';
 const F = '1002003400500';
 
 const ckb1 = new Amount('1', AmountUnit.ckb);
@@ -31,7 +33,7 @@ test('formatting test set', (t) => {
   t.is(ckb1.toString(AmountUnit.shannon), M + '00');
   t.is(ckb1.toString(AmountUnit.ckb), '1');
 
-  t.is(ckb10000.toString(AmountUnit.shannon, { commify: true }), T);
+  t.is(ckb10000.toString(AmountUnit.shannon, { commify: true }), T1);
   t.is(ckb10000.toString(AmountUnit.ckb, { commify: true }), '10,000');
 
   t.is(shannon1.toString(AmountUnit.ckb), '0.00000001');
@@ -54,14 +56,14 @@ test('formatting test set', (t) => {
     shannonFull.toString(AmountUnit.ckb, { pad: true, commify: true }),
     '10,020.03400500'
   );
-  t.is(shannonFull.toString(AmountUnit.ckb, { section: 'whole' }), '10020');
+  t.is(shannonFull.toString(AmountUnit.ckb, { section: 'integer' }), '10020');
   t.is(
-    shannonFull.toString(AmountUnit.ckb, { section: 'whole', commify: true }),
+    shannonFull.toString(AmountUnit.ckb, { section: 'integer', commify: true }),
     '10,020'
   );
-  t.is(shannonFull.toString(AmountUnit.ckb, { section: 'fraction' }), '034005');
+  t.is(shannonFull.toString(AmountUnit.ckb, { section: 'decimal' }), '034005');
   t.is(
-    shannonFull.toString(AmountUnit.ckb, { section: 'fraction', pad: true }),
+    shannonFull.toString(AmountUnit.ckb, { section: 'decimal', pad: true }),
     '03400500'
   );
 
@@ -72,27 +74,27 @@ test('formatting test set', (t) => {
   t.is(shannonFull.toString(AmountUnit.ckb, { fixed: 5 }), '10020.03401');
   t.is(shannonFull.toString(AmountUnit.ckb, { fixed: 6 }), '10020.034005');
   t.is(
-    shannonFull.toString(AmountUnit.ckb, { section: 'fraction', fixed: 1 }),
+    shannonFull.toString(AmountUnit.ckb, { section: 'decimal', fixed: 1 }),
     '0'
   );
   t.is(
-    shannonFull.toString(AmountUnit.ckb, { section: 'fraction', fixed: 2 }),
+    shannonFull.toString(AmountUnit.ckb, { section: 'decimal', fixed: 2 }),
     '03'
   );
   t.is(
-    shannonFull.toString(AmountUnit.ckb, { section: 'fraction', fixed: 3 }),
+    shannonFull.toString(AmountUnit.ckb, { section: 'decimal', fixed: 3 }),
     '034'
   );
   t.is(
-    shannonFull.toString(AmountUnit.ckb, { section: 'fraction', fixed: 4 }),
+    shannonFull.toString(AmountUnit.ckb, { section: 'decimal', fixed: 4 }),
     '0340'
   );
   t.is(
-    shannonFull.toString(AmountUnit.ckb, { section: 'fraction', fixed: 5 }),
+    shannonFull.toString(AmountUnit.ckb, { section: 'decimal', fixed: 5 }),
     '03401'
   );
   t.is(
-    shannonFull.toString(AmountUnit.ckb, { section: 'fraction', fixed: 6 }),
+    shannonFull.toString(AmountUnit.ckb, { section: 'decimal', fixed: 6 }),
     '034005'
   );
 
@@ -100,7 +102,7 @@ test('formatting test set', (t) => {
 
   t.is(
     shannonFull.toString(AmountUnit.ckb, {
-      section: 'fraction',
+      section: 'decimal',
       fixed: 5,
       pad: true,
     }),
@@ -124,4 +126,32 @@ test('to hex string', (t) => {
   t.is(shannon1.toHexString(), '0x1');
   t.is(ckb1.toHexString(), '0x5f5e100');
   t.is(shannonFull.toHexString(), '0xe94c0e8734');
+});
+
+// tests for random decimals
+
+const d0 = new Amount('10', 0);
+const d1 = new Amount('1', 1);
+const d2 = new Amount('0.1', 2);
+const p = new Amount('0.00361', AmountUnit.ckb);
+const q = new Amount('213.00', AmountUnit.ckb);
+const r = new Amount('213.12', AmountUnit.ckb);
+
+const s = new Amount('213.1200000', 25);
+
+test.only('to BigInt', (t) => {
+  t.is(d0.toBigInt().toString(), JSBI.BigInt(10).toString());
+  t.is(d1.toBigInt().toString(), JSBI.BigInt(10).toString());
+  t.is(d2.toBigInt().toString(), JSBI.BigInt(10).toString());
+  t.is(p.toString(), '0.00361');
+  t.is(p.toString(AmountUnit.ckb), '0.00361');
+  t.is(p.toString(AmountUnit.shannon), '361000');
+
+  t.is(q.toString(AmountUnit.shannon), '21300000000');
+  t.is(q.toString(AmountUnit.ckb), '213');
+
+  t.is(r.toString(AmountUnit.ckb), '213.12');
+  t.is(r.toString(AmountUnit.shannon), '21312000000');
+
+  t.is(s.toString(0), '2131200000000000000000000000');
 });

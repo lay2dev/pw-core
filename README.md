@@ -133,13 +133,13 @@ Finally, here is an [example project](https://github.com/lay2dev/simplestdapp) w
   console.log(ckb100.toHexString()); //'0x2540be400'
 
   console.log(result.toString(AmountUnit.ckb, {
-  section: 'full', pad: true, commify: true
+    pad: true, commify: true
   })); //'1,000,099.99999000'
 
-  console.log(result.toString(Amount), { section: 'whole' })); //'1000099'
-  console.log(result.toString(Amount), { section: 'whole', commify: true })); //'1,000,099'
-  console.log(result.toString(Amount), { section: 'fraction' })); //'99999'
-  console.log(result.toString(Amount), { section: 'fraction', pad: true })); //'99999000'
+  console.log(result.toString(Amount), { section: 'integer' })); //'1000099'
+  console.log(result.toString(Amount), { section: 'integer', commify: true })); //'1,000,099'
+  console.log(result.toString(Amount), { section: 'decimal' })); //'99999'
+  console.log(result.toString(Amount), { section: 'decimal', pad: true })); //'99999000'
 
   /* Cell */
   const cell = new Cell(new Amount('100'), PWCore.provider.address.toLockScript());
