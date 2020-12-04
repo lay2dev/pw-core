@@ -93,6 +93,11 @@ export const rationalNumberToBnString = (
   //   );
   // }
 
+  if (typeof rational === 'number') {
+    const dp = new Decimal(rational).dp();
+    rational = Number(rational).toFixed(dp);
+  }
+
   const parts = `${rational}`.split('.');
 
   if (!!parts[1] && parts[1].length > decimals) {

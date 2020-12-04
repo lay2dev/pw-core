@@ -32,14 +32,6 @@ export class Amount {
     );
   }
 
-  mul(val: Amount): Amount {
-    const res = JSBI.divide(
-      JSBI.multiply(this.toBigInt(), val.toBigInt()),
-      JSBI.BigInt(10 ** (val.decimals + this.decimals))
-    ).toString();
-    return new Amount(res, AmountUnit.shannon);
-  }
-
   gt(val: Amount): boolean {
     return JSBI.GT(this.toBigInt(), val.toBigInt());
   }
@@ -61,13 +53,11 @@ export class Amount {
   }
 
   private amount: string;
-  private decimals: number;
 
   constructor(amount: string, decimals: number | AmountUnit = AmountUnit.ckb) {
     if (!Number.isInteger(decimals) || decimals < 0) {
       throw new Error(`decimals ${decimals} must be a natural number`);
     }
-    this.decimals = decimals;
 
     if (Number.isNaN(amount)) {
       throw new Error(`amount ${amount} must be a valid number`);
