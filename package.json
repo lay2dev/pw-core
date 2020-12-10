@@ -1,6 +1,6 @@
 {
   "name": "@lay2/pw-core",
-  "version": "0.3.20",
+  "version": "0.4.0-beta.0",
   "description": "the javascript sdk of pw-sdk",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -70,11 +70,12 @@
     "codecov": "^3.6.5",
     "cz-conventional-changelog": "^3.1.0",
     "gh-pages": "^2.2.0",
+    "husky": "^4.3.5",
     "npm-run-all": "^4.1.5",
     "nyc": "^15.0.0",
     "open-cli": "^6.0.1",
     "prettier": "^2.0.2",
-    "standard-version": "^8.0.1",
+    "standard-version": "^9.0.0",
     "trash-cli": "^3.0.0",
     "tslint": "^6.1.0",
     "tslint-config-prettier": "^1.18.0",
@@ -96,7 +97,7 @@
   },
   "config": {
     "commitizen": {
-      "path": "cz-conventional-changelog"
+      "path": "node_modules/cz-conventional-changelog"
     }
   },
   "prettier": {
