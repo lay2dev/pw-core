@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.22-beta.0](https://github.com/lay2dev/pw-core/compare/v0.3.21-beta.0...v0.3.22-beta.0) (2020-12-29)
+
+
+### Bug Fixes
+
+* **config:** re-update sudt config of constants ([90df82e](https://github.com/lay2dev/pw-core/commit/90df82e1b1e8875086c54ad6125442eaca5ae880))
+
 ### [0.3.21-beta.0](https://github.com/lay2dev/pw-core/compare/v0.2.2...v0.3.21-beta.0) (2020-12-10)
 
 
