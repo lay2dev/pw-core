@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.22](https://github.com/lay2dev/pw-core/compare/v0.3.22-beta.0...v0.3.22) (2020-12-29)
+
+
+### Features
+
+* **merge:** merge rc branch ([bab95f3](https://github.com/lay2dev/pw-core/commit/bab95f32d45883e890166e8e9ce22c877ad2737c))
+
+### [0.3.21](https://github.com/lay2dev/pw-core/compare/v0.3.21-beta.0...v0.3.21) (2020-12-10)
+
 ### [0.3.21](https://github.com/lay2dev/pw-core/compare/v0.3.21-beta.0...v0.3.21) (2020-12-10)
 
 
