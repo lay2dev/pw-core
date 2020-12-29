@@ -89,26 +89,46 @@ Finally, here is an [example project](https://github.com/lay2dev/simplestdapp) w
   Talk is cheap, let's show some code.
 
   ```typescript
-  /* Address */
-  const addressCkb = new Address(
-    'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs',
-    AddressType.ckb
-  );
+  /* ------ Address ------ */
+  
+  /* create an Address instance from a CKB address */
+  const ckbAddress = new Address('ckb1qyqdmeuqrsrnm7e5vnrmruzmsp4m9wacf6vsxasryq', AddressType.ckb);
 
-  const addressEth = new Address(
-    '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc',
-    AddressType.eth
-  );
+  /* create an Address instance from an Ethereum address */
+  const ethAddress = new Address('0x308f27c8595b2ee9e6a5faa875b4c1f9de6b679a', AddressType.eth);
 
-  const addressCkbFull = new Address(
-    'ckt1qjmk32srs9nx345sgj0xrcq6slzx5ta3vt8azm4py95aalx7qq2agvh5ct04panc49rqn6v03mnllv2tv7vmc2z5pkp',
-    AddressType.ckb
-  );
+  /* get the original address string */
+  console.log('ckb: ', ckbAddress.addressString)  
+  console.log('eth: ', ethAddress.addressString)
+  // ckb: ckb1qyqdmeuqrsrnm7e5vnrmruzmsp4m9wacf6vsxasryq
+  // eth: 0x308f27c8595b2ee9e6a5faa875b4c1f9de6b679a
 
-  console.log(addressEth.toCKBAddress());
-  //'ckt1qjmk32srs9nx345sgj0xrcq6slzx5ta3vt8azm4py95aalx7qq2agvh5ct04panc49rqn6v03mnllv2tv7vmc2z5pkp'
+  /* get the corresponding CKB address */
+  console.log('ckb: ', ckbAddress.toCKBAddress())
+  console.log('eth: ', ethAddress.toCKBAddress())
+  // ckb: ckb1qyqdmeuqrsrnm7e5vnrmruzmsp4m9wacf6vsxasryq
+  // eth: ckt1q3vvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxvy0yly9jkewa8n2t74gwk6vr7w7ddne5jrkf6c
 
-  /* Script */
+  /* get the corresponding lock script hash (with the toHash method of class Script) */
+  console.log('ckb: ', ethAddress.toLockScript().toHash())
+  console.log('eth: ', ethAddress.toLockScript().toHash())
+  // ckb: 0xe9e412caf497c69e9612d305be13f9173752b9e75bc5a9b6d1ca51eb38d07d59
+  // eth: 0x0963476f28975bf93da673cd2442bd69c4b2d4e720af5a67ecece8a03b8926b5
+
+  /* check if the address is an ACP address */
+  console.log('ckb: ', ckbAddress.isAcp())
+  console.log('eth: ', ethAddress.isAcp())
+  // false
+  // true
+
+  // get the minimal CKB amount (an Amount instance) you can transfer to this address
+  console.log('ckb: ', ckbAddress.minPaymentAmount().toString() + ' CKB')
+  console.log('eth: ', ethAddress.minPaymentAmount().toString() + ' CKB')
+  // 61 CKB
+  // 0.00000001 CKB
+
+  /* ------ Script ------ */
+  
   const lockScript = addressCkb.toLockScript();
   const lockScriptHash = lockScript.toHash();
   const address1 = Address.fromLockScript(lockScript);
@@ -117,40 +137,81 @@ Finally, here is an [example project](https://github.com/lay2dev/simplestdapp) w
   console.log(addressEth.toLockScript().sameWith(addressCkbFull.toLockScript()));
   //true
 
-  /* Amount */
+  /* ------ Amount ------ */
+  
   const ckb100 = new Amount('100');
-  const ckb1M = new Amount('1000000');
-  const shannon1k = new Amount('1000', AmountUnit.shannon);
-  const shannon10B = new Amount('10000000000', AmountUnit.shannon);
+  const shannon100 = new Amount('100', AmountUnit.shannon);
+  const usdt = new Amount('1234.5678', 6); // Assume usdt's decimals is 6
 
-  console.log(ckb100.eq(shannon10B)); //true
-  console.log(ckb100.lt(shannon1k)); //false
+  /* format */
 
-  const result = ckb1M.add(ckb100).sub(shannon1k);
-  console.log(result.eq(new Amount('1000099.99999'))); //true
+  console.log(`${ckb100.toString()} CKB is ${ckb100.toString(AmountUnit.shannon, {commify: true})} Shannon`);
+  // 100 CKB is 1,000,000 Shannon
 
-  console.log(ckb100.toString(AmountUnit.shannon)); //'10000000000'
-  console.log(ckb100.toHexString()); //'0x2540be400'
+  console.log(`${shannon100.toString(AmountUnit.shannon)} Shannon is ${shannon100.toString()} CKB`)
+  // 100 Shannon is 0.000001 CKB
 
-  console.log(result.toString(AmountUnit.ckb, {
-    pad: true, commify: true
-  })); //'1,000,099.99999000'
+  console.log(`${usdt.toString(6, {fixed: 2, commify: true})} USDT is rounded from ${usdt.toString(6, {pad: true})} USDT`);
+  // 1,234.57 USDT is rounded from 1234.567800 USDT
 
-  console.log(result.toString(Amount), { section: 'integer' })); //'1000099'
-  console.log(result.toString(Amount), { section: 'integer', commify: true })); //'1,000,099'
-  console.log(result.toString(Amount), { section: 'decimal' })); //'99999'
-  console.log(result.toString(Amount), { section: 'decimal', pad: true })); //'99999000'
+  /* compare */
 
-  /* Cell */
-  const cell = new Cell(new Amount('100'), PWCore.provider.address.toLockScript());
+  console.log('100 CKB is greater than 100 Shannon: ', ckb100.gt(shannon100));
+  console.log('100 CKB is less than 100 Shannon: ', ckb100.lt(shannon100));
+  // 100 CKB is greater than 100 Shannon: true
+  // 100 CKB is less than 100 Shannon: false
 
-  cell.setData('Hello from Lay2');
-  console.log(cell.getHexData()); //'0x48656c6c6f2066726f6d204c617932'
-  cell.setHexData('0x48656c6c6f204261636b');
-  console.log(cell.getData()); //'Hello Back'
+  console.log('100 Shannon is equal to 0.000001 CKB: ', shannon100.eq(new Amount('0.000001')));
+  // 100 Shannon is equal to 0.000001 CKB: true
 
-  cell.setData('a looooooooooooooooooooooong data');
-  cell.resize(); // cell.capacity will be adjusted to the actual space usage.
+  /* calculate */
+
+  console.log(`100 CKB + 100 Shannon = ${ckb100.add(shannon100).toString()} CKB`);
+  console.log(`100 CKB - 100 Shannon = ${ckb100.sub(shannon100).toString()} CKB`);
+  // 100 CKB + 100 Shannon = 100.000001 CKB
+  // 100 CKB - 100 Shannon = 99.999999 CKB
+
+  // Amount is assumed with unit, so if we want to perform multiplication or division, the best way is to convert the Amount instance to JSBI BigInt, and convert  back to Amount instance if necessary.
+  const bn = JSBI.mul(ckb100.toBigInt(), JSBI.BigInt(10));
+  const amount = new Amount(bn.toString())
+  console.log(`100 CKB * 10 = ${amount.toString(AmountUnit.ckb, {commify: true})} CKB`);
+  // 100 CKB * 10 = 1,000 CKB
+
+  /* ------ Cell ------ */
+  
+  /* load from blockchain with a rpc instance and an outpoint */
+  const cell1 = Cell.loadFromBlockchain(rpc, outpoint);
+
+  /* convert rpc formated data to a Cell instance */
+  const cell2 = Cell.fromRPC(rpcData);
+
+  /* check how many capacity is occupied by scripts and data */
+  const occupiedCapacity = cell1.occupiedCapacity();
+
+  /* check if the cell's capacity is enough for the actual size */
+  cell1.spaceCheck();
+
+  /* check if the cell is empty (no data is stored) */
+  cell2.isEmpty()
+
+  /* adjust the capacity to the minimal value of this cell */
+  cell2.resize();
+
+  /* set / get amount of an sUDT cell */
+  const cell3 = cell2.clone();
+  cell3.setSUDTAmount(new Amount(100));
+  console.log('sUDT amount: ', cell3.getSUDTAmount().toString());
+  // sUDT amount: 100
+
+  /* playing with data */
+  cell1.setData('data');
+  cell2.setHexData('0x64617461');
+  console.log('data of cell 1: ', cell1.getData());
+  console.log('data of cell 2: ', cell1.getData());
+  console.log('hex data of cell 1: ', cell1.getHexData());
+  // data of cell 1: data
+  // data of cell 2: data
+  // hex data of cell 1: 0x64617461
   ```
 
 - ### Simple and Clear Structure
