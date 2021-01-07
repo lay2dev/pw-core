@@ -8,7 +8,7 @@ export class Web3ModalProvider extends Provider {
 
   constructor(
     readonly web3: any,
-    onAddressChanged?: (newAddress: Address) => void
+    onAddressChanged?: (newAddress?: Address) => void
   ) {
     super(Platform.eth);
     this.onAddressChanged = onAddressChanged;
@@ -24,7 +24,11 @@ export class Web3ModalProvider extends Provider {
     if (this.web3.currentProvider.on) {
       this.web3.currentProvider.on(
         'accountsChanged',
-        async (newAccounts: string[]) => {
+        async (newAccounts: string[] | undefined) => {
+          if (!newAccounts || newAccounts.length === 0) {
+            this.onAddressChanged?.(undefined);
+            return;
+          }
           this.address = new Address(newAccounts[0], AddressType.eth);
           if (this.onAddressChanged) {
             this.onAddressChanged(this.address);
