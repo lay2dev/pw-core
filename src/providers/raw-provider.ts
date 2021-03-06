@@ -9,30 +9,37 @@ import {
   AddressPrefix,
   privateKeyToAddress,
 } from '@nervosnetwork/ckb-sdk-utils';
-import { ECPair } from '../signers';
+import { Blake2bHasher, Hasher } from '../hashers';
+import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair';
+import { logger } from '../helpers/logger';
 
 export class RawProvider extends Provider {
-  protected ecPair: ECPair;
+  protected keyPair: ECPair;
   constructor(protected privateKey: string) {
     super(Platform.ckb);
-    this.ecPair = new ECPair(privateKey);
+    this.keyPair = new ECPair(privateKey);
   }
 
   async init(): Promise<Provider> {
     const pwPrefix = getDefaultPrefix();
-    let prefix;
-    if (pwPrefix === PwAddressPrefix.ckb) {
-      prefix = AddressPrefix.Mainnet;
-    } else {
-      prefix = AddressPrefix.Testnet;
-    }
+    const prefix =
+      pwPrefix === PwAddressPrefix.ckb
+        ? AddressPrefix.Mainnet
+        : AddressPrefix.Testnet;
     const address = privateKeyToAddress(this.privateKey, { prefix });
     this.address = new Address(address, AddressType.ckb);
     return this;
   }
 
+  hasher(): Hasher {
+    return new Blake2bHasher();
+  }
+
   async sign(message: string): Promise<string> {
-    return this.ecPair.signRecoverable(message);
+    logger.debug('message', message);
+    const sig = this.keyPair.signRecoverable(message);
+    logger.debug('sig', sig);
+    return sig;
   }
 
   async close() {
