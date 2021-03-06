@@ -1,15 +1,15 @@
-import { Builder } from './builder';
+import PWCore from '..';
+import { SUDTCollector } from '../collectors';
 import {
   Address,
   Amount,
   AmountUnit,
   Cell,
   RawTransaction,
-  Transaction,
   SUDT,
+  Transaction,
 } from '../models';
-import PWCore from '..';
-import { SUDTCollector } from '../collectors/sudt-collector';
+import { Builder } from './builder';
 
 export class SimpleSUDTBuilder extends Builder {
   fee: Amount;
@@ -133,7 +133,7 @@ export class SimpleSUDTBuilder extends Builder {
 
     const unspentCKBCells = await this.collector.collect(
       PWCore.provider.address,
-      neededAmount
+      { neededAmount }
     );
 
     if (!unspentCKBCells || unspentCKBCells.length === 0) {
