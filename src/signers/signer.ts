@@ -29,6 +29,7 @@ export abstract class Signer {
       )
     ).serializeJson();
     tx = FillSignedWitnesses(tx, messages, witnesses);
+
     return tx;
   }
 

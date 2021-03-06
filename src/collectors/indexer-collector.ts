@@ -18,23 +18,16 @@ export class IndexerCollector extends SUDTCollector {
   }
 
   async getBalance(address: Address): Promise<Amount> {
-    const lock = address.toLockScript();
     const searchKey = {
-      script: {
-        code_hash: lock.codeHash,
-        args: lock.args,
-        hash_type: lock.hashType,
-      },
+      script: address.toLockScript().serializeJson() as Script,
       script_type: ScriptType.lock,
       filter: {
         output_data_len_range: ['0x0', '0x1'] as [HexString, HexString],
       },
     };
-    // console.log({searchKey});
     const cells = (await this.indexer.getCells(searchKey)).filter(
       (cell) => cell.output.type === null
     );
-    // console.dir(cells, {depth: null});
     let balance = Amount.ZERO;
     cells.forEach((cell) => {
       const amount = new Amount(cell.output.capacity, AmountUnit.shannon);
@@ -61,39 +54,26 @@ export class IndexerCollector extends SUDTCollector {
         return { stop: false, push: true };
       }
     };
-    const lock = address.toLockScript();
     const searchKey = {
-      script: {
-        code_hash: lock.codeHash,
-        args: lock.args,
-        hash_type: lock.hashType,
-      },
+      script: address.toLockScript().serializeJson() as Script,
       script_type: ScriptType.lock,
       filter: {
         output_data_len_range: ['0x0', '0x1'] as [HexString, HexString],
       },
     };
     const cells = await this.indexer.getCells(searchKey, terminator);
-    // console.dir(cells, {depth: null});
     return cells.map((cell) => IndexerCellToCell(cell));
   }
 
   async getSUDTBalance(sudt: SUDT, address: Address): Promise<Amount> {
-    const lock = address.toLockScript();
     const searchKey = {
-      script: {
-        code_hash: lock.codeHash,
-        args: lock.args,
-        hash_type: lock.hashType,
-      },
+      script: address.toLockScript().serializeJson() as Script,
       script_type: ScriptType.lock,
       filter: {
         script: sudt.toTypeScript().serializeJson() as Script,
       },
     };
-    // console.log({searchKey});
     const cells = await this.indexer.getCells(searchKey);
-    // console.dir(cells, {depth: null});
     let balance = Amount.ZERO;
     cells.forEach((cell) => {
       const amount = Amount.fromUInt128LE(cell.output_data);
@@ -110,13 +90,8 @@ export class IndexerCollector extends SUDTCollector {
     if (!options || !options.neededAmount) {
       throw new Error("'neededAmount' in options must be provided");
     }
-    const lock = address.toLockScript();
     const searchKey = {
-      script: {
-        code_hash: lock.codeHash,
-        args: lock.args,
-        hash_type: lock.hashType,
-      },
+      script: address.toLockScript().serializeJson() as Script,
       script_type: ScriptType.lock,
       filter: {
         script: sudt.toTypeScript().serializeJson() as Script,
@@ -131,7 +106,6 @@ export class IndexerCollector extends SUDTCollector {
       return { stop: false, push: true };
     };
     const cells = await this.indexer.getCells(searchKey, terminator);
-    // console.dir(cells, {depth: null});
     return cells.map((cell) => IndexerCellToCell(cell));
   }
 }

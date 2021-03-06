@@ -1,5 +1,5 @@
 import { Address } from '../models';
-import {Hasher, Keccak256Hasher} from "../hashers";
+import { Hasher, Keccak256Hasher } from '../hashers';
 
 export enum Platform {
   ckb = 0,

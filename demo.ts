@@ -149,9 +149,10 @@ async function main() {
   //     new Amount('10', AmountUnit.shannon),
   //     true,
   // );
-  await ckbSendTx();
+  // await ckbSendTx();
   const txHash = await pwcore.send(toAddr, new Amount('100', AmountUnit.ckb));
-  await asyncSleep(10000);
+  console.log({ txHash });
+  await asyncSleep(20000);
   const fromAfter = await collector.getBalance(provider.address);
   const toAfter = await collector.getBalance(toAddr);
   console.log({ fromBefore, toBefore, fromAfter, toAfter });

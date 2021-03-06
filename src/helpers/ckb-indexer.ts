@@ -71,9 +71,7 @@ export class CkbIndexer {
       method,
       params,
     };
-    // console.dir({data, url: this.ckbIndexerUrl}, {depth: null});
     const res = await axios.post(this.ckbIndexerUrl, data);
-    // console.dir(res, {depth: null});
     if (res.status !== 200) {
       throw new Error(`indexer request failed with HTTP code ${res.status}`);
     }
