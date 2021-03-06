@@ -53,18 +53,16 @@ You can also use it in backend scenarios with `RawProvider` and `IndexerCollecto
 
 ```javascript
 import PWCore, {
-  EthProvider,
-  PwCollector,
   ChainID,
   Address,
   Amount,
   AddressType,
   IndexerCollector,
+  RawProvider,
 } from '@lay2/pw-core';
 
 const provider = new RawProvider('your-private-key');
 const collector = new IndexerCollector('https://ckb-indexer-url');
-
 const pwcore = await new PWCore('https://ckb-node-url').init(provider, collector);
 
 const txHash = await pwcore.send(
