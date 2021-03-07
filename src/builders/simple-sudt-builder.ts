@@ -133,7 +133,7 @@ export class SimpleSUDTBuilder extends Builder {
 
     const unspentCKBCells = await this.collector.collect(
       PWCore.provider.address,
-      neededAmount
+      { neededAmount }
     );
 
     if (!unspentCKBCells || unspentCKBCells.length === 0) {
