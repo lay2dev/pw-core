@@ -10,8 +10,9 @@ import {
   SimpleSUDTACPBuilder,
   SimpleSUDTBuilder,
 } from './builders';
-import { Provider } from './providers';
+import { Platform, Provider } from './providers';
 import { SUDTCollector } from './collectors/sudt-collector';
+import { Blake2bHasher } from '.';
 
 export enum ChainID {
   ckb,
@@ -120,7 +121,12 @@ export default class PWCore {
     tx.validate();
 
     if (!signer) {
-      signer = new DefaultSigner(PWCore.provider);
+      const hasher =
+        // for ckb platform we usually use blake2b as hash function
+        PWCore.provider.platform === Platform.ckb
+          ? new Blake2bHasher()
+          : undefined;
+      signer = new DefaultSigner(PWCore.provider, hasher);
     }
 
     return this.rpc.send_transaction(

@@ -1,8 +1,8 @@
 import {
   AddressPrefix,
-  AddressType as CkbAddressType,
   privateKeyToAddress,
 } from '@nervosnetwork/ckb-sdk-utils';
+import { AddressOptions } from '@nervosnetwork/ckb-sdk-utils/lib/address';
 import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair';
 import PWCore, { Address, AddressType, ChainID } from '..';
 import { Platform, Provider } from './provider';
@@ -19,21 +19,21 @@ export class RawProvider extends Provider {
   constructor(privateKey: string) {
     super(Platform.ckb);
     this.#privateKey = privateKey;
-    this.address = new Address(
-      privateKeyToAddress(privateKey, {
-        prefix: getCkbAddressPrefix(),
-        type: CkbAddressType.HashIdx,
-        codeHashOrCodeHashIndex: '0x00',
-      }),
-      AddressType.ckb
-    );
   }
 
-  async close(): Promise<any> {
-    return Promise.resolve(undefined);
+  async close(): Promise<void> {
+    return;
   }
 
   async init(): Promise<Provider> {
+    // this is a patch for ckb-sdk-utils
+    const options = ({
+      prefix: getCkbAddressPrefix(),
+    } as unknown) as AddressOptions;
+    this.address = new Address(
+      privateKeyToAddress(this.#privateKey, options),
+      AddressType.ckb
+    );
     return this;
   }
 

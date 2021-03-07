@@ -1,19 +1,25 @@
-import { Address, Amount, AmountUnit, Cell, OutPoint, SUDTCollector } from '..';
-import { SUDT } from '../models';
-import { CollectorOptions } from './collector';
+import { Indexer, IndexerCellIterator } from '.';
 import {
-  IndexerCellIterator,
-  Options,
-} from './indexer-collector/IndexerCellIterator';
+  Address,
+  Amount,
+  AmountUnit,
+  Cell,
+  CollectorOptions,
+  OutPoint,
+} from '../..';
+import { SUDT } from '../../models';
+import { SUDTCollector } from '../sudt-collector';
+import { Options } from './indexer-cell-iterator';
 
 export class IndexerCollector extends SUDTCollector {
-  private readonly options: Required<Options>;
+  private readonly options: Options;
 
-  constructor(options?: Options) {
+  constructor(options: { url: string; thunkSize?: number }) {
     super();
+
     this.options = {
+      url: options.url,
       thunkSize: options?.thunkSize ?? 100,
-      url: options?.url ?? 'https://testnet.ckb.dev/indexer',
     };
   }
 
@@ -23,15 +29,23 @@ export class IndexerCollector extends SUDTCollector {
     }
 
     const iter = new IndexerCellIterator(
-      { script: address.toLockScript().serializeJson(), script_type: 'lock' },
+      {
+        script: address.toLockScript().serializeJson() as Indexer.Script,
+        script_type: Indexer.ScriptType.Lock,
+        filter: {
+          // ensure that only ckb live cells are filtered out
+          output_data_len_range: ['0x0', '0x1'],
+        },
+      },
       this.options
     );
 
     const cells: Cell[] = [];
-    let accAmount = new Amount('0', AmountUnit.shannon);
+    let accAmount = Amount.ZERO;
 
     while (iter.hasNext()) {
       for (const { output, out_point } of await iter.next()) {
+        // ensure that only ckb live cells are filtered out
         if (output.type != null) continue;
 
         const capacity = new Amount(output.capacity, AmountUnit.shannon);
@@ -57,15 +71,17 @@ export class IndexerCollector extends SUDTCollector {
 
     const iter = new IndexerCellIterator(
       {
-        script: address.toLockScript().serializeJson(),
-        script_type: 'lock',
-        filter: { script: sudt.toTypeScript().serializeJson() },
+        script: address.toLockScript().serializeJson() as Indexer.Script,
+        script_type: Indexer.ScriptType.Lock,
+        filter: {
+          script: sudt.toTypeScript().serializeJson() as Indexer.Script,
+        },
       },
       this.options
     );
 
     const cells: Cell[] = [];
-    let accAmount = new Amount('0', AmountUnit.shannon);
+    let accAmount = Amount.ZERO;
 
     while (iter.hasNext()) {
       for (const { output, out_point, output_data } of await iter.next()) {
@@ -91,11 +107,18 @@ export class IndexerCollector extends SUDTCollector {
 
   async getBalance(address: Address): Promise<Amount> {
     const iter = new IndexerCellIterator(
-      { script: address.toLockScript().serializeJson(), script_type: 'lock' },
+      {
+        script: address.toLockScript().serializeJson() as Indexer.Script,
+        script_type: Indexer.ScriptType.Lock,
+        filter: {
+          // ensure that only ckb live cells are filtered out
+          output_data_len_range: ['0x0', '0x1'],
+        },
+      },
       this.options
     );
 
-    let balance = new Amount('0', AmountUnit.shannon);
+    let balance = Amount.ZERO;
 
     while (iter.hasNext()) {
       for (const { output } of await iter.next()) {
@@ -112,14 +135,16 @@ export class IndexerCollector extends SUDTCollector {
   async getSUDTBalance(sudt: SUDT, address: Address): Promise<Amount> {
     const iter = new IndexerCellIterator(
       {
-        script: address.toLockScript().serializeJson(),
-        script_type: 'lock',
-        filter: { script: sudt.toTypeScript().serializeJson() },
+        script: address.toLockScript().serializeJson() as Indexer.Script,
+        script_type: Indexer.ScriptType.Lock,
+        filter: {
+          script: sudt.toTypeScript().serializeJson() as Indexer.Script,
+        },
       },
       this.options
     );
 
-    let balance = new Amount('0', AmountUnit.shannon);
+    let balance = Amount.ZERO;
 
     while (iter.hasNext()) {
       for (const { output_data } of await iter.next()) {
