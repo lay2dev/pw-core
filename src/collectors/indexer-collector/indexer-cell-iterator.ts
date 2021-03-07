@@ -23,15 +23,7 @@ export class IndexerCellIterator<T = Indexer.Cell> {
 
   hasNext(): boolean {
     const notStarted = !this.hasStarted();
-
-    // https://github.com/nervosnetwork/ckb/blob/develop/util/jsonrpc-types/src/bytes.rs#L11
-    /// | JSON       | Binary                               |
-    /// | ---------- | ------------------------------------ |
-    /// | "0x"       | Empty binary                         |
-    /// | "0x00"     | Single byte 0                        |
-    /// | "0x636b62" | 3 bytes, UTF-8 encoding of ckb       |
-    /// | "00"       | Invalid, 0x is required              |
-    /// | "0x0"      | Invalid, each byte requires 2 digits |
+    // {@link Indexer.JsonBytes}
     const cursorNotEmpty = this.cursor !== '0x';
 
     return notStarted || cursorNotEmpty;

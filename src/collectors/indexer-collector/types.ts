@@ -1,33 +1,44 @@
-// type Option<T> = T | null;
-
 // https://github.com/nervosnetwork/ckb/blob/master/util/types
-
 type Uint64 = string;
 type Uint32 = string;
 
 type Capacity = Uint64;
 type BlockNumber = Uint64;
+
+// https://github.com/nervosnetwork/ckb/blob/develop/util/jsonrpc-types/src/bytes.rs#L11
+/// | JSON       | Binary                               |
+/// | ---------- | ------------------------------------ |
+/// | "0x"       | Empty binary                         |
+/// | "0x00"     | Single byte 0                        |
+/// | "0x636b62" | 3 bytes, UTF-8 encoding of ckb       |
+/// | "00"       | Invalid, 0x is required              |
+/// | "0x0"      | Invalid, each byte requires 2 digits |
 type JsonBytes = string;
 type H256 = string;
 
 // https://github.com/nervosnetwork/ckb/blob/develop/util/jsonrpc-types/src/blockchain.rs
-export type Script = {
-  args: string;
-  code_hash: string;
-  hash_type: string;
-};
-
-export type OutPoint = {
-  index: Uint32;
-  tx_hash: H256;
-};
-
 export type Cell = {
   output: CellOutput;
   output_data: JsonBytes;
   out_point: OutPoint;
   block_number: BlockNumber;
   tx_index: Uint32;
+};
+
+export type Script = {
+  args: JsonBytes;
+  code_hash: H256;
+  hash_type: ScriptHashType;
+};
+
+export enum ScriptHashType {
+  Data = 'data',
+  Type = 'type',
+}
+
+export type OutPoint = {
+  index: Uint32;
+  tx_hash: H256;
 };
 
 export type CellOutput = {
