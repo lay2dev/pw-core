@@ -150,7 +150,7 @@ export class Address {
     const { args, codeHash, hashType } = this.toLockScript();
 
     return fullPayloadToAddress({
-      arg: args,
+      args,
       codeHash,
       type:
         hashType === HashType.data ? AType.DataCodeHash : AType.TypeCodeHash,

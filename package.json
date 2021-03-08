@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "@ckb-lumos/types": "^0.2.4",
-    "@nervosnetwork/ckb-sdk-utils": "^0.32.0",
+    "@nervosnetwork/ckb-sdk-utils": "^0.39.0",
     "@scatterjs/core": "^2.7.53",
     "@scatterjs/eosjs2": "^1.5.35",
     "axios": "^0.19.2",

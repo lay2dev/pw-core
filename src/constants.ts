@@ -136,7 +136,7 @@ export const CHAIN_SPECS = {
       script: new Script(
         '0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4',
         '0x',
-        HashType.data
+        HashType.type
       ),
     },
     multiSigLock: {

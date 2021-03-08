@@ -1,4 +1,5 @@
 import { Address } from '../models';
+import { Hasher, Keccak256Hasher } from '../hashers';
 
 export enum Platform {
   ckb = 0,
@@ -17,6 +18,10 @@ export abstract class Provider {
   }
   set address(value: Address) {
     this._address = value;
+  }
+
+  hasher(): Hasher {
+    return new Keccak256Hasher();
   }
 
   abstract async init(): Promise<Provider>;

@@ -49,6 +49,28 @@ const txHash = await pwcore.send(
 
 That's it! If CKB transaction (with Ethereum wallets, e.g. MetaMask) is the only thing you need, you can already start your integration with pw-core.
 
+You can also use it in backend scenarios with `RawProvider` and `IndexerCollector`.
+
+```javascript
+import PWCore, {
+  ChainID,
+  Address,
+  Amount,
+  AddressType,
+  IndexerCollector,
+  RawProvider,
+} from '@lay2/pw-core';
+
+const provider = new RawProvider('your-private-key');
+const collector = new IndexerCollector('https://ckb-indexer-url');
+const pwcore = await new PWCore('https://ckb-node-url').init(provider, collector);
+
+const txHash = await pwcore.send(
+  new Address('0x26C5F390FF2033CbB44377361c63A3Dd2DE3121d', AddressType.eth),
+  new Amount('100')
+);
+```
+
 ### One Step Further
 
 However, if you need more features, such as adding multiple outputs, setting data, or adding custom lock/type scripts, you can always implement you own builder extends the `Builder` class. If you have more requirements with retriving unspent cells, a custom cell collector based on `Collector` is a good choice. The same approach applies to `Signer` / `Hasher` / `Provider`. In fact, you will find that almost every aspect of buiding a transaction can be customized to meet your demands. This is because we have well encapsulated the transaction process as **build -> sign -> send**, and any kind of transaction can be created and sent given a builder and a signer. For example, the basic `send` method used in the Hello World example is implented like this:
