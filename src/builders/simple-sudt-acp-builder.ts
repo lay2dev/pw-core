@@ -1,4 +1,4 @@
-import { Builder } from './builder';
+import { Builder, BuilderOption } from './builder';
 import {
   Address,
   Amount,
@@ -16,10 +16,9 @@ export class SimpleSUDTACPBuilder extends Builder {
     private sudt: SUDT,
     private address: Address,
     private amount: Amount,
-    feeRate?: number,
-    collector?: SUDTCollector
+    protected options: BuilderOption = {}
   ) {
-    super(feeRate, collector);
+    super(options.feeRate, options.collector, options.witnessArgs);
   }
 
   async build(): Promise<Transaction> {
@@ -166,7 +165,7 @@ export class SimpleSUDTACPBuilder extends Builder {
     ];
     const tx = new Transaction(
       new RawTransaction(inputCells, outputCells, sudtCellDeps),
-      [Builder.WITNESS_ARGS.Secp256k1]
+      [this.witnessArgs]
     );
 
     this.fee = Builder.calcFee(tx, this.feeRate);

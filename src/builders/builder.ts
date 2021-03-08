@@ -1,15 +1,27 @@
 import { Collector } from '../collectors/collector';
 import { Amount, AmountUnit, Transaction } from '../models';
+import { WitnessArgs } from '../interfaces';
 import PWCore from '..';
 import { SUDTCollector } from '../collectors/sudt-collector';
 
 const FEE_BASE = 1000;
+
+export interface BuilderOption {
+  feeRate?: number;
+  collector?: Collector;
+  witnessArgs?: WitnessArgs;
+}
 
 export abstract class Builder {
   static readonly MIN_FEE_RATE = 1000;
   static readonly MIN_CHANGE = new Amount('61', AmountUnit.ckb);
   static readonly WITNESS_ARGS = {
     Secp256k1: {
+      lock: '0x' + '0'.repeat(132),
+      input_type: '',
+      output_type: '',
+    },
+    RawSecp256k1: {
       lock: '0x' + '0'.repeat(130),
       input_type: '',
       output_type: '',
@@ -37,7 +49,8 @@ export abstract class Builder {
 
   protected constructor(
     protected feeRate: number = Builder.MIN_FEE_RATE,
-    protected collector: Collector | SUDTCollector = PWCore.defaultCollector
+    protected collector: Collector | SUDTCollector = PWCore.defaultCollector,
+    protected witnessArgs: WitnessArgs = Builder.WITNESS_ARGS.Secp256k1
   ) {}
 
   getFee(): Amount {

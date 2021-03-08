@@ -59,15 +59,21 @@ import PWCore, {
   AddressType,
   IndexerCollector,
   RawProvider,
+  Builder,
 } from '@lay2/pw-core';
 
 const provider = new RawProvider('your-private-key');
 const collector = new IndexerCollector('https://ckb-indexer-url');
-const pwcore = await new PWCore('https://ckb-node-url').init(provider, collector);
+const pwcore = await new PWCore('https://ckb-node-url').init(
+  provider,
+  collector
+);
 
+const options = { witnessArgs: Builder.WITNESS_ARGS.RawSecp256k1 };
 const txHash = await pwcore.send(
   new Address('0x26C5F390FF2033CbB44377361c63A3Dd2DE3121d', AddressType.eth),
-  new Amount('100')
+  new Amount('100'),
+  options
 );
 ```
 

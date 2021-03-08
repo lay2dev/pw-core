@@ -10,6 +10,7 @@ import PWCore, {
   IndexerCollector,
   AmountUnit,
   SUDT,
+  Builder,
 } from '../src';
 import { RPC } from 'ckb-js-toolkit';
 
@@ -31,11 +32,14 @@ async function main() {
   const balance = await collector.getBalance(provider.address);
   console.log(`balance: ${balance}`);
   const sudt = new SUDT(
-    '0x8462b20277bcbaa30d821790b852fb322d55c2b12e750ea91ad7059bc98dda4b'
+    // '0x8462b20277bcbaa30d821790b852fb322d55c2b12e750ea91ad7059bc98dda4b'
+    '0xacaa8f78be29c93a76146cf015a5af75e7aa2f401d0836b406a56f6d3c91b0f3'
   );
   const sudtBalance = await collector.getSUDTBalance(sudt, provider.address);
   console.log(`sudt balance: ${sudtBalance}`);
 
+  // for ckb system lock script, its length of witness lock is 65 bytes, use RawScep256K1 here.
+  const options = { witnessArgs: Builder.WITNESS_ARGS.RawSecp256k1 };
   // transfer
   const toAddr = new Address(
     '0x7Ad9ec46A9c2910b446148728aCEd0C7E2B50048',
@@ -44,7 +48,11 @@ async function main() {
   const fromBefore = await collector.getBalance(provider.address);
   const toBefore = await collector.getBalance(toAddr);
   // The amount should be more than 61 CKB, unless the toAddr is acp address and there is already cell to receive CKB
-  const txHash = await pwcore.send(toAddr, new Amount('1', AmountUnit.shannon));
+  const txHash = await pwcore.send(
+    toAddr,
+    new Amount('1', AmountUnit.shannon),
+    options
+  );
   await waitUntilCommitted(txHash, rpc);
   const fromAfter = await collector.getBalance(provider.address);
   const toAfter = await collector.getBalance(toAddr);
@@ -59,7 +67,9 @@ async function main() {
     sudt,
     toAddr,
     new Amount('1', AmountUnit.shannon),
-    false
+    false,
+    null,
+    options
   );
   await waitUntilCommitted(txSudtHash, rpc);
   const fromSudtAfter = await collector.getSUDTBalance(sudt, provider.address);

@@ -1,4 +1,4 @@
-import { Builder } from './builder';
+import { Builder, BuilderOption } from './builder';
 import {
   Address,
   Amount,
@@ -21,10 +21,9 @@ export class SimpleSUDTBuilder extends Builder {
     private sudt: SUDT,
     private address: Address,
     private amount: Amount,
-    feeRate?: number,
-    collector?: SUDTCollector
+    protected options: BuilderOption = {}
   ) {
-    super(feeRate, collector);
+    super(options.feeRate, options.collector, options.witnessArgs);
     this.fee = new Amount('0');
   }
 
@@ -213,7 +212,7 @@ export class SimpleSUDTBuilder extends Builder {
     ];
     const tx = new Transaction(
       new RawTransaction(this.inputCells, this.outputCells, sudtCellDeps),
-      [Builder.WITNESS_ARGS.Secp256k1]
+      [this.witnessArgs]
     );
 
     this.fee = Builder.calcFee(tx, this.feeRate);

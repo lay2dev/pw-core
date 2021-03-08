@@ -9,6 +9,7 @@ import {
   Builder,
   SimpleSUDTACPBuilder,
   SimpleSUDTBuilder,
+  BuilderOption,
 } from './builders';
 import { Provider } from './providers';
 import { SUDTCollector } from './collectors/sudt-collector';
@@ -96,14 +97,14 @@ export default class PWCore {
    * Transfer CKB to any address
    * @param address The receiver's address
    * @param amount The amount of CKB to send
-   * @param feeRate The feeRate (Shannon/KB) for this transaction.
+   * @param options The transaction builder options for this transaction.
    */
   async send(
     address: Address,
     amount: Amount,
-    feeRate?: number
+    options?: BuilderOption
   ): Promise<string> {
-    const simpleBuilder = new SimpleBuilder(address, amount, feeRate);
+    const simpleBuilder = new SimpleBuilder(address, amount, options);
     return this.sendTransaction(simpleBuilder);
   }
 
@@ -133,7 +134,7 @@ export default class PWCore {
    * @param sudt The sudt definition
    * @param address the receiver's address
    * @param amount the aount of sudt to send
-   * @param feeRate the feeRate (Shannon/CKB) for this transation
+   * @param options The transaction builder options for this transaction.
    * @returns the transaction hash
    */
   async sendSUDT(
@@ -142,11 +143,11 @@ export default class PWCore {
     amount: Amount,
     createAcp?: boolean,
     signer?: Signer,
-    feeRate?: number
+    options?: BuilderOption
   ): Promise<string> {
     const builder = createAcp
-      ? new SimpleSUDTBuilder(sudt, address, amount, feeRate)
-      : new SimpleSUDTACPBuilder(sudt, address, amount, feeRate);
+      ? new SimpleSUDTBuilder(sudt, address, amount, options)
+      : new SimpleSUDTACPBuilder(sudt, address, amount, options);
 
     return this.sendTransaction(builder, signer);
   }

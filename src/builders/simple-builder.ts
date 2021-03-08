@@ -1,5 +1,4 @@
 import { Builder } from '../builders/builder';
-import { Collector } from '../collectors/collector';
 import {
   Address,
   Amount,
@@ -10,6 +9,7 @@ import {
 } from '../models';
 import PWCore from '../core';
 import { SimpleACPBuilder } from './simple-acp-builder';
+import { BuilderOption } from './builder';
 
 export class SimpleBuilder extends Builder {
   simpleACPBuilder: Builder;
@@ -17,15 +17,13 @@ export class SimpleBuilder extends Builder {
   constructor(
     private address: Address,
     private amount: Amount,
-    feeRate?: number,
-    collector?: Collector
+    protected options: BuilderOption = {}
   ) {
-    super(feeRate, collector);
+    super(options.feeRate, options.collector, options.witnessArgs);
     this.simpleACPBuilder = new SimpleACPBuilder(
       this.address,
       this.amount,
-      this.feeRate,
-      this.collector
+      this.options
     );
   }
 
@@ -64,7 +62,7 @@ export class SimpleBuilder extends Builder {
 
     const tx = new Transaction(
       new RawTransaction(inputCells, [outputCell, changeCell]),
-      [Builder.WITNESS_ARGS.Secp256k1]
+      [this.witnessArgs]
     );
 
     this.fee = Builder.calcFee(tx, this.feeRate);
