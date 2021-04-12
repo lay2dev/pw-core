@@ -21,7 +21,7 @@ export abstract class Signer {
     const messages = this.toMessages(tx);
     const witnesses = await this.signMessages(messages);
     for (let i = 0; i < witnesses.length; i++) {
-      if (witnesses[i] === undefined || witnesses[i] == "0x") {
+      if (witnesses[i] === undefined || witnesses[i] === "0x") {
           continue
       }
       witnesses[i] = new Reader(
