@@ -20,14 +20,19 @@ export abstract class Signer {
   async sign(tx: Transaction): Promise<Transaction> {
     const messages = this.toMessages(tx);
     const witnesses = await this.signMessages(messages);
-    witnesses[0] = new Reader(
-      SerializeWitnessArgs(
-        normalizers.NormalizeWitnessArgs({
-          ...tx.witnessArgs[0],
-          lock: witnesses[0],
-        })
-      )
-    ).serializeJson();
+    for (let i = 0; i < witnesses.length; i++) {
+      if (witnesses[i] === undefined || witnesses[i] == "0x") {
+          continue
+      }
+      witnesses[i] = new Reader(
+        SerializeWitnessArgs(
+          normalizers.NormalizeWitnessArgs({
+            ...tx.witnessArgs[i],
+            lock: witnesses[i],
+          })
+        )
+      ).serializeJson();
+    }
     tx = FillSignedWitnesses(tx, messages, witnesses);
 
     return tx;
