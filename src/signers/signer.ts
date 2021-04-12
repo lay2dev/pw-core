@@ -22,7 +22,7 @@ export abstract class Signer {
     const witnesses = await this.signMessages(messages);
     for (let i = 0; i < witnesses.length; i++) {
       if (witnesses[i] === undefined || witnesses[i] === "0x") {
-          continue
+          continue;
       }
       witnesses[i] = new Reader(
         SerializeWitnessArgs(
