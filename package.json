@@ -56,7 +56,7 @@
     "cross-fetch": "^3.1.4",
     "decimal.js": "^10.2.1",
     "ethereum-ens": "^0.8.0",
-    "jsbi": "^3.1.2",
+    "jsbi": "^3.1.4",
     "keccak": "^3.0.0"
   },
   "devDependencies": {

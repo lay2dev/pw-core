@@ -11,7 +11,10 @@ export class EthProvider extends Provider {
   async init(): Promise<Provider> {
     if (typeof window.ethereum !== 'undefined') {
       window.ethereum.autoRefreshOnNetworkChange = false;
-      const accounts = await window.ethereum.enable();
+      // const accounts = await window.ethereum.enable();
+      const accounts = await window.ethereum.request({
+        method: 'eth_accounts',
+      });
       this.address = new Address(accounts[0], AddressType.eth);
 
       if (!!window.ethereum.on) {
@@ -55,25 +58,41 @@ export class EthProvider extends Provider {
   async sign(message: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const from = this.address.addressString;
-      const params = [message, from];
-      const method = 'personal_sign';
 
-      window.web3.currentProvider.sendAsync(
-        { method, params, from },
-        (err, result) => {
-          if (err) {
-            reject(err);
+      const handleResult = (result): string => {
+        result = result.result;
+        let v = Number.parseInt(result.slice(-2), 16);
+        if (v >= 27) v -= 27;
+        result = result.slice(0, -2) + v.toString(16).padStart(2, '0');
+        return result;
+      };
+
+      if (typeof window.ethereum !== 'undefined') {
+        window.ethereum
+          .request({ method: 'eth_sign', params: [from, message] })
+          .then((result) => {
+            resolve(handleResult(result));
+          });
+      } else if (!!window.web3) {
+        window.web3.currentProvider.sendAsync(
+          { method: 'personal_sign', params: [message, from], from },
+          (err, result) => {
+            if (err) {
+              reject(err);
+            }
+            if (result.error) {
+              reject(result.error);
+            }
+            resolve(handleResult(result));
           }
-          if (result.error) {
-            reject(result.error);
-          }
-          result = result.result;
-          let v = Number.parseInt(result.slice(-2), 16);
-          if (v >= 27) v -= 27;
-          result = result.slice(0, -2) + v.toString(16).padStart(2, '0');
-          resolve(result);
-        }
-      );
+        );
+      } else {
+        reject(
+          new Error(
+            'window.ethereum/window.web3 is undefined, Ethereum environment is required.'
+          )
+        );
+      }
     });
   }
 
