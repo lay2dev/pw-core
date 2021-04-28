@@ -9,11 +9,6 @@ import {
   verifyEthAddress,
   cellOccupiedBytes,
 } from '../utils';
-import {
-  fullPayloadToAddress,
-  AddressType as AType,
-  AddressPrefix as APrefix,
-} from '@nervosnetwork/ckb-sdk-utils';
 import { Amount, AmountUnit } from './amount';
 
 export enum AddressPrefix {
@@ -95,18 +90,9 @@ export class Address {
     if (this.addressType === AddressType.ckb) {
       return this.addressString;
     }
-
-    const { args, codeHash, hashType } = this.toLockScript();
-
-    return fullPayloadToAddress({
-      arg: args,
-      codeHash,
-      type:
-        hashType === HashType.data ? AType.DataCodeHash : AType.TypeCodeHash,
-      prefix:
-        getDefaultPrefix() === AddressPrefix.ckb
-          ? APrefix.Mainnet
-          : APrefix.Testnet,
+    const prefix: AddressPrefix = getDefaultPrefix();
+    return generateAddress(this.toLockScript().serializeJson(), {
+      config: LumosConfigs[prefix],
     });
   }
 

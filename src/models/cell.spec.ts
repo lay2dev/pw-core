@@ -1,7 +1,7 @@
 import anyTest, { TestInterface } from 'ava';
 import PWCore, { ChainID } from '../core';
 import { DummyCollector } from '../collectors/dummy-collector';
-import { validators, transformers } from 'ckb-js-toolkit';
+import { validators, transformers } from '../ckb-js-toolkit';
 import {
   Address,
   AddressType,

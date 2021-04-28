@@ -1,10 +1,12 @@
 import { CKBModel, WitnessArgs } from '../interfaces';
 import { ECDSA_WITNESS_LEN } from '../constants';
-import { validators, normalizers, transformers, Reader } from 'ckb-js-toolkit';
 import {
-  SerializeTransaction,
-  SerializeWitnessArgs,
-} from '@ckb-lumos/types/lib/core';
+  validators,
+  normalizers,
+  transformers,
+  Reader,
+} from '../ckb-js-toolkit';
+import { SerializeTransaction, SerializeWitnessArgs } from '../ckb-lumos/core';
 import { RawTransaction } from '.';
 
 export class Transaction implements CKBModel {

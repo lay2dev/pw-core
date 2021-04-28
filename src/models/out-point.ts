@@ -1,4 +1,4 @@
-import { validators, transformers } from 'ckb-js-toolkit';
+import { validators, transformers } from '../ckb-js-toolkit';
 import { CKBModel } from '..';
 
 export class OutPoint implements CKBModel {

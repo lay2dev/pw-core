@@ -3,7 +3,7 @@ import { Amount, Script, OutPoint } from '.';
 import { CellInput } from './cell-input';
 // import { minimalCellCapacity } from '../utils';
 import { AmountUnit } from './amount';
-import { RPC, validators, transformers } from 'ckb-js-toolkit';
+import { RPC, validators, transformers } from '../ckb-js-toolkit';
 import { HashType } from '..';
 import { byteArrayToHex, cellOccupiedBytes, hexToByteArray } from '../utils';
 

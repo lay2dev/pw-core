@@ -1,6 +1,6 @@
 import { OutPoint } from '.';
 import { CKBModel } from '..';
-import { validators, transformers } from 'ckb-js-toolkit';
+import { validators, transformers } from '../ckb-js-toolkit';
 
 export class CellInput implements CKBModel {
   static fromRPC(data: any): CellInput {

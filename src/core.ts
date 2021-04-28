@@ -1,4 +1,4 @@
-import { RPC, transformers } from 'ckb-js-toolkit';
+import { RPC, transformers } from './ckb-js-toolkit';
 import { CHAIN_SPECS } from './constants';
 import { Config } from './interfaces';
 import { Address, Amount, SUDT, Transaction } from './models';

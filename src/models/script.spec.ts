@@ -1,7 +1,7 @@
 import anyTest, { TestInterface } from 'ava';
 import PWCore, { ChainID } from '../core';
 import { Address, AddressType, Script } from '.';
-import { validators } from 'ckb-js-toolkit';
+import { validators } from '../ckb-js-toolkit';
 import { DummyProvider } from '../providers/dummy-provider';
 import { DummyCollector } from '../collectors/dummy-collector';
 
@@ -13,11 +13,15 @@ const address = new Address(
   'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs',
   AddressType.ckb
 );
+const defaultLockscriptHash =
+  '0xece2a204369183d34393c4cbffbe872ddb6666066667c7955234ce37f94288b7';
 
 const ethAddress = new Address(
   '0x26C5F390FF2033CbB44377361c63A3Dd2DE3121d',
   AddressType.eth
 );
+const ethLockscriptHash =
+  '0x0ed227f99c630514b8f3147012377f59b0dd6b9a29a2dbae137870aefa98f1bc';
 
 test.before(async (t) => {
   await new PWCore('https://aggron.ckb.dev').init(
@@ -60,4 +64,7 @@ test('toAddress', (t) => {
   );
 });
 
-test.todo('toHash');
+test('toHash', (t) => {
+  t.is(t.context.lockScript.toHash(), defaultLockscriptHash);
+  t.is(t.context.ethLockScript.toHash(), ethLockscriptHash);
+});

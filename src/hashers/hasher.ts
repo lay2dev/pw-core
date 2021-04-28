@@ -1,4 +1,4 @@
-import { Reader } from 'ckb-js-toolkit';
+import { Reader } from '../ckb-js-toolkit';
 
 export interface HashMethod {
   update(data: string | Uint8Array): HashMethod;

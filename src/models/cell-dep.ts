@@ -1,6 +1,6 @@
 import { OutPoint } from '.';
 import { DepType, CKBModel } from '..';
-import { validators, transformers } from 'ckb-js-toolkit';
+import { validators, transformers } from '../ckb-js-toolkit';
 
 export class CellDep implements CKBModel {
   static fromRPC(data: any): CellDep | undefined {

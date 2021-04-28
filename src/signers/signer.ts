@@ -1,10 +1,10 @@
 import { Transaction } from '..';
 import { Hasher, Blake2bHasher } from '../hashers';
-import { normalizers, Reader, transformers } from 'ckb-js-toolkit';
+import { normalizers, Reader, transformers } from '../ckb-js-toolkit';
 import {
   SerializeWitnessArgs,
   SerializeRawTransaction,
-} from '@ckb-lumos/types/lib/core';
+} from '../ckb-lumos/core';
 import { Script } from '../models';
 
 export interface Message {
