@@ -14,21 +14,23 @@ export class Transaction implements CKBModel {
 
   constructor(
     public raw: RawTransaction,
-    public witnessArgs: WitnessArgs[],
+    public witnessArgs: (WitnessArgs | string)[],
     witnessLengths: number[] = [ECDSA_WITNESS_LEN]
   ) {
     this.witnesses = raw.inputs.map((_) => '0x');
-    for (let i = 0; i < witnessLengths.length; i++) {
-      this.witnesses[i] = '0x' + '0'.repeat(witnessLengths[i] - 2);
-    }
+    // for (let i = 0; i < witnessLengths.length; i++) {
+    //   this.witnesses[i] = '0x' + '0'.repeat(witnessLengths[i] - 2);
+    // }
     if (!Array.isArray(witnessArgs))
       throw new Error('[Transaction] - witnessArgs must be an Array!');
     for (let i = 0; i < witnessArgs.length; i++) {
-      this.witnesses[i] = new Reader(
-        SerializeWitnessArgs(
-          normalizers.NormalizeWitnessArgs(this.witnessArgs[i])
-        )
-      ).serializeJson();
+      if (typeof witnessArgs[i] !== 'string') {
+        this.witnesses[i] = new Reader(
+          SerializeWitnessArgs(
+            normalizers.NormalizeWitnessArgs(this.witnessArgs[i] as WitnessArgs)
+          )
+        ).serializeJson();
+      }
     }
   }
 
