@@ -1,5 +1,4 @@
 import { HashType, CKBModel } from '../interfaces';
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils';
 import {
   Address,
   AddressType,
@@ -7,7 +6,9 @@ import {
   getDefaultPrefix,
 } from './address';
 import { generateAddress, LumosConfigs } from '../utils';
-import { validators, transformers } from 'ckb-js-toolkit';
+import { validators, transformers, normalizers } from '../ckb-js-toolkit';
+import { SerializeScript } from '../ckb-lumos/core';
+import { Blake2bHasher } from '../hashers';
 
 export class Script implements CKBModel {
   static fromRPC(data: any): Script | undefined {
@@ -45,7 +46,14 @@ export class Script implements CKBModel {
   }
 
   toHash(): string {
-    return scriptToHash(this);
+    return new Blake2bHasher()
+      .update(
+        SerializeScript(
+          normalizers.NormalizeScript(transformers.TransformScript(this))
+        )
+      )
+      .digest()
+      .serializeJson();
   }
 
   toAddress(prefix: AddressPrefix = getDefaultPrefix()): Address {

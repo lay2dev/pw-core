@@ -5,7 +5,7 @@ import {
   CkbIndexer,
   HexString,
   IndexerCellToCell,
-  Script,
+  SnakeScript,
   ScriptType,
   Terminator,
 } from '../helpers/ckb-indexer';
@@ -19,7 +19,7 @@ export class IndexerCollector extends SUDTCollector {
 
   async getBalance(address: Address): Promise<Amount> {
     const searchKey = {
-      script: address.toLockScript().serializeJson() as Script,
+      script: address.toLockScript().serializeJson() as SnakeScript,
       script_type: ScriptType.lock,
       filter: {
         output_data_len_range: ['0x0', '0x1'] as [HexString, HexString],
@@ -55,7 +55,7 @@ export class IndexerCollector extends SUDTCollector {
       }
     };
     const searchKey = {
-      script: address.toLockScript().serializeJson() as Script,
+      script: address.toLockScript().serializeJson() as SnakeScript,
       script_type: ScriptType.lock,
       filter: {
         output_data_len_range: ['0x0', '0x1'] as [HexString, HexString],
@@ -67,10 +67,10 @@ export class IndexerCollector extends SUDTCollector {
 
   async getSUDTBalance(sudt: SUDT, address: Address): Promise<Amount> {
     const searchKey = {
-      script: address.toLockScript().serializeJson() as Script,
+      script: address.toLockScript().serializeJson() as SnakeScript,
       script_type: ScriptType.lock,
       filter: {
-        script: sudt.toTypeScript().serializeJson() as Script,
+        script: sudt.toTypeScript().serializeJson() as SnakeScript,
       },
     };
     const cells = await this.indexer.getCells(searchKey);
@@ -91,10 +91,10 @@ export class IndexerCollector extends SUDTCollector {
       throw new Error("'neededAmount' in options must be provided");
     }
     const searchKey = {
-      script: address.toLockScript().serializeJson() as Script,
+      script: address.toLockScript().serializeJson() as SnakeScript,
       script_type: ScriptType.lock,
       filter: {
-        script: sudt.toTypeScript().serializeJson() as Script,
+        script: sudt.toTypeScript().serializeJson() as SnakeScript,
       },
     };
     let accCapacity = Amount.ZERO;

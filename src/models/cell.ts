@@ -4,7 +4,7 @@ import { OutPoint } from './out-point';
 import { CellInput } from './cell-input';
 // import { minimalCellCapacity } from '../utils';
 import { AmountUnit, Amount } from './amount';
-import { RPC, validators, transformers } from 'ckb-js-toolkit';
+import { RPC, validators, transformers } from '../ckb-js-toolkit';
 import { byteArrayToHex, cellOccupiedBytes, hexToByteArray } from '../utils';
 
 export class Cell implements CKBModel {

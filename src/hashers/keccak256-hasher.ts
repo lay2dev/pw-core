@@ -1,5 +1,5 @@
-import { Hasher } from './hasher';
-import { Reader } from 'ckb-js-toolkit';
+import { Hasher } from '.';
+import { Reader } from '../ckb-js-toolkit';
 import keccak from 'keccak';
 
 export class Keccak256Hasher extends Hasher {

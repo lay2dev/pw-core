@@ -1,7 +1,6 @@
 import JSBI from 'jsbi';
 import bech32 from 'bech32';
-import { FormatOptions } from './models/amount';
-import { toUint64Le } from '@nervosnetwork/ckb-sdk-utils';
+import { FormatOptions } from '.';
 import Decimal from 'decimal.js';
 
 const BECH32_LIMIT = 1023;
@@ -333,7 +332,12 @@ export function readBigUInt32LE(hex) {
 }
 
 export function toBigUInt64LE(num) {
-  return toUint64Le(`0x${JSBI.BigInt(num).toString(16)}`);
+  const hexNumber = JSBI.BigInt(num)
+    .toString(16)
+    .slice(0, 16)
+    .padStart(16, '0');
+  const buffer = hexToByteArray(`0x${hexNumber}`).reverse();
+  return byteArrayToHex(buffer);
 }
 
 export function readBigUInt64LE(hex) {

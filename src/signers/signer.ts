@@ -1,10 +1,11 @@
-import { Transaction, Script } from '../models';
+import { Transaction, WitnessArgs } from '..';
 import { Hasher, Blake2bHasher } from '../hashers';
-import { normalizers, Reader, transformers } from 'ckb-js-toolkit';
+import { normalizers, Reader, transformers } from '../ckb-js-toolkit';
 import {
   SerializeWitnessArgs,
   SerializeRawTransaction,
-} from '@ckb-lumos/types/lib/core';
+} from '../ckb-lumos/core';
+import { Script } from '../models';
 
 export interface Message {
   index: number;
@@ -20,20 +21,29 @@ export abstract class Signer {
   async sign(tx: Transaction): Promise<Transaction> {
     const messages = this.toMessages(tx);
     const witnesses = await this.signMessages(messages);
-    witnesses[0] = new Reader(
-      SerializeWitnessArgs(
-        normalizers.NormalizeWitnessArgs({
-          ...tx.witnessArgs[0],
-          lock: witnesses[0],
-        })
-      )
-    ).serializeJson();
+
+    for (let i = 0; i < messages.length; i++) {
+      const { index } = messages[i];
+      if (
+        index < tx.witnessArgs.length &&
+        typeof tx.witnessArgs[index] !== 'string'
+      ) {
+        witnesses[i] = new Reader(
+          SerializeWitnessArgs(
+            normalizers.NormalizeWitnessArgs({
+              ...(tx.witnessArgs[index] as WitnessArgs),
+              lock: witnesses[i],
+            })
+          )
+        ).serializeJson();
+      }
+    }
     tx = FillSignedWitnesses(tx, messages, witnesses);
 
     return tx;
   }
 
-  private toMessages(tx: Transaction): Message[] {
+  public toMessages(tx: Transaction): Message[] {
     tx.validate();
 
     if (tx.raw.inputs.length !== tx.raw.inputCells.length) {

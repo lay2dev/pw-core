@@ -1,8 +1,11 @@
-import PWCore from '../core';
-import { CKBModel } from '../interfaces';
-import { CellDep, Cell } from '../models';
-import { SerializeRawTransaction } from '@ckb-lumos/types/lib/core';
-import { validators, normalizers, Reader, transformers } from 'ckb-js-toolkit';
+import PWCore, { CKBModel, CellDep, Cell } from '..';
+import { SerializeRawTransaction } from '../ckb-lumos/core';
+import {
+  validators,
+  normalizers,
+  Reader,
+  transformers,
+} from '../ckb-js-toolkit';
 import { CellInput } from './cell-input';
 import { Blake2bHasher } from '../hashers';
 

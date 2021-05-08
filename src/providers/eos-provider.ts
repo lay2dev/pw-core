@@ -3,7 +3,7 @@ import { Address, AddressType } from '../models';
 import ScatterJS from '@scatterjs/core';
 import ScatterEOS from '@scatterjs/eosjs2';
 import ecc from 'eosjs-ecc';
-import { Reader } from 'ckb-js-toolkit';
+import { Reader } from '../ckb-js-toolkit';
 import { Keccak256Hasher } from '../hashers';
 import { spliceStr } from '../utils';
 import axios from 'axios';

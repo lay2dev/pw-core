@@ -10,5 +10,8 @@ export * from './hashers';
 export * from './signers';
 export * from './utils';
 export * from './constants';
+export * from './ckb-js-toolkit';
+export * from './ckb-lumos';
+export * from './helpers/ckb-indexer';
 
 export default PWCore;

@@ -1,5 +1,12 @@
 import axios from 'axios';
-import { Cell, Amount, AmountUnit, OutPoint, Script as PwScript } from '..';
+import {
+  Cell,
+  Amount,
+  AmountUnit,
+  OutPoint,
+  Script as PwScript,
+  HashType,
+} from '..';
 
 export enum ScriptType {
   type = 'type',
@@ -13,19 +20,19 @@ export enum Order {
 
 export type HexString = string;
 export type Hash = HexString;
-export type HashType = 'type' | 'data';
+// export type HashType = 'type' | 'data';
 
-export interface Script {
+export interface SnakeScript {
   code_hash: Hash;
   hash_type: HashType;
   args: HexString;
 }
 
 export interface SearchKey {
-  script: Script;
+  script: SnakeScript;
   script_type: ScriptType;
   filter?: {
-    script?: Script;
+    script?: SnakeScript;
     output_data_len_range?: [HexString, HexString];
     output_capacity_range?: [HexString, HexString];
     block_range?: [HexString, HexString];
@@ -40,8 +47,8 @@ export interface IndexerCell {
   };
   output: {
     capacity: HexString;
-    lock: Script;
-    type?: Script;
+    lock: SnakeScript;
+    type?: SnakeScript;
   };
   output_data: HexString;
   tx_index: HexString;

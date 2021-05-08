@@ -1,5 +1,5 @@
-import { Hasher } from './hasher';
-import { Reader } from 'ckb-js-toolkit';
+import { Hasher } from '.';
+import { Reader } from '../ckb-js-toolkit';
 import blake2b from 'blake2b';
 
 export class Blake2bHasher extends Hasher {
