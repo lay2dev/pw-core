@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0-alpha.7](https://github.com/lay2dev/pw-core/compare/v0.4.0-alpha.6...v0.4.0-alpha.7) (2021-05-14)
+
+
+### Features
+
+* **eth-provider:** update ethereum connection methods, fix metamask deprecated ethereum.enable() ([24c664f](https://github.com/lay2dev/pw-core/commit/24c664fea9436dd245d8694d5abfa5baa65f8cf3))
+* **eth-provider:** upgrade ethereum web3 because of metamask deprecated window.ethereum.enable() ([7c6d189](https://github.com/lay2dev/pw-core/commit/7c6d1897d323ac2fb8d9ad83c12dc863d40de37e))
+* **signer:** can sign tx with grouped inputs ([62e762e](https://github.com/lay2dev/pw-core/commit/62e762e0e57fd15dd2f400ba852a1b9f2433ea37))
+
+
+### Bug Fixes
+
+* **core:** fix chainId bug ([2463067](https://github.com/lay2dev/pw-core/commit/24630678701ba3fee129baa01c9ddfae436b8a44))
+* **eth-provider:** update ethereum connector for metamask depcrated ethereum.enable() ([1f5f1e4](https://github.com/lay2dev/pw-core/commit/1f5f1e424d134de5d38457ec88b5bc6969f88796))
+
+### [0.3.22-beta.0](https://github.com/lay2dev/pw-core/compare/v0.3.21-beta.0...v0.3.22-beta.0) (2020-12-29)
+
+
+### Bug Fixes
+
+* **config:** re-update sudt config of constants ([90df82e](https://github.com/lay2dev/pw-core/commit/90df82e1b1e8875086c54ad6125442eaca5ae880))
+
+### [0.3.21-beta.0](https://github.com/lay2dev/pw-core/compare/v0.2.2...v0.3.21-beta.0) (2020-12-10)
+
 ## [0.4.0-alpha.6](https://github.com/lay2dev/pw-core/compare/v0.2.2...v0.4.0-alpha.6) (2021-03-08)
 
 ### ⚠ BREAKING CHANGES
