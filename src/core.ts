@@ -43,7 +43,7 @@ export default class PWCore {
     chainId?: ChainID,
     config?: Config
   ): Promise<PWCore> {
-    if (chainId) {
+    if (chainId !== undefined) {
       if (!(chainId in ChainID)) {
         throw new Error(`invalid chainId ${chainId}`);
       }
