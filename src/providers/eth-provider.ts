@@ -1,5 +1,5 @@
 import { Provider, Platform } from './provider';
-import { Address, AddressType } from '..';
+import { Address, AddressType } from '../models';
 import ENS from 'ethereum-ens';
 
 export class EthProvider extends Provider {
@@ -13,7 +13,7 @@ export class EthProvider extends Provider {
       window.ethereum.autoRefreshOnNetworkChange = false;
       // const accounts = await window.ethereum.enable();
       const accounts = await window.ethereum.request({
-        method: 'eth_accounts',
+        method: 'eth_requestAccounts',
       });
       this.address = new Address(accounts[0], AddressType.eth);
 
@@ -60,7 +60,6 @@ export class EthProvider extends Provider {
       const from = this.address.addressString;
 
       const handleResult = (result): string => {
-        result = result.result;
         let v = Number.parseInt(result.slice(-2), 16);
         if (v >= 27) v -= 27;
         result = result.slice(0, -2) + v.toString(16).padStart(2, '0');
@@ -69,7 +68,7 @@ export class EthProvider extends Provider {
 
       if (typeof window.ethereum !== 'undefined') {
         window.ethereum
-          .request({ method: 'eth_sign', params: [from, message] })
+          .request({ method: 'personal_sign', params: [from, message] })
           .then((result) => {
             resolve(handleResult(result));
           });
@@ -83,7 +82,7 @@ export class EthProvider extends Provider {
             if (result.error) {
               reject(result.error);
             }
-            resolve(handleResult(result));
+            resolve(handleResult(result.result));
           }
         );
       } else {

@@ -40,35 +40,48 @@ export class EthSigner extends Signer {
 
   signMessages(messages: Message[]): Promise<string[]> {
     return new Promise((resolve, reject) => {
-      /*
-      try {
-        const sig = sendSync({ params: [messages[0].message] });
-        resolve([sig]);
-      } catch (e) {
-        reject(e);
-      }
-      */
-
       const from = this.from;
-      const params = [messages[0].message, from];
-      const method = 'personal_sign';
 
-      window.web3.currentProvider.sendAsync(
-        { method, params, from },
-        (err, result) => {
-          if (err) {
-            reject(err);
+      const handleResult = (result): string => {
+        let v = Number.parseInt(result.slice(-2), 16);
+        if (v >= 27) v -= 27;
+        result = result.slice(0, -2) + v.toString(16).padStart(2, '0');
+        return result;
+      };
+
+      if (typeof window.ethereum !== 'undefined') {
+        window.ethereum
+          .request({
+            method: 'personal_sign',
+            params: [from, messages[0].message],
+          })
+          .then((result) => {
+            resolve([handleResult(result)]);
+          });
+      } else if (!!window.web3) {
+        window.web3.currentProvider.sendAsync(
+          {
+            method: 'personal_sign',
+            params: [messages[0].message, from],
+            from,
+          },
+          (err, result) => {
+            if (err) {
+              reject(err);
+            }
+            if (result.error) {
+              reject(result.error);
+            }
+            resolve([handleResult(result.result)]);
           }
-          if (result.error) {
-            reject(result.error);
-          }
-          result = result.result;
-          let v = Number.parseInt(result.slice(-2), 16);
-          if (v >= 27) v -= 27;
-          result = result.slice(0, -2) + v.toString(16).padStart(2, '0');
-          resolve([result]);
-        }
-      );
+        );
+      } else {
+        reject(
+          new Error(
+            'window.ethereum/window.web3 is undefined, Ethereum environment is required.'
+          )
+        );
+      }
     });
   }
 }

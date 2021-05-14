@@ -15,7 +15,7 @@ export class Transaction implements CKBModel {
   constructor(
     public raw: RawTransaction,
     public witnessArgs: (WitnessArgs | string)[],
-    witnessLengths: number[] = [ECDSA_WITNESS_LEN]
+    _witnessLengths: number[] = [ECDSA_WITNESS_LEN]
   ) {
     this.witnesses = raw.inputs.map((_) => '0x');
     // for (let i = 0; i < witnessLengths.length; i++) {
