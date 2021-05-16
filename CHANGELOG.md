@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0-alpha.8](https://github.com/lay2dev/pw-core/compare/v0.4.0-alpha.7...v0.4.0-alpha.8) (2021-05-16)
+
+
+### Bug Fixes
+
+* ios13 compatibility ([2837278](https://github.com/lay2dev/pw-core/commit/28372789d091653606684793264e05ddaa991057))
+* **lint:** fix lint error ([b100c67](https://github.com/lay2dev/pw-core/commit/b100c67c921e98b7b6c72af16c3849a532000b44))
+
 ## [0.4.0-alpha.7](https://github.com/lay2dev/pw-core/compare/v0.4.0-alpha.6...v0.4.0-alpha.7) (2021-05-14)
 
 
