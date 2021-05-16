@@ -129,7 +129,7 @@ function validateSince(since, tipSinceValidationInfo, cellSinceValidationInfo) {
         throw new Error(`Must provide tip median_timestamp!`);
       }
 
-      return value * 1000n <= BigInt(tipSinceValidationInfo.median_timestamp);
+      return value * BigInt(1000) <= BigInt(tipSinceValidationInfo.median_timestamp);
     }
   } else {
     if (type === "epochNumber") {
@@ -178,7 +178,7 @@ function validateSince(since, tipSinceValidationInfo, cellSinceValidationInfo) {
       }
 
       return (
-        value * 1000n + BigInt(cellSinceValidationInfo.median_timestamp) <=
+        value * BigInt(1000) + BigInt(cellSinceValidationInfo.median_timestamp) <=
         BigInt(tipSinceValidationInfo.median_timestamp)
       );
     }
