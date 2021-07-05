@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0-alpha.9](https://github.com/lay2dev/pw-core/compare/v0.4.0-alpha.8...v0.4.0-alpha.9) (2021-07-05)
+
+
+### Features
+
+* the send method supports custom data ([63539b9](https://github.com/lay2dev/pw-core/commit/63539b95960933a913fb4c24f06ac1bfccd63a80))
+
 ## [0.4.0-alpha.8](https://github.com/lay2dev/pw-core/compare/v0.4.0-alpha.7...v0.4.0-alpha.8) (2021-05-16)
 
 
