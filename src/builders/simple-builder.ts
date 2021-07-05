@@ -33,6 +33,17 @@ export class SimpleBuilder extends Builder {
     }
 
     const outputCell = new Cell(this.amount, this.address.toLockScript());
+
+    const data = this.options.data;
+    if (data) {
+      if (data.startsWith('0x')) {
+        outputCell.setHexData(data);
+      }
+      else {
+        outputCell.setData(data);
+      }
+    }
+
     const neededAmount = this.amount.add(Builder.MIN_CHANGE).add(fee);
     let inputSum = new Amount('0');
     const inputCells: Cell[] = [];
