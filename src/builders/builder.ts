@@ -10,6 +10,7 @@ export interface BuilderOption {
   feeRate?: number;
   collector?: Collector;
   witnessArgs?: WitnessArgs;
+  data?: string;
 }
 
 export abstract class Builder {
