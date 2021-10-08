@@ -14,6 +14,8 @@ import { SUDTCollector } from '../collectors/sudt-collector';
 
 export interface SimpleSUDTBuilderOptions extends BuilderOption {
   autoCalculateCapacity?: boolean;
+  minimumOutputCellCapacity?: Amount;
+  maximumOutputCellCapacity?: Amount;
 }
 
 export class SimpleSUDTBuilder extends Builder {
@@ -21,17 +23,19 @@ export class SimpleSUDTBuilder extends Builder {
 
   inputCells: Cell[] = [];
   outputCells: Cell[] = [];
-  autoCalculateCapacity?: boolean = false;
+  
 
   constructor(
     private sudt: SUDT,
     private address: Address,
     private amount: Amount,
-    protected options: SimpleSUDTBuilderOptions = {}
+    protected options: SimpleSUDTBuilderOptions = {},
+    protected autoCalculateCapacity = false,
+    protected minimumOutputCellCapacity = new Amount('142', AmountUnit.ckb),
+    protected maximumOutputCellCapacity = new Amount('1000', AmountUnit.ckb),
   ) {
     super(options.feeRate, options.collector, options.witnessArgs);
     this.fee = new Amount('0');
-    this.autoCalculateCapacity = options.autoCalculateCapacity;
   }
 
   async build(): Promise<Transaction> {
@@ -50,7 +54,7 @@ export class SimpleSUDTBuilder extends Builder {
     let senderInputCKBSum = new Amount('0');
     let minSenderOccupiedCKBSum = new Amount('0');
 
-    let receiverAmount: Amount;
+    let receiverAmount = new Amount('0');
 
     if (this.autoCalculateCapacity) {
       const receiverOutputCellSetup = {
@@ -59,8 +63,14 @@ export class SimpleSUDTBuilder extends Builder {
         data: this.amount.toUInt128LE()
       };
       receiverAmount = new Amount(cellOccupiedBytes(receiverOutputCellSetup).toString(), AmountUnit.ckb);
-    } else {
-      receiverAmount = new Amount('142');
+    }
+
+    if (this.minimumOutputCellCapacity && receiverAmount.lt(this.minimumOutputCellCapacity)) {
+      receiverAmount = this.minimumOutputCellCapacity;
+    }
+
+    if (this.maximumOutputCellCapacity && receiverAmount.gt(this.maximumOutputCellCapacity)) {
+      receiverAmount = this.maximumOutputCellCapacity;
     }
 
     const receiverOutputCell = new Cell(
