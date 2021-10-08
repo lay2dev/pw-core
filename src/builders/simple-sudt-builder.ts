@@ -7,24 +7,31 @@ import {
   RawTransaction,
   Transaction,
   SUDT,
+
 } from '../models';
-import PWCore from '..';
+import PWCore, { cellOccupiedBytes } from '..';
 import { SUDTCollector } from '../collectors/sudt-collector';
+
+export interface SimpleSUDTBuilderOptions extends BuilderOption {
+  autoCalculateCapacity?: boolean;
+}
 
 export class SimpleSUDTBuilder extends Builder {
   fee: Amount;
 
   inputCells: Cell[] = [];
   outputCells: Cell[] = [];
+  autoCalculateCapacity?: boolean = false;
 
   constructor(
     private sudt: SUDT,
     private address: Address,
     private amount: Amount,
-    protected options: BuilderOption = {}
+    protected options: SimpleSUDTBuilderOptions = {}
   ) {
     super(options.feeRate, options.collector, options.witnessArgs);
     this.fee = new Amount('0');
+    this.autoCalculateCapacity = options.autoCalculateCapacity;
   }
 
   async build(): Promise<Transaction> {
@@ -43,7 +50,19 @@ export class SimpleSUDTBuilder extends Builder {
     let senderInputCKBSum = new Amount('0');
     let minSenderOccupiedCKBSum = new Amount('0');
 
-    const receiverAmount = new Amount('142');
+    let receiverAmount: Amount;
+
+    if (this.autoCalculateCapacity) {
+      const receiverOutputCellSetup = {
+        lock: this.address.toLockScript(),
+        type: this.sudt.toTypeScript(),
+        data: this.amount.toUInt128LE()
+      };
+      receiverAmount = new Amount(cellOccupiedBytes(receiverOutputCellSetup).toString(), AmountUnit.ckb);
+    } else {
+      receiverAmount = new Amount('142');
+    }
+
     const receiverOutputCell = new Cell(
       receiverAmount,
       this.address.toLockScript(),
