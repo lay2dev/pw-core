@@ -125,7 +125,8 @@ export default class PWCore {
     }
 
     return this.rpc.send_transaction(
-      transformers.TransformTransaction(await signer.sign(tx))
+      transformers.TransformTransaction(await signer.sign(tx)),
+      'passthrough'
     );
   }
 
