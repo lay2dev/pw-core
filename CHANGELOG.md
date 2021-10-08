@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0-alpha.10](https://github.com/lay2dev/pw-core/compare/v0.4.0-alpha.9...v0.4.0-alpha.10) (2021-10-08)
+
+
+### Bug Fixes
+
+* **core:** set passthrough as outputs_validator when call send_transaction rpc call ([2c20ecc](https://github.com/lay2dev/pw-core/commit/2c20ecc396326da011ce3749669a4cb729be6873))
+
 ## [0.4.0-alpha.9](https://github.com/lay2dev/pw-core/compare/v0.4.0-alpha.8...v0.4.0-alpha.9) (2021-07-05)
 
 
