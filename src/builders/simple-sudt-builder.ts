@@ -23,19 +23,31 @@ export class SimpleSUDTBuilder extends Builder {
 
   inputCells: Cell[] = [];
   outputCells: Cell[] = [];
-  
+
+  protected autoCalculateCapacity = false;
+  protected minimumOutputCellCapacity = new Amount('142', AmountUnit.ckb);
+  protected maximumOutputCellCapacity = new Amount('1000', AmountUnit.ckb);
 
   constructor(
     private sudt: SUDT,
     private address: Address,
     private amount: Amount,
     protected options: SimpleSUDTBuilderOptions = {},
-    protected autoCalculateCapacity = false,
-    protected minimumOutputCellCapacity = new Amount('142', AmountUnit.ckb),
-    protected maximumOutputCellCapacity = new Amount('1000', AmountUnit.ckb),
   ) {
     super(options.feeRate, options.collector, options.witnessArgs);
     this.fee = new Amount('0');
+
+    if (typeof options.autoCalculateCapacity === 'boolean') {
+      this.autoCalculateCapacity = options.autoCalculateCapacity;
+    }
+
+    if (typeof options.minimumOutputCellCapacity !== 'undefined') {
+      this.minimumOutputCellCapacity = options.minimumOutputCellCapacity;
+    }
+
+    if (typeof options.maximumOutputCellCapacity !== 'undefined') {
+      this.maximumOutputCellCapacity = options.maximumOutputCellCapacity;
+    }
   }
 
   async build(): Promise<Transaction> {
