@@ -7,7 +7,6 @@ import {
   RawTransaction,
   Transaction,
   SUDT,
-
 } from '../models';
 import PWCore, { cellOccupiedBytes } from '..';
 import { SUDTCollector } from '../collectors/sudt-collector';
@@ -32,7 +31,7 @@ export class SimpleSUDTBuilder extends Builder {
     private sudt: SUDT,
     private address: Address,
     private amount: Amount,
-    protected options: SimpleSUDTBuilderOptions = {},
+    protected options: SimpleSUDTBuilderOptions = {}
   ) {
     super(options.feeRate, options.collector, options.witnessArgs);
     this.fee = new Amount('0');
@@ -72,16 +71,25 @@ export class SimpleSUDTBuilder extends Builder {
       const receiverOutputCellSetup = {
         lock: this.address.toLockScript(),
         type: this.sudt.toTypeScript(),
-        data: this.amount.toUInt128LE()
+        data: this.amount.toUInt128LE(),
       };
-      receiverAmount = new Amount(cellOccupiedBytes(receiverOutputCellSetup).toString(), AmountUnit.ckb);
+      receiverAmount = new Amount(
+        cellOccupiedBytes(receiverOutputCellSetup).toString(),
+        AmountUnit.ckb
+      );
     }
 
-    if (this.minimumOutputCellCapacity && receiverAmount.lt(this.minimumOutputCellCapacity)) {
+    if (
+      this.minimumOutputCellCapacity &&
+      receiverAmount.lt(this.minimumOutputCellCapacity)
+    ) {
       receiverAmount = this.minimumOutputCellCapacity;
     }
 
-    if (this.maximumOutputCellCapacity && receiverAmount.gt(this.maximumOutputCellCapacity)) {
+    if (
+      this.maximumOutputCellCapacity &&
+      receiverAmount.gt(this.maximumOutputCellCapacity)
+    ) {
       receiverAmount = this.maximumOutputCellCapacity;
     }
 
