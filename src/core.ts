@@ -10,6 +10,7 @@ import {
   SimpleSUDTACPBuilder,
   SimpleSUDTBuilder,
   BuilderOption,
+  SimpleSUDTBuilderOptions,
 } from './builders';
 import { Provider } from './providers';
 import { SUDTCollector } from './collectors/sudt-collector';
@@ -144,7 +145,7 @@ export default class PWCore {
     amount: Amount,
     createAcp?: boolean,
     signer?: Signer,
-    options?: BuilderOption
+    options?: SimpleSUDTBuilderOptions
   ): Promise<string> {
     const builder = createAcp
       ? new SimpleSUDTBuilder(sudt, address, amount, options)

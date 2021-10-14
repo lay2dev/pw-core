@@ -38,8 +38,7 @@ export class SimpleBuilder extends Builder {
     if (data) {
       if (data.startsWith('0x')) {
         outputCell.setHexData(data);
-      }
-      else {
+      } else {
         outputCell.setData(data);
       }
     }
