@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0-alpha.11](https://github.com/lay2dev/pw-core/compare/v0.4.0-alpha.10...v0.4.0-alpha.11) (2021-10-16)
+
+
+### Features
+
+* add autoCalculateCapacity option to sendSUDT options ([02b8bde](https://github.com/lay2dev/pw-core/commit/02b8bdefb0a5ce9e9f98688a085014da64cfc83a))
+
+
+### Bug Fixes
+
+* fix linting ([ad84d62](https://github.com/lay2dev/pw-core/commit/ad84d62d373a46a9ec873b770a8e01ffa121651b))
+* fix passing options ([bc493cb](https://github.com/lay2dev/pw-core/commit/bc493cb6b7bff7489afe6fcda71c3c03e7985b96))
+
 ## [0.4.0-alpha.10](https://github.com/lay2dev/pw-core/compare/v0.4.0-alpha.9...v0.4.0-alpha.10) (2021-10-08)
 
 
