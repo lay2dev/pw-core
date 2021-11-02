@@ -2,6 +2,7 @@ import { Provider, Platform } from './provider';
 import { Address, AddressType } from '../models';
 import ENS from 'ethereum-ens';
 import { verifyEthAddress } from '../utils';
+import PWCore, { ChainID } from '../core';
 
 export class Web3ModalProvider extends Provider {
   onAddressChanged: (newAddress: Address) => void;
@@ -55,7 +56,9 @@ export class Web3ModalProvider extends Provider {
     if (v >= 27) v -= 27;
     result =
       '0x' +
-      this.platform.toString(16).padStart(2, '0') +
+      (PWCore.chainId === ChainID.ckb
+        ? ''
+        : this.platform.toString(16).padStart(2, '0')) +
       result.slice(2, -2) +
       v.toString(16).padStart(2, '0');
 
