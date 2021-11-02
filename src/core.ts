@@ -25,8 +25,8 @@ export enum ChainID {
  * The default main class of pw-core
  */
 export default class PWCore {
-  static config: Config;
-  static chainId: ChainID;
+  static config: Config = CHAIN_SPECS[ChainID.ckb_testnet];
+  static chainId: ChainID = ChainID.ckb_testnet;
   static provider: Provider;
   static defaultCollector: Collector | SUDTCollector;
 
@@ -34,6 +34,21 @@ export default class PWCore {
 
   constructor(nodeUrl: string) {
     this._rpc = new RPC(nodeUrl);
+  }
+
+  /**
+   * set chain id for pw-core
+   *
+   * @param chainId chain id of ckb blockchain: 0 for mainnet, 1 for testnet, 2 for devnet
+   * @param config chain config
+   */
+  static setChainId(chainId: ChainID, config?: Config) {
+    if (chainId !== ChainID.ckb && chainId !== ChainID.ckb_testnet && !config) {
+      throw new Error('config must be provided for dev chain');
+    }
+
+    PWCore.chainId = chainId;
+    PWCore.config = config ? config : CHAIN_SPECS[chainId];
   }
 
   /**
