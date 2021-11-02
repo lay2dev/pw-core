@@ -104,6 +104,20 @@ async sendTransaction(builder: Builder, signer: Signer): Promise<string> {
 }
 ```
 
+If you would like to use `Address` without initialize `PWCore`, you should set chain id first.
+
+```typescript
+import PWCore, { Address, ChainID, AddressType } from '@lay2dev/pw-core';
+
+PWCore.setChainId(ChainID.ckb);
+const address = new Address(
+  '0x26C5F390FF2033CbB44377361c63A3Dd2DE3121d',
+  AddressType.eth
+);
+
+console.log('address', address);
+```
+
 Finally, here is an [example project](https://github.com/lay2dev/simplestdapp) which shows how to implement custom classes to achieve certain features. The `SDCollector` can collect unspent cells with a [ckb-indexer](https://github.com/quake/ckb-indexer), while the `SDBuilder` can build transactions for creating / updating / deleting cells. More over, the built-in `EthProvider` and `EthSigner` (along with `Keccak256Hasher`) are used to make this dApp runnable in Ethereum enviromment (such as MetaMask).
 
 ## Highlights
@@ -118,68 +132,89 @@ Finally, here is an [example project](https://github.com/lay2dev/simplestdapp) w
 
   ```typescript
   /* ------ Address ------ */
-  
+
   /* create an Address instance from a CKB address */
-  const ckbAddress = new Address('ckb1qyqdmeuqrsrnm7e5vnrmruzmsp4m9wacf6vsxasryq', AddressType.ckb);
+  const ckbAddress = new Address(
+    'ckb1qyqdmeuqrsrnm7e5vnrmruzmsp4m9wacf6vsxasryq',
+    AddressType.ckb
+  );
 
   /* create an Address instance from an Ethereum address */
-  const ethAddress = new Address('0x308f27c8595b2ee9e6a5faa875b4c1f9de6b679a', AddressType.eth);
+  const ethAddress = new Address(
+    '0x308f27c8595b2ee9e6a5faa875b4c1f9de6b679a',
+    AddressType.eth
+  );
 
   /* get the original address string */
-  console.log('ckb: ', ckbAddress.addressString)  
-  console.log('eth: ', ethAddress.addressString)
+  console.log('ckb: ', ckbAddress.addressString);
+  console.log('eth: ', ethAddress.addressString);
   // ckb: ckb1qyqdmeuqrsrnm7e5vnrmruzmsp4m9wacf6vsxasryq
   // eth: 0x308f27c8595b2ee9e6a5faa875b4c1f9de6b679a
 
   /* get the corresponding CKB address */
-  console.log('ckb: ', ckbAddress.toCKBAddress())
-  console.log('eth: ', ethAddress.toCKBAddress())
+  console.log('ckb: ', ckbAddress.toCKBAddress());
+  console.log('eth: ', ethAddress.toCKBAddress());
   // ckb: ckb1qyqdmeuqrsrnm7e5vnrmruzmsp4m9wacf6vsxasryq
   // eth: ckt1q3vvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxvy0yly9jkewa8n2t74gwk6vr7w7ddne5jrkf6c
 
   /* get the corresponding lock script hash (with the toHash method of class Script) */
-  console.log('ckb: ', ethAddress.toLockScript().toHash())
-  console.log('eth: ', ethAddress.toLockScript().toHash())
+  console.log('ckb: ', ethAddress.toLockScript().toHash());
+  console.log('eth: ', ethAddress.toLockScript().toHash());
   // ckb: 0xe9e412caf497c69e9612d305be13f9173752b9e75bc5a9b6d1ca51eb38d07d59
   // eth: 0x0963476f28975bf93da673cd2442bd69c4b2d4e720af5a67ecece8a03b8926b5
 
   /* check if the address is an ACP address */
-  console.log('ckb: ', ckbAddress.isAcp())
-  console.log('eth: ', ethAddress.isAcp())
+  console.log('ckb: ', ckbAddress.isAcp());
+  console.log('eth: ', ethAddress.isAcp());
   // false
   // true
 
   // get the minimal CKB amount (an Amount instance) you can transfer to this address
-  console.log('ckb: ', ckbAddress.minPaymentAmount().toString() + ' CKB')
-  console.log('eth: ', ethAddress.minPaymentAmount().toString() + ' CKB')
+  console.log('ckb: ', ckbAddress.minPaymentAmount().toString() + ' CKB');
+  console.log('eth: ', ethAddress.minPaymentAmount().toString() + ' CKB');
   // 61 CKB
   // 0.00000001 CKB
 
   /* ------ Script ------ */
-  
+
   const lockScript = addressCkb.toLockScript();
   const lockScriptHash = lockScript.toHash();
   const address1 = Address.fromLockScript(lockScript);
   const address2 = lockScript.toAddress();
 
-  console.log(addressEth.toLockScript().sameWith(addressCkbFull.toLockScript()));
+  console.log(
+    addressEth.toLockScript().sameWith(addressCkbFull.toLockScript())
+  );
   //true
 
   /* ------ Amount ------ */
-  
+
   const ckb100 = new Amount('100');
   const shannon100 = new Amount('100', AmountUnit.shannon);
   const usdt = new Amount('1234.5678', 6); // Assume usdt's decimals is 6
 
   /* format */
 
-  console.log(`${ckb100.toString()} CKB is ${ckb100.toString(AmountUnit.shannon, {commify: true})} Shannon`);
+  console.log(
+    `${ckb100.toString()} CKB is ${ckb100.toString(AmountUnit.shannon, {
+      commify: true,
+    })} Shannon`
+  );
   // 100 CKB is 1,000,000 Shannon
 
-  console.log(`${shannon100.toString(AmountUnit.shannon)} Shannon is ${shannon100.toString()} CKB`)
+  console.log(
+    `${shannon100.toString(
+      AmountUnit.shannon
+    )} Shannon is ${shannon100.toString()} CKB`
+  );
   // 100 Shannon is 0.000001 CKB
 
-  console.log(`${usdt.toString(6, {fixed: 2, commify: true})} USDT is rounded from ${usdt.toString(6, {pad: true})} USDT`);
+  console.log(
+    `${usdt.toString(6, {
+      fixed: 2,
+      commify: true,
+    })} USDT is rounded from ${usdt.toString(6, { pad: true })} USDT`
+  );
   // 1,234.57 USDT is rounded from 1234.567800 USDT
 
   /* compare */
@@ -189,24 +224,33 @@ Finally, here is an [example project](https://github.com/lay2dev/simplestdapp) w
   // 100 CKB is greater than 100 Shannon: true
   // 100 CKB is less than 100 Shannon: false
 
-  console.log('100 Shannon is equal to 0.000001 CKB: ', shannon100.eq(new Amount('0.000001')));
+  console.log(
+    '100 Shannon is equal to 0.000001 CKB: ',
+    shannon100.eq(new Amount('0.000001'))
+  );
   // 100 Shannon is equal to 0.000001 CKB: true
 
   /* calculate */
 
-  console.log(`100 CKB + 100 Shannon = ${ckb100.add(shannon100).toString()} CKB`);
-  console.log(`100 CKB - 100 Shannon = ${ckb100.sub(shannon100).toString()} CKB`);
+  console.log(
+    `100 CKB + 100 Shannon = ${ckb100.add(shannon100).toString()} CKB`
+  );
+  console.log(
+    `100 CKB - 100 Shannon = ${ckb100.sub(shannon100).toString()} CKB`
+  );
   // 100 CKB + 100 Shannon = 100.000001 CKB
   // 100 CKB - 100 Shannon = 99.999999 CKB
 
   // Amount is assumed with unit, so if we want to perform multiplication or division, the best way is to convert the Amount instance to JSBI BigInt, and convert  back to Amount instance if necessary.
   const bn = JSBI.mul(ckb100.toBigInt(), JSBI.BigInt(10));
-  const amount = new Amount(bn.toString())
-  console.log(`100 CKB * 10 = ${amount.toString(AmountUnit.ckb, {commify: true})} CKB`);
+  const amount = new Amount(bn.toString());
+  console.log(
+    `100 CKB * 10 = ${amount.toString(AmountUnit.ckb, { commify: true })} CKB`
+  );
   // 100 CKB * 10 = 1,000 CKB
 
   /* ------ Cell ------ */
-  
+
   /* load from blockchain with a rpc instance and an outpoint */
   const cell1 = Cell.loadFromBlockchain(rpc, outpoint);
 
@@ -220,7 +264,7 @@ Finally, here is an [example project](https://github.com/lay2dev/simplestdapp) w
   cell1.spaceCheck();
 
   /* check if the cell is empty (no data is stored) */
-  cell2.isEmpty()
+  cell2.isEmpty();
 
   /* adjust the capacity to the minimal value of this cell */
   cell2.resize();
