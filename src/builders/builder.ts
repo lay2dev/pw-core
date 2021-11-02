@@ -1,7 +1,7 @@
 import { Collector } from '../collectors/collector';
 import { Amount, AmountUnit, Transaction } from '../models';
 import { WitnessArgs } from '../interfaces';
-import PWCore from '..';
+import PWCore, { ChainID } from '..';
 import { SUDTCollector } from '../collectors/sudt-collector';
 
 const FEE_BASE = 1000;
@@ -51,7 +51,9 @@ export abstract class Builder {
   protected constructor(
     protected feeRate: number = Builder.MIN_FEE_RATE,
     protected collector: Collector | SUDTCollector = PWCore.defaultCollector,
-    protected witnessArgs: WitnessArgs = Builder.WITNESS_ARGS.Secp256k1
+    protected witnessArgs: WitnessArgs = PWCore.chainId === ChainID.ckb
+      ? Builder.WITNESS_ARGS.RawSecp256k1
+      : Builder.WITNESS_ARGS.Secp256k1
   ) {}
 
   getFee(): Amount {

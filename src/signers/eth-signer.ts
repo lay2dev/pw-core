@@ -1,6 +1,7 @@
 import { Signer, Message } from './signer';
 import { Keccak256Hasher } from '../hashers';
 import { Platform } from '../providers';
+import PWCore, { ChainID } from '../core';
 // import {
 //   ecsign,
 //   bufferToHex,
@@ -51,7 +52,9 @@ export class EthSigner extends Signer {
         if (v >= 27) v -= 27;
         result =
           '0x' +
-          this.currentPlatform.toString(16).padStart(2, '0') +
+          (PWCore.chainId === ChainID.ckb
+            ? ''
+            : this.currentPlatform.toString(16).padStart(2, '0')) +
           result.slice(2, -2) +
           v.toString(16).padStart(2, '0');
         return result;
