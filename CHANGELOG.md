@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0-alpha.12](https://github.com/lay2dev/pw-core/compare/v0.4.0-alpha.11...v0.4.0-alpha.12) (2021-11-02)
+
+
+### Features
+
+* **builder:** auto adjust witness length by network type ([81195c5](https://github.com/lay2dev/pw-core/commit/81195c55b48a34aa103464d40ee22548d649aecf))
+* **config:** add setChainId for PWCore ([246d1ab](https://github.com/lay2dev/pw-core/commit/246d1ab640530a596d4edbacfdbd1a2fdb75b511))
+
 ## [0.4.0-alpha.11](https://github.com/lay2dev/pw-core/compare/v0.4.0-alpha.10...v0.4.0-alpha.11) (2021-10-16)
 
 
