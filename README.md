@@ -107,7 +107,7 @@ async sendTransaction(builder: Builder, signer: Signer): Promise<string> {
 If you would like to use `Address` without initialize `PWCore`, you should set chain id first.
 
 ```typescript
-import PWCore, { Address, ChainID, AddressType } from '@lay2dev/pw-core';
+import PWCore, { Address, ChainID, AddressType } from '@lay2/pw-core';
 
 PWCore.setChainId(ChainID.ckb);
 const address = new Address(
@@ -158,7 +158,7 @@ Finally, here is an [example project](https://github.com/lay2dev/simplestdapp) w
   // eth: ckt1q3vvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxvy0yly9jkewa8n2t74gwk6vr7w7ddne5jrkf6c
 
   /* get the corresponding lock script hash (with the toHash method of class Script) */
-  console.log('ckb: ', ethAddress.toLockScript().toHash());
+  console.log('ckb: ', ckbAddress.toLockScript().toHash());
   console.log('eth: ', ethAddress.toLockScript().toHash());
   // ckb: 0xe9e412caf497c69e9612d305be13f9173752b9e75bc5a9b6d1ca51eb38d07d59
   // eth: 0x0963476f28975bf93da673cd2442bd69c4b2d4e720af5a67ecece8a03b8926b5
