@@ -50,7 +50,7 @@
     "node": ">=8.9"
   },
   "dependencies": {
-    "@nervosnetwork/ckb-sdk-utils": "^0.41.1",
+    "@nervosnetwork/ckb-sdk-utils": "0.101.0",
     "@scatterjs/core": "^2.7.53",
     "@scatterjs/eosjs2": "^1.5.35",
     "axios": "^0.19.2",
