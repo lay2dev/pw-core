@@ -1,7 +1,8 @@
 import JSBI from 'jsbi';
-import bech32 from 'bech32';
+import { bech32, bech32m } from 'bech32';
 import { FormatOptions } from '.';
 import Decimal from 'decimal.js';
+import { addressToScript, AddressType } from '@nervosnetwork/ckb-sdk-utils';
 
 const BECH32_LIMIT = 1023;
 
@@ -221,13 +222,25 @@ export function generateAddress(script: any, { config = LINA } = {}): string {
 }
 
 export function parseAddress(address: string, { config = LINA } = {}) {
-  const { prefix, words } = bech32.decode(address, BECH32_LIMIT);
+  let data: number[] = [];
+  let prefix: string = null;
+
+  try {
+    const decoded = bech32.decode(address, BECH32_LIMIT);
+    data = bech32.fromWords(new Uint8Array(decoded.words));
+    prefix = decoded.prefix;
+  } catch {
+    const decoded = bech32m.decode(address, BECH32_LIMIT);
+    data = bech32m.fromWords(new Uint8Array(decoded.words));
+    prefix = decoded.prefix;
+  }
+
   if (prefix !== config.PREFIX) {
     throw Error(
       `Invalid prefix! Expected: ${config.PREFIX}, actual: ${prefix}`
     );
   }
-  const data = bech32.fromWords(words);
+
   switch (data[0]) {
     case 1:
       if (data.length < 2) {
@@ -258,6 +271,15 @@ export function parseAddress(address: string, { config = LINA } = {}) {
         hash_type: 'type',
         args: byteArrayToHex(data.slice(33)),
       };
+    case +AddressType.FullVersion: {
+      const parsedAddress = addressToScript(address);
+
+      return {
+        code_hash: parsedAddress.codeHash,
+        hash_type: parsedAddress.hashType,
+        args: parsedAddress.args,
+      };
+    }
   }
   throw Error(`Invalid payload format type: ${data[0]}`);
 }

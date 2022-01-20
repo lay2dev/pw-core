@@ -4,6 +4,7 @@ import { Address, AddressType } from './address';
 import { DummyCollector } from '../collectors/dummy-collector';
 import { EosProvider } from '../providers';
 import { DummyProvider } from '../providers/dummy-provider';
+import { AddressPrefix, HashType, Script } from '..';
 
 const eth = '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc';
 const ckb = 'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs';
@@ -72,6 +73,27 @@ test('to ckb address', (t) => {
 
   t.is(eosAddress.toCKBAddress(), eosFull);
   t.is(tronAddress.toCKBAddress(), tronFull);
+});
+
+test('to ckb2021 mainnet address (Nervos RFC21)', async (t) => {
+  PWCore.chainId = ChainID.ckb;
+
+  t.is(
+    Address.fromLockScript(
+      new Script(
+        '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
+        '0xb39bbc0b3673c7d36450bc14cfcdad2d559c6c64',
+        HashType.type
+      ),
+      AddressPrefix.ckb
+    ).addressString,
+    new Address(
+      'ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqdnnw7qkdnnclfkg59uzn8umtfd2kwxceqxwquc4',
+      AddressType.ckb
+    ).addressString
+  );
+
+  PWCore.chainId = ChainID.ckb_testnet;
 });
 
 test('to lock script', (t) => {

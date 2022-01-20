@@ -18,6 +18,7 @@ import ScatterJS from '@scatterjs/core';
 import { Keccak256Hasher } from '../hashers';
 import { Reader } from '../ckb-js-toolkit';
 import { Amount, AmountUnit } from './amount';
+import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils';
 
 export enum AddressPrefix {
   ckb,
@@ -47,9 +48,8 @@ export class Address {
     lockScript: Script,
     prefix: AddressPrefix = getDefaultPrefix()
   ): Address {
-    const addressString = generateAddress(lockScript.serializeJson(), {
-      config: LumosConfigs[prefix],
-    });
+    const isMainnet = prefix === AddressPrefix.ckb;
+    const addressString = scriptToAddress(lockScript, isMainnet);
 
     return new Address(addressString, AddressType.ckb);
   }
