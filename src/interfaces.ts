@@ -9,6 +9,7 @@ export interface CKBModel {
 export enum HashType {
   data = 'data',
   type = 'type',
+  data1 = 'data1',
 }
 
 export enum DepType {
