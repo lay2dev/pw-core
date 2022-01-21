@@ -1,8 +1,13 @@
 import JSBI from 'jsbi';
 import { bech32, bech32m } from 'bech32';
-import { FormatOptions } from '.';
+import { FormatOptions, Script } from '.';
 import Decimal from 'decimal.js';
-import { addressToScript, AddressType } from '@nervosnetwork/ckb-sdk-utils';
+import {
+  AddressPrefix,
+  addressToScript,
+  AddressType,
+  scriptToAddress,
+} from '@nervosnetwork/ckb-sdk-utils';
 
 const BECH32_LIMIT = 1023;
 
@@ -202,23 +207,18 @@ export function hexToByteArray(h: string) {
   return array;
 }
 
-export function generateAddress(script: any, { config = LINA } = {}): string {
-  const scriptTemplate = Object.values(config.SCRIPTS).find(
-    (s) =>
-      s.SCRIPT.code_hash === script.code_hash &&
-      s.SCRIPT.hash_type === script.hash_type
-  );
-  const data = [];
-  if (scriptTemplate && scriptTemplate.SHORT_ID !== undefined) {
-    data.push(1, scriptTemplate.SHORT_ID);
-    data.push(...hexToByteArray(script.args));
-  } else {
-    data.push(script.hash_type === 'type' ? 4 : 2);
-    data.push(...hexToByteArray(script.code_hash));
-    data.push(...hexToByteArray(script.args));
-  }
-  const words = bech32.toWords(data);
-  return bech32.encode(config.PREFIX, words, BECH32_LIMIT);
+export function getLumosConfigByNetworkPrefix(networkPrefix: AddressPrefix) {
+  return LumosConfigs.find((c) => c.PREFIX === networkPrefix);
+}
+
+export function generateCkbAddressString(
+  lockScript: Script,
+  networkPrefix: AddressPrefix
+) {
+  const isMainnet = networkPrefix === AddressPrefix.Mainnet;
+  const addressString = scriptToAddress(lockScript, isMainnet);
+
+  return addressString;
 }
 
 export function parseAddress(address: string, { config = LINA } = {}) {

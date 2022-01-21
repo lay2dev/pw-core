@@ -1,11 +1,6 @@
 import { HashType, CKBModel } from '../interfaces';
-import {
-  Address,
-  AddressType,
-  AddressPrefix,
-  getDefaultPrefix,
-} from './address';
-import { generateAddress, LumosConfigs } from '../utils';
+import { Address, AddressType, getDefaultPrefix } from './address';
+import { generateCkbAddressString } from '../utils';
 import { validators, transformers, normalizers } from '../ckb-js-toolkit';
 import { SerializeScript } from '../ckb-lumos/core';
 import { Blake2bHasher } from '../hashers';
@@ -56,11 +51,7 @@ export class Script implements CKBModel {
       .serializeJson();
   }
 
-  toAddress(prefix: AddressPrefix = getDefaultPrefix()): Address {
-    const address = generateAddress(this.serializeJson(), {
-      config: LumosConfigs[prefix],
-    });
-
-    return new Address(address, AddressType.ckb);
+  toAddress(prefix = getDefaultPrefix()): Address {
+    return new Address(generateCkbAddressString(this, prefix), AddressType.ckb);
   }
 }

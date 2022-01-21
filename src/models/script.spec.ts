@@ -10,7 +10,7 @@ const test = anyTest as TestInterface<{
   ethLockScript: Script;
 }>;
 const address = new Address(
-  'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs',
+  'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtq7jf409fnmd4t8nm30kjfezj4v5g8hwskhal6m',
   AddressType.ckb
 );
 const defaultLockscriptHash =

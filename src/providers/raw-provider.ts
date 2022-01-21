@@ -1,14 +1,6 @@
 import { Platform, Provider } from './provider';
-import {
-  Address,
-  AddressType,
-  getDefaultPrefix,
-  AddressPrefix as PwAddressPrefix,
-} from '../models';
-import {
-  AddressPrefix,
-  privateKeyToAddress,
-} from '@nervosnetwork/ckb-sdk-utils';
+import { Address, AddressType, getDefaultPrefix } from '../models';
+import { privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
 import { Blake2bHasher, Hasher } from '../hashers';
 import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair';
 
@@ -20,11 +12,8 @@ export class RawProvider extends Provider {
   }
 
   async init(): Promise<Provider> {
-    const pwPrefix = getDefaultPrefix();
-    const prefix =
-      pwPrefix === PwAddressPrefix.ckb
-        ? AddressPrefix.Mainnet
-        : AddressPrefix.Testnet;
+    const prefix = getDefaultPrefix();
+
     const address = privateKeyToAddress(this.privateKey, { prefix });
     this.address = new Address(address, AddressType.ckb);
     return this;

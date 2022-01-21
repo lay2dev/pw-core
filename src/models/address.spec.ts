@@ -4,19 +4,20 @@ import { Address, AddressType } from './address';
 import { DummyCollector } from '../collectors/dummy-collector';
 import { EosProvider } from '../providers';
 import { DummyProvider } from '../providers/dummy-provider';
-import { AddressPrefix, HashType, Script } from '..';
+import { Script } from './script';
+import { HashType } from '../interfaces';
 
 const eth = '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc';
 const ckb = 'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs';
 const ckbFull =
-  'ckt1q3vvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxvh5ct04panc49rqn6v03mnllv2tv7vmc9kkmjq';
+  'ckt1qpvvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxqfj7npd758k0z55vz0f378w0la3fdnen0qj5grsu';
 
 const eos = 'sking1234511';
 const eosFull =
-  'ckt1q3vvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxm6cetwv38anze52vznk9mz8dcwsjns4kdxuu6a';
+  'ckt1qpvvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxqt0tr9dejylkvtx3fs2wchvgahp6z2wzkcd3cuk8';
 const tron = 'TNV2p8Zmy5JcZWbtn59Qee8jTdGmCRC6e8';
 const tronFull =
-  'ckt1q3vvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdx8z2900qym3ghkd4x8ullvz0ftg52ekvqqtyehuu';
+  'ckt1qpvvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxqvfg4auqnw9z7ek5clnlasfa9dz3txesqq3pm97m';
 
 const ckbAddress = new Address(ckb, AddressType.ckb);
 const ckbFullAddress = new Address(ckbFull, AddressType.ckb);
@@ -75,6 +76,7 @@ test('to ckb address', (t) => {
   t.is(tronAddress.toCKBAddress(), tronFull);
 });
 
+// RFC: https://github.com/nervosnetwork/rfcs/pull/239
 test('to ckb2021 mainnet address (Nervos RFC21)', async (t) => {
   PWCore.chainId = ChainID.ckb;
 
@@ -84,8 +86,7 @@ test('to ckb2021 mainnet address (Nervos RFC21)', async (t) => {
         '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
         '0xb39bbc0b3673c7d36450bc14cfcdad2d559c6c64',
         HashType.type
-      ),
-      AddressPrefix.ckb
+      )
     ).addressString,
     new Address(
       'ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqdnnw7qkdnnclfkg59uzn8umtfd2kwxceqxwquc4',
