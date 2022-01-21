@@ -4,26 +4,24 @@ import { HashType } from '../interfaces';
 import ecc from 'eosjs-ecc';
 import {
   parseAddress,
-  generateAddress,
-  LumosConfigs,
   verifyCkbAddress,
   verifyEthAddress,
   verifyEosAddress,
   verifyTronAddress,
   cellOccupiedBytes,
+  generateCkbAddressString,
+  getLumosConfigByNetworkPrefix,
 } from '../utils';
 import bs58 from 'bs58';
 import axios from 'axios';
 import ScatterJS from '@scatterjs/core';
+import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils';
+
 import { Keccak256Hasher } from '../hashers';
 import { Reader } from '../ckb-js-toolkit';
 import { Amount, AmountUnit } from './amount';
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils';
 
-export enum AddressPrefix {
-  ckb,
-  ckt,
-}
+export { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils';
 
 export enum AddressType {
   ckb,
@@ -40,7 +38,9 @@ export enum LockType {
 }
 
 export function getDefaultPrefix(): AddressPrefix {
-  return PWCore.chainId === ChainID.ckb ? AddressPrefix.ckb : AddressPrefix.ckt;
+  return PWCore.chainId === ChainID.ckb
+    ? AddressPrefix.Mainnet
+    : AddressPrefix.Testnet;
 }
 
 export class Address {
@@ -48,10 +48,10 @@ export class Address {
     lockScript: Script,
     prefix: AddressPrefix = getDefaultPrefix()
   ): Address {
-    const isMainnet = prefix === AddressPrefix.ckb;
-    const addressString = scriptToAddress(lockScript, isMainnet);
-
-    return new Address(addressString, AddressType.ckb);
+    return new Address(
+      generateCkbAddressString(lockScript, prefix),
+      AddressType.ckb
+    );
   }
 
   static async getEosLockArgs(networkJSON: any, account: string) {
@@ -93,7 +93,7 @@ export class Address {
           break;
         case AddressType.ckb:
           const lock = parseAddress(this.addressString, {
-            config: LumosConfigs[getDefaultPrefix()],
+            config: getLumosConfigByNetworkPrefix(getDefaultPrefix()),
           });
           this.lockArgs = lock.args;
           break;
@@ -141,10 +141,8 @@ export class Address {
     if (this.addressType === AddressType.ckb) {
       return this.addressString;
     }
-    const prefix: AddressPrefix = getDefaultPrefix();
-    return generateAddress(this.toLockScript().serializeJson(), {
-      config: LumosConfigs[prefix],
-    });
+
+    return generateCkbAddressString(this.toLockScript(), getDefaultPrefix());
   }
 
   toLockScript(): Script {
@@ -154,7 +152,7 @@ export class Address {
     }
 
     const lock = parseAddress(this.addressString, {
-      config: LumosConfigs[getDefaultPrefix()],
+      config: getLumosConfigByNetworkPrefix(getDefaultPrefix()),
     });
     return new Script(lock.code_hash, lock.args, HashType[lock.hash_type]);
   }
