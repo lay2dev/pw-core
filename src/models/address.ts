@@ -20,6 +20,7 @@ import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils';
 import { Keccak256Hasher } from '../hashers';
 import { Reader } from '../ckb-js-toolkit';
 import { Amount, AmountUnit } from './amount';
+import { NervosAddressVersion } from '../helpers/address';
 
 export { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils';
 
@@ -46,10 +47,11 @@ export function getDefaultPrefix(): AddressPrefix {
 export class Address {
   static fromLockScript(
     lockScript: Script,
-    prefix: AddressPrefix = getDefaultPrefix()
+    prefix: AddressPrefix = getDefaultPrefix(),
+    addressVersion = NervosAddressVersion.latest
   ): Address {
     return new Address(
-      generateCkbAddressString(lockScript, prefix),
+      generateCkbAddressString(lockScript, prefix, addressVersion),
       AddressType.ckb
     );
   }
@@ -137,12 +139,12 @@ export class Address {
     return acpLock && acpLock.length > 0;
   }
 
-  toCKBAddress(): string {
-    if (this.addressType === AddressType.ckb) {
-      return this.addressString;
-    }
-
-    return generateCkbAddressString(this.toLockScript(), getDefaultPrefix());
+  toCKBAddress(addressVersion = NervosAddressVersion.latest): string {
+    return generateCkbAddressString(
+      this.toLockScript(),
+      getDefaultPrefix(),
+      addressVersion
+    );
   }
 
   toLockScript(): Script {

@@ -6,10 +6,13 @@ import { EosProvider } from '../providers';
 import { DummyProvider } from '../providers/dummy-provider';
 import { Script } from './script';
 import { HashType } from '../interfaces';
+import { NervosAddressVersion } from '..';
 
 const eth = '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc';
-const ckb = 'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs';
-const ckbFull =
+
+const ckbAddress1StringFullPre2021 =
+  'ckt1q3vvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxvh5ct04panc49rqn6v03mnllv2tv7vmc9kkmjq';
+const ckbAddress1StringFull2021 =
   'ckt1qpvvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxqfj7npd758k0z55vz0f378w0la3fdnen0qj5grsu';
 
 const eos = 'sking1234511';
@@ -19,8 +22,24 @@ const tron = 'TNV2p8Zmy5JcZWbtn59Qee8jTdGmCRC6e8';
 const tronFull =
   'ckt1qpvvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxqvfg4auqnw9z7ek5clnlasfa9dz3txesqq3pm97m';
 
-const ckbAddress = new Address(ckb, AddressType.ckb);
-const ckbFullAddress = new Address(ckbFull, AddressType.ckb);
+const ckbAddress1FullPre2021 = new Address(
+  ckbAddress1StringFullPre2021,
+  AddressType.ckb
+);
+const ckbAddress1Full2021 = new Address(
+  ckbAddress1StringFull2021,
+  AddressType.ckb
+);
+
+const ckbAddress2StringShortPre2021 =
+  'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs';
+const ckbAddress2StringFull2021 =
+  'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtq7jf409fnmd4t8nm30kjfezj4v5g8hwskhal6m';
+const ckbAddress2ShortPre2021 = new Address(
+  ckbAddress2StringShortPre2021,
+  AddressType.ckb
+);
+
 const ethAddress = new Address(eth, AddressType.eth);
 let eosAddress;
 const tronAddress = new Address(tron, AddressType.tron);
@@ -54,23 +73,51 @@ test('to address and type', (t) => {
   t.is(ethAddress.addressString, eth);
   t.is(ethAddress.addressType, AddressType.eth);
 
-  t.is(ckbAddress.addressString, ckb);
-  t.is(ckbAddress.addressType, AddressType.ckb);
+  t.is(ckbAddress2ShortPre2021.addressString, ckbAddress2StringShortPre2021);
+  t.is(ckbAddress2ShortPre2021.addressType, AddressType.ckb);
 
   t.is(eosAddress.addressString, eos);
   t.is(eosAddress.addressType, AddressType.eos);
 
   t.is(tronAddress.addressString, tron);
   t.is(tronAddress.addressType, AddressType.tron);
-
-  t.is(ckbFullAddress.addressString, ckbFull);
-  t.is(ckbFullAddress.addressType, AddressType.ckb);
 });
 
-test('to ckb address', (t) => {
-  t.is(ethAddress.toCKBAddress(), ckbFull);
-  t.is(ckbFullAddress.toCKBAddress(), ckbFull);
-  t.is(ckbAddress.toCKBAddress(), ckb);
+test('addressString for AddressType.ckb by default returns address passed class in constructor', (t) => {
+  t.is(ckbAddress1Full2021.addressString, ckbAddress1StringFull2021);
+  t.is(ckbAddress1Full2021.addressType, AddressType.ckb);
+
+  t.is(ckbAddress1FullPre2021.addressString, ckbAddress1StringFullPre2021);
+  t.is(ckbAddress1FullPre2021.addressType, AddressType.ckb);
+
+  t.is(ckbAddress2ShortPre2021.addressString, ckbAddress2StringShortPre2021);
+  t.is(ckbAddress2ShortPre2021.addressType, AddressType.ckb);
+});
+
+test('"toCKBAddress" correctly transforms preckb2021 address to desired version', (t) => {
+  t.is(ckbAddress1FullPre2021.toCKBAddress(), ckbAddress1StringFull2021);
+  t.is(
+    ckbAddress1FullPre2021.toCKBAddress(NervosAddressVersion.latest),
+    ckbAddress1StringFull2021
+  );
+  t.is(
+    ckbAddress1FullPre2021.toCKBAddress(NervosAddressVersion.ckb2021),
+    ckbAddress1StringFull2021
+  );
+  t.is(
+    ckbAddress1FullPre2021.toCKBAddress(NervosAddressVersion.pre2021),
+    ckbAddress1StringFullPre2021
+  );
+});
+
+test('"toCKBAddress" general test', (t) => {
+  t.is(ethAddress.toCKBAddress(), ckbAddress1StringFull2021);
+  t.is(ckbAddress1Full2021.toCKBAddress(), ckbAddress1StringFull2021);
+  t.is(ckbAddress2ShortPre2021.toCKBAddress(), ckbAddress2StringFull2021);
+  t.is(
+    ckbAddress2ShortPre2021.toCKBAddress(NervosAddressVersion.pre2021),
+    ckbAddress2StringShortPre2021
+  );
 
   t.is(eosAddress.toCKBAddress(), eosFull);
   t.is(tronAddress.toCKBAddress(), tronFull);
@@ -104,13 +151,13 @@ test('to lock script', (t) => {
     hash_type: PWCore.config.pwLock.script.hashType,
   });
 
-  t.deepEqual(ckbAddress.toLockScript().serializeJson(), {
+  t.deepEqual(ckbAddress2ShortPre2021.toLockScript().serializeJson(), {
     args: '0x60f493579533db6ab3cf717da49c8a5565107bba',
     code_hash: PWCore.config.defaultLock.script.codeHash,
     hash_type: PWCore.config.defaultLock.script.hashType,
   });
 
-  t.deepEqual(ckbFullAddress.toLockScript().serializeJson(), {
+  t.deepEqual(ckbAddress1Full2021.toLockScript().serializeJson(), {
     args: '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc',
     code_hash: PWCore.config.pwLock.script.codeHash,
     hash_type: PWCore.config.pwLock.script.hashType,
