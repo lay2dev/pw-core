@@ -4,6 +4,7 @@ import { generateCkbAddressString } from '../utils';
 import { validators, transformers, normalizers } from '../ckb-js-toolkit';
 import { SerializeScript } from '../ckb-lumos/core';
 import { Blake2bHasher } from '../hashers';
+import { NervosAddressVersion } from '../helpers/address';
 
 export class Script implements CKBModel {
   static fromRPC(data: any): Script | undefined {
@@ -51,7 +52,13 @@ export class Script implements CKBModel {
       .serializeJson();
   }
 
-  toAddress(prefix = getDefaultPrefix()): Address {
-    return new Address(generateCkbAddressString(this, prefix), AddressType.ckb);
+  toAddress(
+    prefix = getDefaultPrefix(),
+    addressVersion = NervosAddressVersion.latest
+  ): Address {
+    return new Address(
+      generateCkbAddressString(this, prefix, addressVersion),
+      AddressType.ckb
+    );
   }
 }

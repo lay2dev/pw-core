@@ -8,6 +8,10 @@ import {
   AddressType,
   scriptToAddress,
 } from '@nervosnetwork/ckb-sdk-utils';
+import {
+  getConcreteNervosAddressVersion,
+  NervosAddressVersion,
+} from './helpers/address';
 
 const BECH32_LIMIT = 1023;
 
@@ -213,12 +217,40 @@ export function getLumosConfigByNetworkPrefix(networkPrefix: AddressPrefix) {
 
 export function generateCkbAddressString(
   lockScript: Script,
-  networkPrefix: AddressPrefix
+  networkPrefix: AddressPrefix,
+  addressVersion: NervosAddressVersion
 ) {
-  const isMainnet = networkPrefix === AddressPrefix.Mainnet;
-  const addressString = scriptToAddress(lockScript, isMainnet);
+  switch (getConcreteNervosAddressVersion(addressVersion)) {
+    case NervosAddressVersion.ckb2021:
+      const isMainnet = networkPrefix === AddressPrefix.Mainnet;
+      return scriptToAddress(lockScript, isMainnet);
+    case NervosAddressVersion.pre2021:
+      return generatePre2021CkbAddress(lockScript.serializeJson(), {
+        config: getLumosConfigByNetworkPrefix(networkPrefix),
+      });
+  }
+}
 
-  return addressString;
+export function generatePre2021CkbAddress(
+  script: any,
+  { config = LINA } = {}
+): string {
+  const scriptTemplate = Object.values(config.SCRIPTS).find(
+    (s) =>
+      s.SCRIPT.code_hash === script.code_hash &&
+      s.SCRIPT.hash_type === script.hash_type
+  );
+  const data = [];
+  if (scriptTemplate && scriptTemplate.SHORT_ID !== undefined) {
+    data.push(1, scriptTemplate.SHORT_ID);
+    data.push(...hexToByteArray(script.args));
+  } else {
+    data.push(script.hash_type === 'type' ? 4 : 2);
+    data.push(...hexToByteArray(script.code_hash));
+    data.push(...hexToByteArray(script.args));
+  }
+  const words = bech32.toWords(data);
+  return bech32.encode(config.PREFIX, words, BECH32_LIMIT);
 }
 
 export function parseAddress(address: string, { config = LINA } = {}) {
