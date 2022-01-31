@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0-alpha.13](https://github.com/lay2dev/pw-core/compare/v0.4.0-alpha.12...v0.4.0-alpha.13) (2022-01-31)
+
+
+### Features
+
+* add ability to generate pre2021 addresses ([5101ff2](https://github.com/lay2dev/pw-core/commit/5101ff290d4c46d583908f59abd1558ab718ac91))
+* CKB2021 compatibility ([a73f08c](https://github.com/lay2dev/pw-core/commit/a73f08cbed0184c65a98f92d96bc073f68650b3a))
+* replace Script.toCKBAddress() with CKB2021 version ([e382609](https://github.com/lay2dev/pw-core/commit/e382609afa6a590a9b78d098e202127c095cc6a7))
+* Support CKB2021 addresses. ([3846db3](https://github.com/lay2dev/pw-core/commit/3846db3d9fba23945b8312c5e7d8ba40515b62c2))
+
+
+### Bug Fixes
+
+* **web3Provider:** auto adjust by network type ([8a3d5e8](https://github.com/lay2dev/pw-core/commit/8a3d5e8f631be23d79059170174474700c58c29b))
+
 ## [0.4.0-alpha.12](https://github.com/lay2dev/pw-core/compare/v0.4.0-alpha.11...v0.4.0-alpha.12) (2021-11-02)
 
 
