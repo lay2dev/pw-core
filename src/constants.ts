@@ -93,6 +93,11 @@ export const CHAIN_SPECS = {
         '0x',
         HashType.data
       ),
+      new Script(
+        '0xd369597ff47f29fbc0d47d2e3775370d1250b85140c670e4718af712983a2354',
+        '0x',
+        HashType.type
+      ),
     ],
   },
 
@@ -175,6 +180,11 @@ export const CHAIN_SPECS = {
       ),
       new Script(
         '0x86a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
+        '0x',
+        HashType.type
+      ),
+      new Script(
+        '0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356',
         '0x',
         HashType.type
       ),
