@@ -301,8 +301,16 @@ export function parseAddress(address: string, { config = LINA } = {}) {
     );
   }
 
-  switch (data[0]) {
-    case 1:
+  const payloadFormatType = data[0];
+  switch (payloadFormatType) {
+    case Number(AddressType.FullVersion): // 0x00 Full version identifies the hash_type.
+      const parsedAddress = addressToScript(address);
+      return {
+        code_hash: parsedAddress.codeHash,
+        hash_type: parsedAddress.hashType,
+        args: parsedAddress.args,
+      };
+    case Number(AddressType.HashIdx): // 0x01 Short version for locks with popular code_hash, deprecated.
       if (data.length < 2) {
         throw Error(`Invalid payload length!`);
       }
@@ -313,7 +321,7 @@ export function parseAddress(address: string, { config = LINA } = {}) {
         throw Error(`Invalid code hash index: ${data[1]}!`);
       }
       return { ...scriptTemplate.SCRIPT, args: byteArrayToHex(data.slice(2)) };
-    case 2:
+    case Number(AddressType.DataCodeHash): // 0x02 Full version with hash_type = "Data", deprecated.
       if (data.length < 33) {
         throw Error(`Invalid payload length!`);
       }
@@ -322,7 +330,7 @@ export function parseAddress(address: string, { config = LINA } = {}) {
         hash_type: 'data',
         args: byteArrayToHex(data.slice(33)),
       };
-    case 4:
+    case Number(AddressType.TypeCodeHash): // 0x04 Full version with hash_type = "Type", deprecated.
       if (data.length < 33) {
         throw Error(`Invalid payload length!`);
       }
@@ -331,15 +339,6 @@ export function parseAddress(address: string, { config = LINA } = {}) {
         hash_type: 'type',
         args: byteArrayToHex(data.slice(33)),
       };
-    case +AddressType.FullVersion: {
-      const parsedAddress = addressToScript(address);
-
-      return {
-        code_hash: parsedAddress.codeHash,
-        hash_type: parsedAddress.hashType,
-        args: parsedAddress.args,
-      };
-    }
   }
   throw Error(`Invalid payload format type: ${data[0]}`);
 }
