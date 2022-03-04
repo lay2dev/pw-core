@@ -71,14 +71,8 @@ export class Cell implements CKBModel {
   }
 
   resize() {
-    // const base = SerializeCellOutput(
-    //   normalizers.NormalizeCellOutput(transformers.TransformCellOutput(this))
-    // ).byteLength;
-    const base = this.type ? 102 : 61;
-    const extra = new Buffer(this.data.replace('0x', ''), 'hex').byteLength;
-    const size = base + extra;
-    this.capacity = new Amount(size.toString());
-    return size;
+    this.capacity = this.occupiedCapacity();
+    return this.capacity;
   }
 
   spaceCheck() {
