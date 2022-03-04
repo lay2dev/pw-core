@@ -30,7 +30,7 @@ const outPoint4 = new OutPoint(
 );
 
 test.before(async (t) => {
-  const pw = new PWCore('https://aggron.ckb.dev');
+  const pw = new PWCore('https://testnet.ckb.dev');
   await pw.init(new DummyProvider(), new DummyCollector(), ChainID.ckb_testnet);
   const cells = await Promise.all([
     Cell.loadFromBlockchain(pw.rpc, outPoint1),

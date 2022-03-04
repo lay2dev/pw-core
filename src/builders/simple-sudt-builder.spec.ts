@@ -17,7 +17,7 @@ test.before(async (t) => {
     '0xc369a6fc6f0f907e46de96f668d986b8e4b52ea832da213f864eda805d34c932'
   );
 
-  await new PWCore('https://aggron.ckb.dev').init(
+  await new PWCore('https://testnet.ckb.dev').init(
     new DummyProvider(),
     new DummyCollector(),
     ChainID.ckb_testnet

@@ -24,7 +24,7 @@ const ethLockscriptHash =
   '0x0ed227f99c630514b8f3147012377f59b0dd6b9a29a2dbae137870aefa98f1bc';
 
 test.before(async (t) => {
-  await new PWCore('https://aggron.ckb.dev').init(
+  await new PWCore('https://testnet.ckb.dev').init(
     new DummyProvider(),
     new DummyCollector(),
     ChainID.ckb_testnet
