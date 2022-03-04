@@ -35,7 +35,7 @@ test.serial('chain specs auto select', async (t) => {
   );
   t.is(PWCore.chainId, ChainID.ckb);
 
-  await new PWCore('https://aggron.ckb.dev').init(
+  await new PWCore('https://testnet.ckb.dev').init(
     new DummyProvider(),
     new PwCollector('https://cellapi.ckb.pw')
   );
