@@ -19,6 +19,7 @@ export class RawTransaction implements CKBModel {
     public cellDeps: CellDep[] = [
       PWCore.config.defaultLock.cellDep,
       PWCore.config.pwLock.cellDep,
+      PWCore.config.omniLock.cellDep,
     ],
     public headerDeps: string[] = [],
     public readonly version: string = '0x0'
