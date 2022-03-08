@@ -114,7 +114,7 @@ export class Address {
       case AddressType.tron:
         return verifyTronAddress(this.addressString);
       default:
-        throw Error('Invalid addresss type specified.');
+        throw Error('Invalid address type specified.');
     }
   }
 
