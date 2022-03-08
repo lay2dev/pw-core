@@ -118,8 +118,14 @@ export class Address {
     }
   }
 
-  minPaymentAmount(): Amount {
-    if (this.isAcp()) {
+  /**
+   * Returns the minimum amount of CKBytes that an address can receive.
+   * 
+   * This function will detect well-known ACP locks, and will return an amount of 1 Shannon if detected.
+   * To disable this functionality and force the calculation without ACP pass false. eg: minPaymentAmount(false)
+   */
+  minPaymentAmount(allowAcp = true): Amount {
+    if (allowAcp && this.isAcp()) {
       return new Amount('1', AmountUnit.shannon);
     }
     const bytes = cellOccupiedBytes({
