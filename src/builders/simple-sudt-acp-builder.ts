@@ -161,6 +161,7 @@ export class SimpleSUDTACPBuilder extends Builder {
     const sudtCellDeps = [
       PWCore.config.defaultLock.cellDep,
       PWCore.config.pwLock.cellDep,
+      PWCore.config.omniLock.cellDep,
       PWCore.config.sudtType.cellDep,
     ];
     const tx = new Transaction(

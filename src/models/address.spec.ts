@@ -1,126 +1,134 @@
 import test from 'ava';
 import PWCore, { ChainID } from '../core';
-import { Address, AddressType } from './address';
+import { Address, AddressType, LockType } from './address';
 import { DummyCollector } from '../collectors/dummy-collector';
-import { EosProvider } from '../providers';
 import { DummyProvider } from '../providers/dummy-provider';
+import { EosProvider } from '../providers';
 import { Script } from './script';
 import { HashType } from '../interfaces';
 import { NervosAddressVersion } from '..';
 
-const eth = '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc';
+// This is a standard CKB address using the default lock.
+const ckbAddressStringShortPre2021 = 'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs';
+const ckbAddressShortPre2021 = new Address(ckbAddressStringShortPre2021, AddressType.ckb);
+const ckbAddressStringFull2021 = 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtq7jf409fnmd4t8nm30kjfezj4v5g8hwskhal6m';
 
-const ckbAddress1StringFullPre2021 =
-  'ckt1q3vvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxvh5ct04panc49rqn6v03mnllv2tv7vmc9kkmjq';
-const ckbAddress1StringFull2021 =
-  'ckt1qpvvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxqfj7npd758k0z55vz0f378w0la3fdnen0qj5grsu';
+// Interoperability Addresses: ETH
+const ethChainAddress = '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc';
+const ethAddress = new Address(ethChainAddress, AddressType.eth);
+const ethAddressStringPre2021Pw = 'ckt1q3vvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxvh5ct04panc49rqn6v03mnllv2tv7vmc9kkmjq';
+const ethAddressString2021Pw = 'ckt1qpvvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxqfj7npd758k0z55vz0f378w0la3fdnen0qj5grsu';
+const ethAddressStringPre2021Omni = 'ckt1q3uljza4azfdsrwjzdpea6442yfqadqhv7yzfu5zknlmtusm45hpuqfj7npd758k0z55vz0f378w0la3fdnen0qqheqlhl';
+const ethAddressString2021Omni = 'ckt1qpuljza4azfdsrwjzdpea6442yfqadqhv7yzfu5zknlmtusm45hpuqgpxt6v9h6s7eu2j3sfax8caellk99k0xduqq0pcwmd';
 
-const eos = 'sking1234511';
-const eosFull =
-  'ckt1qpvvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxqt0tr9dejylkvtx3fs2wchvgahp6z2wzkcd3cuk8';
-const tron = 'TNV2p8Zmy5JcZWbtn59Qee8jTdGmCRC6e8';
-const tronFull =
-  'ckt1qpvvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxqvfg4auqnw9z7ek5clnlasfa9dz3txesqq3pm97m';
+// Interoperability Addresses: EOS
+const eosChainAddress = 'sking1234511'; // Base lockArg: 0x6f58cadcc89fb31668a60a762ec476e1d094e15b
+let eosProvider; // Populated in test.before().
+let eosAddressPw; // Populated in test.before().
+let eosAddressOmni; // Populated in test.before().
+const eosAddressStringPre2021Pw = 'ckt1q3vvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxm6cetwv38anze52vznk9mz8dcwsjns4kdxuu6a';
+const eosAddressString2021Pw = 'ckt1qpvvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxqt0tr9dejylkvtx3fs2wchvgahp6z2wzkcd3cuk8';
+const eosAddressStringPre2021Omni = 'ckt1q3uljza4azfdsrwjzdpea6442yfqadqhv7yzfu5zknlmtusm45hpuqn0tr9dejylkvtx3fs2wchvgahp6z2wzkcq9j4s0d';
+const eosAddressString2021Omni = 'ckt1qpuljza4azfdsrwjzdpea6442yfqadqhv7yzfu5zknlmtusm45hpuqgzdavv4hxgn7e3v69xpfmza3rku8gffc2mqqx393a7';
 
-const ckbAddress1FullPre2021 = new Address(
-  ckbAddress1StringFullPre2021,
-  AddressType.ckb
-);
-const ckbAddress1Full2021 = new Address(
-  ckbAddress1StringFull2021,
-  AddressType.ckb
-);
-
-const ckbAddress2StringShortPre2021 =
-  'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs';
-const ckbAddress2StringFull2021 =
-  'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtq7jf409fnmd4t8nm30kjfezj4v5g8hwskhal6m';
-const ckbAddress2ShortPre2021 = new Address(
-  ckbAddress2StringShortPre2021,
-  AddressType.ckb
-);
-
-const ethAddress = new Address(eth, AddressType.eth);
-let eosAddress;
-const tronAddress = new Address(tron, AddressType.tron);
-
-const network = {
-  blockchain: 'eos',
-  chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
-  host: 'mainnet.eosamsterdam.net',
-  port: 80,
-  protocol: 'http',
-};
-let eosProvider;
+// Interoperability Addresses: TRON
+const tronChainAddress = 'TNV2p8Zmy5JcZWbtn59Qee8jTdGmCRC6e8'; // Base lockArg: 0x89457bc04dc517b36a63f3ff609e95a28acd9800
+const tronAddress = new Address(tronChainAddress, AddressType.tron);
+const tronAddressStringPre2021Pw = 'ckt1q3vvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdx8z2900qym3ghkd4x8ullvz0ftg52ekvqqtyehuu';
+const tronAddressString2021Pw = 'ckt1qpvvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxqvfg4auqnw9z7ek5clnlasfa9dz3txesqq3pm97m';
+const tronAddressStringPre2021Omni = 'ckt1q3uljza4azfdsrwjzdpea6442yfqadqhv7yzfu5zknlmtusm45hpuqufg4auqnw9z7ek5clnlasfa9dz3txesqqq6rdksf';
+const tronAddressString2021Omni = 'ckt1qpuljza4azfdsrwjzdpea6442yfqadqhv7yzfu5zknlmtusm45hpuqgr39zhhszdc5tmx6nr70lkp854529vmxqqqq79jmm4';
 
 test.before(async () => {
+  // Init PWCore
   await new PWCore('https://testnet.ckb.dev').init(
     new DummyProvider(),
     new DummyCollector(),
     ChainID.ckb_testnet
   );
-  eosProvider = new EosProvider(network);
-  const lockArgs = await eosProvider.getCKBLockArgsForEosAccount(eos);
-  eosAddress = new Address(eos, AddressType.eos, lockArgs);
+
+  // Lookup EOS lockArgs.
+  const eosNetwork = {
+    blockchain: 'eos',
+    chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
+    host: 'mainnet.eosamsterdam.net',
+    port: 80,
+    protocol: 'http',
+  };
+  eosProvider = new EosProvider(eosNetwork);
+  const lockArgsPw = await eosProvider.getCKBLockArgsForEosAccount(eosChainAddress);
+  const lockArgsOmni = `0x02${lockArgsPw.replace('0x', '')}00`;
+  eosAddressPw = new Address(eosChainAddress, AddressType.eos, lockArgsPw);
+  eosAddressOmni = new Address(eosChainAddress, AddressType.eos, lockArgsOmni);
 });
 
 test('get lock args for eos', async (t) => {
-  const lockArgs = await eosProvider.getCKBLockArgsForEosAccount(eos);
+  const lockArgs = await eosProvider.getCKBLockArgsForEosAccount(eosChainAddress);
   t.is(lockArgs, '0x6f58cadcc89fb31668a60a762ec476e1d094e15b');
 });
 
-test('to address and type', (t) => {
-  t.is(ethAddress.addressString, eth);
+test('addressString and addressType returns values passed class in constructor', (t) => {
+  t.is(ckbAddressShortPre2021.addressString, ckbAddressStringShortPre2021);
+  t.is(ckbAddressShortPre2021.addressType, AddressType.ckb);
+
+  t.is(ethAddress.addressString, ethChainAddress);
   t.is(ethAddress.addressType, AddressType.eth);
 
-  t.is(ckbAddress2ShortPre2021.addressString, ckbAddress2StringShortPre2021);
-  t.is(ckbAddress2ShortPre2021.addressType, AddressType.ckb);
+  t.is(eosAddressPw.addressString, eosChainAddress);
+  t.is(eosAddressPw.addressType, AddressType.eos);
+  t.is(eosAddressOmni.addressString, eosChainAddress);
+  t.is(eosAddressOmni.addressType, AddressType.eos);
 
-  t.is(eosAddress.addressString, eos);
-  t.is(eosAddress.addressType, AddressType.eos);
-
-  t.is(tronAddress.addressString, tron);
+  t.is(tronAddress.addressString, tronChainAddress);
   t.is(tronAddress.addressType, AddressType.tron);
 });
 
-test('addressString for AddressType.ckb by default returns address passed class in constructor', (t) => {
-  t.is(ckbAddress1Full2021.addressString, ckbAddress1StringFull2021);
-  t.is(ckbAddress1Full2021.addressType, AddressType.ckb);
-
-  t.is(ckbAddress1FullPre2021.addressString, ckbAddress1StringFullPre2021);
-  t.is(ckbAddress1FullPre2021.addressType, AddressType.ckb);
-
-  t.is(ckbAddress2ShortPre2021.addressString, ckbAddress2StringShortPre2021);
-  t.is(ckbAddress2ShortPre2021.addressType, AddressType.ckb);
+test('toCKBAddress() general test', (t) => {
+  t.is(ckbAddressShortPre2021.toCKBAddress(), ckbAddressStringFull2021);
+  t.is(ethAddress.toCKBAddress(), ethAddressString2021Omni);
+  t.is(eosAddressOmni.toCKBAddress(), eosAddressString2021Omni);
+  t.is(tronAddress.toCKBAddress(), tronAddressString2021Omni);
 });
 
-test('"toCKBAddress" correctly transforms preckb2021 address to desired version', (t) => {
-  t.is(ckbAddress1FullPre2021.toCKBAddress(), ckbAddress1StringFull2021);
-  t.is(
-    ckbAddress1FullPre2021.toCKBAddress(NervosAddressVersion.latest),
-    ckbAddress1StringFull2021
-  );
-  t.is(
-    ckbAddress1FullPre2021.toCKBAddress(NervosAddressVersion.ckb2021),
-    ckbAddress1StringFull2021
-  );
-  t.is(
-    ckbAddress1FullPre2021.toCKBAddress(NervosAddressVersion.pre2021),
-    ckbAddress1StringFullPre2021
-  );
+test('toCKBAddress() correctly transforms preckb2021 address to desired version', (t) => {
+  t.is(ckbAddressShortPre2021.toCKBAddress(NervosAddressVersion.latest), ckbAddressStringFull2021);
+  t.is(ckbAddressShortPre2021.toCKBAddress(NervosAddressVersion.ckb2021), ckbAddressStringFull2021);
+  t.is(ckbAddressShortPre2021.toCKBAddress(NervosAddressVersion.pre2021), ckbAddressStringShortPre2021);
+
+  t.is(ethAddress.toCKBAddress(NervosAddressVersion.latest), ethAddressString2021Omni);
+  t.is(ethAddress.toCKBAddress(NervosAddressVersion.ckb2021), ethAddressString2021Omni);
+  t.is(ethAddress.toCKBAddress(NervosAddressVersion.pre2021), ethAddressStringPre2021Omni);
+
+  t.is(eosAddressOmni.toCKBAddress(NervosAddressVersion.latest), eosAddressString2021Omni);
+  t.is(eosAddressOmni.toCKBAddress(NervosAddressVersion.ckb2021), eosAddressString2021Omni);
+  t.is(eosAddressOmni.toCKBAddress(NervosAddressVersion.pre2021), eosAddressStringPre2021Omni);
+
+  t.is(tronAddress.toCKBAddress(NervosAddressVersion.latest), tronAddressString2021Omni);
+  t.is(tronAddress.toCKBAddress(NervosAddressVersion.ckb2021), tronAddressString2021Omni);
+  t.is(tronAddress.toCKBAddress(NervosAddressVersion.pre2021), tronAddressStringPre2021Omni);
 });
 
-test('"toCKBAddress" general test', (t) => {
-  t.is(ethAddress.toCKBAddress(), ckbAddress1StringFull2021);
-  t.is(ckbAddress1Full2021.toCKBAddress(), ckbAddress1StringFull2021);
-  t.is(ckbAddress2ShortPre2021.toCKBAddress(), ckbAddress2StringFull2021);
-  t.is(
-    ckbAddress2ShortPre2021.toCKBAddress(NervosAddressVersion.pre2021),
-    ckbAddress2StringShortPre2021
-  );
+test('toCKBAddress() correctly outputs interoperability addresses when NervosAddressVersion and LockType are specified', (t) => {
+  t.is(ethAddress.toCKBAddress(NervosAddressVersion.latest, LockType.pw), ethAddressString2021Pw);
+  t.is(ethAddress.toCKBAddress(NervosAddressVersion.ckb2021, LockType.pw), ethAddressString2021Pw);
+  t.is(ethAddress.toCKBAddress(NervosAddressVersion.pre2021, LockType.pw), ethAddressStringPre2021Pw);
+  t.is(ethAddress.toCKBAddress(NervosAddressVersion.latest, LockType.omni), ethAddressString2021Omni);
+  t.is(ethAddress.toCKBAddress(NervosAddressVersion.ckb2021, LockType.omni), ethAddressString2021Omni);
+  t.is(ethAddress.toCKBAddress(NervosAddressVersion.pre2021, LockType.omni), ethAddressStringPre2021Omni);
 
-  t.is(eosAddress.toCKBAddress(), eosFull);
-  t.is(tronAddress.toCKBAddress(), tronFull);
+  t.is(eosAddressPw.toCKBAddress(NervosAddressVersion.latest, LockType.pw), eosAddressString2021Pw);
+  t.is(eosAddressPw.toCKBAddress(NervosAddressVersion.ckb2021, LockType.pw), eosAddressString2021Pw);
+  t.is(eosAddressPw.toCKBAddress(NervosAddressVersion.pre2021, LockType.pw), eosAddressStringPre2021Pw);
+  t.is(eosAddressOmni.toCKBAddress(NervosAddressVersion.latest, LockType.omni), eosAddressString2021Omni);
+  t.is(eosAddressOmni.toCKBAddress(NervosAddressVersion.ckb2021, LockType.omni), eosAddressString2021Omni);
+  t.is(eosAddressOmni.toCKBAddress(NervosAddressVersion.pre2021, LockType.omni), eosAddressStringPre2021Omni);
+
+  t.is(tronAddress.toCKBAddress(NervosAddressVersion.latest, LockType.pw), tronAddressString2021Pw);
+  t.is(tronAddress.toCKBAddress(NervosAddressVersion.ckb2021, LockType.pw), tronAddressString2021Pw);
+  t.is(tronAddress.toCKBAddress(NervosAddressVersion.pre2021, LockType.pw), tronAddressStringPre2021Pw);
+  t.is(tronAddress.toCKBAddress(NervosAddressVersion.latest, LockType.omni), tronAddressString2021Omni);
+  t.is(tronAddress.toCKBAddress(NervosAddressVersion.ckb2021, LockType.omni), tronAddressString2021Omni);
+  t.is(tronAddress.toCKBAddress(NervosAddressVersion.pre2021, LockType.omni), tronAddressStringPre2021Omni);
 });
 
 // RFC: https://github.com/nervosnetwork/rfcs/pull/239
@@ -134,9 +142,7 @@ test('to ckb2021 mainnet address (Nervos RFC21)', async (t) => {
         '0xb39bbc0b3673c7d36450bc14cfcdad2d559c6c64',
         HashType.type
       )
-    ).addressString,
-    new Address(
-      'ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqdnnw7qkdnnclfkg59uzn8umtfd2kwxceqxwquc4',
+    ).addressString,new Address('ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqdnnw7qkdnnclfkg59uzn8umtfd2kwxceqxwquc4',
       AddressType.ckb
     ).addressString
   );
@@ -145,31 +151,61 @@ test('to ckb2021 mainnet address (Nervos RFC21)', async (t) => {
 });
 
 test('to lock script', (t) => {
-  t.deepEqual(ethAddress.toLockScript().serializeJson(), {
-    args: eth,
-    code_hash: PWCore.config.pwLock.script.codeHash,
-    hash_type: PWCore.config.pwLock.script.hashType,
-  });
-
-  t.deepEqual(ckbAddress2ShortPre2021.toLockScript().serializeJson(), {
+  t.deepEqual(ckbAddressShortPre2021.toLockScript().serializeJson(), {
     args: '0x60f493579533db6ab3cf717da49c8a5565107bba',
     code_hash: PWCore.config.defaultLock.script.codeHash,
     hash_type: PWCore.config.defaultLock.script.hashType,
   });
 
-  t.deepEqual(ckbAddress1Full2021.toLockScript().serializeJson(), {
+  t.deepEqual(ethAddress.toLockScript().serializeJson(), {
+    args: '0x0132f4c2df50f678a94609e98f8ee7ffb14b6799bc00',
+    code_hash: PWCore.config.omniLock.script.codeHash,
+    hash_type: PWCore.config.omniLock.script.hashType,
+  });
+
+  t.deepEqual(ethAddress.toLockScript(LockType.omni).serializeJson(), {
+    args: '0x0132f4c2df50f678a94609e98f8ee7ffb14b6799bc00',
+    code_hash: PWCore.config.omniLock.script.codeHash,
+    hash_type: PWCore.config.omniLock.script.hashType,
+  });
+  
+  t.deepEqual(ethAddress.toLockScript(LockType.pw).serializeJson(), {
     args: '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc',
     code_hash: PWCore.config.pwLock.script.codeHash,
     hash_type: PWCore.config.pwLock.script.hashType,
   });
 
-  t.deepEqual(eosAddress.toLockScript().serializeJson(), {
+  t.deepEqual(eosAddressOmni.toLockScript().serializeJson(), {
+    args: '0x026f58cadcc89fb31668a60a762ec476e1d094e15b00',
+    code_hash: PWCore.config.omniLock.script.codeHash,
+    hash_type: PWCore.config.omniLock.script.hashType,
+  });
+
+  t.deepEqual(eosAddressOmni.toLockScript(LockType.omni).serializeJson(), {
+    args: '0x026f58cadcc89fb31668a60a762ec476e1d094e15b00',
+    code_hash: PWCore.config.omniLock.script.codeHash,
+    hash_type: PWCore.config.omniLock.script.hashType,
+  });
+  
+  t.deepEqual(eosAddressPw.toLockScript(LockType.pw).serializeJson(), {
     args: '0x6f58cadcc89fb31668a60a762ec476e1d094e15b',
     code_hash: PWCore.config.pwLock.script.codeHash,
     hash_type: PWCore.config.pwLock.script.hashType,
   });
 
   t.deepEqual(tronAddress.toLockScript().serializeJson(), {
+    args: '0x0389457bc04dc517b36a63f3ff609e95a28acd980000',
+    code_hash: PWCore.config.omniLock.script.codeHash,
+    hash_type: PWCore.config.omniLock.script.hashType,
+  });
+
+  t.deepEqual(tronAddress.toLockScript(LockType.omni).serializeJson(), {
+    args: '0x0389457bc04dc517b36a63f3ff609e95a28acd980000',
+    code_hash: PWCore.config.omniLock.script.codeHash,
+    hash_type: PWCore.config.omniLock.script.hashType,
+  });
+
+  t.deepEqual(tronAddress.toLockScript(LockType.pw).serializeJson(), {
     args: '0x89457bc04dc517b36a63f3ff609e95a28acd9800',
     code_hash: PWCore.config.pwLock.script.codeHash,
     hash_type: PWCore.config.pwLock.script.hashType,
@@ -177,37 +213,163 @@ test('to lock script', (t) => {
 });
 
 test('is acp address', (t) => {
-  t.true(
-    new Address(
-      'ckt1qjr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykykn2zrv2y5rex4nnyfs2tqkde8zmayrls6d3kwa5',
-      AddressType.ckb
-    ).isAcp()
-  );
-  t.false(
-    new Address(
-      'ckt1q35y83078t9h7nwzyvpe9qfuh8qjm08d2ktlegc22tcn4fgem6xnxwlwq4vae7nqgpkl6s59znsqmh9jkrtjhwct56efh7uep9y2xr04d4augtnmauya4s2cdvn0s6nxw9m6k7ndhf2l0un2g0tr7f88fegqns00nq',
-      AddressType.ckb
-    ).isAcp()
-  );
+  let address;
+
+  // CKB short address (pre2021) using the default lock.
+  address = 'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs';
+  t.false(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (pre2021) using the default lock.
+  address = 'ckt1qjda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsc85jdte2v7md2eu7uta5jwg54t9zpam5y9ptgq';
+  t.false(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (ckb2021) using the default lock.
+  address = 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtq7jf409fnmd4t8nm30kjfezj4v5g8hwskhal6m';
+  t.false(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (pre2021) using the ACP lock.
+  address = 'ckt1qjr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykykn2zrv2y5rex4nnyfs2tqkde8zmayrls6d3kwa5';
+  t.true(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (ckb2021) using the ACP lock.
+  address = 'ckt1qzr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykykq2dggd3gjs0y6kwv3xpfvzehyut05s07rgk2r806';
+  t.true(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (pre2021) using an unknown lock and extra args.
+  address = 'ckt1q35y83078t9h7nwzyvpe9qfuh8qjm08d2ktlegc22tcn4fgem6xnxwlwq4vae7nqgpkl6s59znsqmh9jkrtjhwct56efh7uep9y2xr04d4augtnmauya4s2cdvn0s6nxw9m6k7ndhf2l0un2g0tr7f88fegqns00nq';
+  t.false(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (ckb2021) using an unknown lock and extra args.
+  address = 'ckt1qp5y83078t9h7nwzyvpe9qfuh8qjm08d2ktlegc22tcn4fgem6xnxqfmacz4nh86vpqxml2zs52wqrwuk2cdw2ampwnt9xlmnyy53gcd74khh3pw00hsnkkptp4jd7r2vech02m6dka9taljdfpav0eyua89q9px9au';
+  t.false(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (pre2021) using PW-Lock (ETH).
+  address = ethAddressStringPre2021Pw;
+  t.true(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (ckb2021) using PW-Lock (ETH).
+  address = ethAddressString2021Pw;
+  t.true(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (pre2021) using OmniLock (ETH).
+  address = ethAddressStringPre2021Omni;
+  t.true(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (ckb2021) using OmniLock (ETH).
+  address = ethAddressString2021Omni;
+  t.true(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (pre2021) using PW-Lock (EOS).
+  address = eosAddressStringPre2021Pw;
+  t.true(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (ckb2021) using PW-Lock (EOS).
+  address = eosAddressString2021Pw;
+  t.true(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (pre2021) using OmniLock (EOS).
+  address = eosAddressStringPre2021Omni;
+  t.true(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (ckb2021) using OmniLock (EOS).
+  address = eosAddressString2021Omni;
+  t.true(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (pre2021) using PW-Lock (TRON).
+  address = tronAddressStringPre2021Pw;
+  t.true(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (ckb2021) using PW-Lock (TRON).
+  address = tronAddressString2021Pw;
+  t.true(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (pre2021) using OmniLock (TRON).
+  address = tronAddressStringPre2021Omni;
+  t.true(new Address(address, AddressType.ckb).isAcp());
+
+  // CKB full address (ckb2021) using OmniLock (TRON).
+  address = tronAddressString2021Omni;
+  t.true(new Address(address, AddressType.ckb).isAcp());
+
+  // ETH Address object.
+  t.true(ethAddress.isAcp());
+
+  // EOS Address object.
+  t.true(eosAddressPw.isAcp()); // Note: toLockScript(), which is used internally by isAcp(), will use OmniLock.
+  t.true(eosAddressOmni.isAcp());
+
+  // TRON Address object.
+  t.true(tronAddress.isAcp());
 });
 
 test('minimal pay amount', (t) => {
-  t.is(
-    new Address(
-      'ckt1q35y83078t9h7nwzyvpe9qfuh8qjm08d2ktlegc22tcn4fgem6xnxwlwq4vae7nqgpkl6s59znsqmh9jkrtjhwct56efh7uep9y2xr04d4augtnmauya4s2cdvn0s6nxw9m6k7ndhf2l0un2g0tr7f88fegqns00nq',
-      AddressType.ckb
-    )
-      .minPaymentAmount()
-      .toString(),
-    '105'
-  );
-  t.is(
-    new Address(
-      'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs',
-      AddressType.ckb
-    )
-      .minPaymentAmount()
-      .toString(),
-    '61'
-  );
+  let address;
+  
+  // CKB short address (pre2021) using the default lock.
+  address = 'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs';
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount().toString(), '61');
+
+  // CKB full address (pre2021) using the default lock.
+  address = 'ckt1qjda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsc85jdte2v7md2eu7uta5jwg54t9zpam5y9ptgq';
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount().toString(), '61');
+
+  // CKB full address (ckb2021) using the default lock.
+  address = 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtq7jf409fnmd4t8nm30kjfezj4v5g8hwskhal6m';
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount().toString(), '61');
+
+  // CKB full address (pre2021) using an unknown lock and extra args.
+  address = 'ckt1q35y83078t9h7nwzyvpe9qfuh8qjm08d2ktlegc22tcn4fgem6xnxwlwq4vae7nqgpkl6s59znsqmh9jkrtjhwct56efh7uep9y2xr04d4augtnmauya4s2cdvn0s6nxw9m6k7ndhf2l0un2g0tr7f88fegqns00nq';
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount().toString(), '105');
+
+  // CKB full address (ckb2021) using an unknown lock and extra args.
+  address = 'ckt1qp5y83078t9h7nwzyvpe9qfuh8qjm08d2ktlegc22tcn4fgem6xnxqfmacz4nh86vpqxml2zs52wqrwuk2cdw2ampwnt9xlmnyy53gcd74khh3pw00hsnkkptp4jd7r2vech02m6dka9taljdfpav0eyua89q9px9au';
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount().toString(), '105');
+
+  // CKB full address (pre2021) using the ACP lock.
+  address = 'ckt1qjr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykykn2zrv2y5rex4nnyfs2tqkde8zmayrls6d3kwa5';
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount().toString(), '0.00000001');
+
+  // CKB full address (ckb2021) using the ACP lock.
+  address = 'ckt1qzr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykykq2dggd3gjs0y6kwv3xpfvzehyut05s07rgk2r806';
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount().toString(), '0.00000001');
+
+  // CKB full address (pre2021) using the ACP lock (allowAcp = false).
+  address = 'ckt1qjr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykykn2zrv2y5rex4nnyfs2tqkde8zmayrls6d3kwa5';
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount(false).toString(), '61');
+
+  // CKB full address (ckb2021) using the ACP lock (allowAcp = false).
+  address = 'ckt1qzr2r35c0f9vhcdgslx2fjwa9tylevr5qka7mfgmscd33wlhfykykq2dggd3gjs0y6kwv3xpfvzehyut05s07rgk2r806';
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount(false).toString(), '61');
+
+  // CKB full address (pre2021) using PW-Lock.
+  address = ethAddressStringPre2021Pw;
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount().toString(), '0.00000001');
+
+  // CKB full address (ckb2021) using PW-Lock.
+  address = ethAddressString2021Pw;
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount().toString(), '0.00000001');
+
+  // CKB full address (pre2021) using PW-Lock (allowAcp = false).
+  address = ethAddressStringPre2021Pw;
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount(false).toString(), '61');
+
+  // CKB full address (ckb2021) using PW-Lock (allowAcp = false).
+  address = ethAddressString2021Pw;
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount(false).toString(), '61');
+
+  // CKB full address (pre2021) using OmniLock.
+  address = ethAddressStringPre2021Omni;
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount().toString(), '0.00000001');
+
+  // CKB full address (ckb2021) using OmniLock.
+  address = ethAddressString2021Omni;
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount().toString(), '0.00000001');
+
+  // CKB full address (pre2021) using OmniLock (allowAcp = false).
+  address = ethAddressStringPre2021Omni;
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount(false).toString(), '63');
+
+  // CKB full address (ckb2021) using OmniLock (allowAcp = false).
+  address = ethAddressString2021Omni;
+  t.is(new Address(address, AddressType.ckb).minPaymentAmount(false).toString(), '63');
 });

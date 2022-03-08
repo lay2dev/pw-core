@@ -82,6 +82,20 @@ export const CHAIN_SPECS = {
         HashType.type
       ),
     },
+    omniLock: {
+      cellDep: new CellDep(
+        DepType.code,
+        new OutPoint(
+          '0xaa8ab7e97ed6a268be5d7e26d63d115fa77230e51ae437fc532988dd0c3ce10a',
+          '0x1'
+        )
+      ),
+      script: new Script(
+        '0x9f3aeaf2fc439549cbc870c653374943af96a0658bd6b51be8d8983183e6f52f',
+        '0x',
+        HashType.type
+      ),
+    },
     acpLockList: [
       new Script(
         '0xbf43c3602455798c1a61a596e0d95278864c552fafe231c063b3fabf97a8febc',
@@ -95,6 +109,11 @@ export const CHAIN_SPECS = {
       ),
       new Script(
         '0xd369597ff47f29fbc0d47d2e3775370d1250b85140c670e4718af712983a2354',
+        '0x',
+        HashType.type
+      ),
+      new Script(
+        '0x9f3aeaf2fc439549cbc870c653374943af96a0658bd6b51be8d8983183e6f52f',
         '0x',
         HashType.type
       ),
@@ -172,6 +191,20 @@ export const CHAIN_SPECS = {
         HashType.type
       ),
     },
+    omniLock: {
+      cellDep: new CellDep(
+        DepType.code,
+        new OutPoint(
+          '0x9154df4f7336402114d04495175b37390ce86a4906d2d4001cf02c3e6d97f39c',
+          '0x0'
+        )
+      ),
+      script: new Script(
+        '0x79f90bb5e892d80dd213439eeab551120eb417678824f282b4ffb5f21bad2e1e',
+        '0x',
+        HashType.type
+      ),
+    },
     acpLockList: [
       new Script(
         '0x58c5f491aba6d61678b7cf7edf4910b1f5e00ec0cde2f42e0abb4fd9aff25a63',
@@ -185,6 +218,11 @@ export const CHAIN_SPECS = {
       ),
       new Script(
         '0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356',
+        '0x',
+        HashType.type
+      ),
+      new Script(
+        '0x79f90bb5e892d80dd213439eeab551120eb417678824f282b4ffb5f21bad2e1e',
         '0x',
         HashType.type
       ),

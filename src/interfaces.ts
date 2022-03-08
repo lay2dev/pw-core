@@ -33,6 +33,7 @@ export interface Config {
   defaultLock: ConfigItem;
   multiSigLock: ConfigItem;
   pwLock: ConfigItem;
+  omniLock?: ConfigItem;
   sudtType: ConfigItem;
   acpLockList: Script[];
 }
