@@ -1,6 +1,8 @@
 import JSBI from 'jsbi';
 import anyTest, { TestInterface } from 'ava';
 import {
+  describeAddress,
+  LumosConfigs,
   readBigUInt128LE,
   readBigUInt32LE,
   readBigUInt64LE,
@@ -69,4 +71,38 @@ test('verifyEosAddress', (t) => {
 test('verifyTronAddress', (t) => {
   t.is(verifyTronAddress('TNV2p8Zmy5JcZWbtn59Qee8jTdGmCRC6e8'), true);
   t.is(verifyTronAddress('TNV2p8Zmy5JcZWbtn59Qee8jTdGmCRC6e'), false);
+});
+
+test('describeAddress() general test', (t) => {
+  let address;
+  let validData;
+  let result;
+
+  // Short address (pre2021) SECP256K1 + Blake160.
+  address = 'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs';
+  validData = {addressVersion: 'pre2021', deprecated: true, payloadFormatType: 1, shortFormatType: 0};
+  result = describeAddress(address, {config: LumosConfigs[1]});
+  delete result.description;
+  t.deepEqual(result, validData);
+
+  // Short address (pre2021) ACP.
+  address = 'ckt1qyp260h7pphjhlapmxqhrm7e0nmhujrqqmdqjfln9h';
+  validData = {addressVersion: 'pre2021', deprecated: true, payloadFormatType: 1, shortFormatType: 2};
+  result = describeAddress(address, {config: LumosConfigs[1]});
+  delete result.description;
+  t.deepEqual(result, validData);
+
+  // Full address (pre2021) hash type "type".
+  address = 'ckt1qjda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsc85jdte2v7md2eu7uta5jwg54t9zpam5y9ptgq';
+  validData = {addressVersion: 'pre2021', deprecated: true, payloadFormatType: 4, shortFormatType: null};
+  result = describeAddress(address, {config: LumosConfigs[1]});
+  delete result.description;
+  t.deepEqual(result, validData);
+
+  // Full address (ckb2021).
+  address = 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtq7jf409fnmd4t8nm30kjfezj4v5g8hwskhal6m';
+  validData = {addressVersion: 'ckb2021', deprecated: false, payloadFormatType: 0, shortFormatType: null};
+  result = describeAddress(address, {config: LumosConfigs[1]});
+  delete result.description;
+  t.deepEqual(result, validData);
 });

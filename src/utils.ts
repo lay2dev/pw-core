@@ -281,6 +281,82 @@ export function generatePre2021CkbAddress(
   return bech32.encode(config.PREFIX, words, BECH32_LIMIT);
 }
 
+export function describeAddress(address: string, { config = LINA } = {}) {
+  let data: number[] = [];
+  let prefix: string = null;
+
+  try {
+    const decoded = bech32.decode(address, BECH32_LIMIT);
+    data = bech32.fromWords(new Uint8Array(decoded.words));
+    prefix = decoded.prefix;
+  } catch {
+    const decoded = bech32m.decode(address, BECH32_LIMIT);
+    data = bech32m.fromWords(new Uint8Array(decoded.words));
+    prefix = decoded.prefix;
+  }
+
+  if (prefix !== config.PREFIX)
+    throw Error(`Invalid prefix! Expected: ${config.PREFIX}, actual: ${prefix}`);
+
+  const payloadFormatType = data[0];
+  switch (payloadFormatType) {
+    case Number(AddressType.FullVersion): // 0x00 Full version identifies the hash_type.
+      return {
+        addressVersion: NervosAddressVersion[NervosAddressVersion.ckb2021],
+        payloadFormatType,
+        shortFormatType: null,
+        deprecated: false,
+        description: 'Full address using CKB2021 address format.',
+      };
+    case Number(AddressType.HashIdx): // 0x01 Short version for locks with popular code_hash, deprecated.
+      if (data.length < 2)
+        throw Error(`Invalid payload length!`);
+
+      const shortFormatType = data[1];
+
+      let shortFormatTypeDescription;
+      switch(shortFormatType) {
+        case(0):
+          shortFormatTypeDescription = 'SECP256K1 + Blake160';
+          break;
+        case(1):
+          shortFormatTypeDescription = 'SECP256K1 + MultiSig';
+          break;
+        case(2):
+          shortFormatTypeDescription = 'ACP';
+          break;
+        default:
+          throw Error(`Invalid short format type!`);
+      }
+
+      return {
+        addressVersion: NervosAddressVersion[NervosAddressVersion.pre2021],
+        payloadFormatType,
+        shortFormatType,
+        deprecated: true,
+        description: `Short address using the ${shortFormatTypeDescription} lock and the pre-2021 address format. (Deprecated.)`,
+      };
+    case Number(AddressType.DataCodeHash): // 0x02 Full version with hash_type = "Data", deprecated.
+      return {
+        addressVersion: NervosAddressVersion[NervosAddressVersion.pre2021],
+        payloadFormatType,
+        shortFormatType: null,
+        deprecated: true,
+        description: 'Full address using a hash type of "data" and the pre-2021 address format. (Deprecated.)',
+      };
+    case Number(AddressType.TypeCodeHash): // 0x04 Full version with hash_type = "Type", deprecated.
+      return {
+        addressVersion: NervosAddressVersion[NervosAddressVersion.pre2021],
+        payloadFormatType,
+        shortFormatType: null,
+        deprecated: true,
+        description: 'Full address using a hash type of "data" and the pre-2021 address format. (Deprecated.)',
+      };
+    default:
+      throw Error(`Invalid payload format type: ${data[0]}`);
+  }
+}
+
 export function parseAddress(address: string, { config = LINA } = {}) {
   let data: number[] = [];
   let prefix: string = null;
