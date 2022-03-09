@@ -3,6 +3,7 @@ import PWCore, { ChainID } from '../core';
 import { HashType } from '../interfaces';
 import ecc from 'eosjs-ecc';
 import {
+  describeAddress,
   parseAddress,
   verifyCkbAddress,
   verifyEthAddress,
@@ -185,6 +186,13 @@ export class Address {
 
     const lockArgs = '0x' + publicHash.slice(-40);
     return lockArgs;
+  }
+
+  describe() {
+    if (this.addressType === AddressType.ckb)
+      return describeAddress(this.addressString, {config: getLumosConfigByNetworkPrefix(getDefaultPrefix())});
+    else
+      return describeAddress(this.toCKBAddress(), {config: getLumosConfigByNetworkPrefix(getDefaultPrefix())});
   }
 
   /**
