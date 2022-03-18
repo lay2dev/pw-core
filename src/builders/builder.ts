@@ -17,12 +17,18 @@ export abstract class Builder {
   static readonly MIN_FEE_RATE = 1000;
   static readonly MIN_CHANGE = new Amount('61', AmountUnit.ckb);
   static readonly WITNESS_ARGS = {
-    Secp256k1: {
+    Secp256k1Pw: {
       lock: '0x' + '0'.repeat(132),
       input_type: '',
       output_type: '',
     },
-    RawSecp256k1: {
+    // Omni Lock Witness Structure: https://github.com/XuJiandong/docs-bank/blob/master/omni_lock.md#omni-lock-witness
+    Secp256k1Omni: {
+      lock: '0x' + '0'.repeat(170), // 0x + 20 bytes for RcLockWitnessLock Molecule table + 65 bytes for signature.
+      input_type: '',
+      output_type: '',
+    },
+    Secp256k1: {
       lock: '0x' + '0'.repeat(130),
       input_type: '',
       output_type: '',
@@ -52,8 +58,8 @@ export abstract class Builder {
     protected feeRate: number = Builder.MIN_FEE_RATE,
     protected collector: Collector | SUDTCollector = PWCore.defaultCollector,
     protected witnessArgs: WitnessArgs = PWCore.chainId === ChainID.ckb
-      ? Builder.WITNESS_ARGS.RawSecp256k1
-      : Builder.WITNESS_ARGS.Secp256k1
+      ? Builder.WITNESS_ARGS.Secp256k1
+      : Builder.WITNESS_ARGS.Secp256k1Pw
   ) {}
 
   getFee(): Amount {

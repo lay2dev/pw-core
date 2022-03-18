@@ -25,12 +25,12 @@ import { NervosAddressVersion } from '../helpers/address';
 export { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils';
 
 export enum AddressType {
-  // btc,
   ckb,
-  // doge,
   eth,
   eos,
   tron,
+  // btc,
+  // doge,
 }
 
 export enum LockType {
@@ -247,9 +247,12 @@ export class Address {
    * Generate a CKB address string for the Address.
    */
   toCKBAddress(addressVersion = NervosAddressVersion.latest, lockType: LockType|null = null): string {
-    // Do not allow lock type to be specified if a CKB address was provided.
+    // Warn when lock type is specified and a CKB address was provided.
     if (this.addressType === AddressType.ckb && lockType !== null)
-        throw new Error(`LockType cannot be specified when AddressType.ckb is used.`);
+    {
+      lockType = null;
+      console.warn(`LockType should not be specified on toCKBAddress() when AddressType.ckb is used.`);
+    }
 
     return generateCkbAddressString(
       this.toLockScript(lockType),
@@ -262,9 +265,12 @@ export class Address {
    * Generate a lock script for the Address.
    */
   toLockScript(lockType: LockType|null = null): Script {
-    // Do not allow lock type to be specified if a CKB address was provided.
+    // Warn when lock type is specified and a CKB address was provided.
     if (this.addressType === AddressType.ckb && lockType !== null)
-        throw new Error(`LockType cannot be specified when AddressType.ckb is used.`);
+    {
+      lockType = null;
+      console.warn(`LockType should not be specified on toCKBAddress() when AddressType.ckb is used.`);
+    }
 
     // Handle CKB native address type.
     if (this.addressType === AddressType.ckb) {
