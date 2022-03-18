@@ -1,8 +1,10 @@
 import { Provider, Platform } from './provider';
 import { Address, AddressType } from '../models';
 import ENS from 'ethereum-ens';
+import { Hasher, Keccak256Hasher } from '../hashers';
+import PWCore, { ChainID } from '../core';
 
-export class EthProvider extends Provider {
+export class EthProviderPw extends Provider {
   onAddressChanged: (newAddress: Address) => void;
   constructor(onAddressChanged?: (newAddress: Address) => void) {
     super(Platform.eth);
@@ -63,7 +65,7 @@ export class EthProvider extends Provider {
         if (v >= 27) v -= 27;
         result =
           '0x' +
-          '5500000010000000550000005500000041000000' + // 20 bytes for RcLockWitnessLock Molecule table. https://bit.ly/3if4CRg
+          (PWCore.chainId === ChainID.ckb ? '' : this.platform.toString(16).padStart(2, '0')) + // Testnet release requires an extra byte for the platform.
           result.slice(2, -2) +
           v.toString(16).padStart(2, '0');
           return result;
@@ -96,6 +98,10 @@ export class EthProvider extends Provider {
         );
       }
     });
+  }
+
+  hasher(): Hasher {
+    return new Keccak256Hasher();
   }
 
   async close() {

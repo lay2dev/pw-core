@@ -1,12 +1,13 @@
 import { Address } from '../models';
-import { Hasher, Keccak256Hasher } from '../hashers';
+import { Blake2bHasher, Hasher } from '../hashers';
 
 export enum Platform {
   ckb = 0,
   eth,
   eos,
   tron,
-  // libra
+  // btc,
+  // doge,
 }
 
 export abstract class Provider {
@@ -21,7 +22,7 @@ export abstract class Provider {
   }
 
   hasher(): Hasher {
-    return new Keccak256Hasher();
+    return new Blake2bHasher();
   }
 
   abstract async init(): Promise<Provider>;

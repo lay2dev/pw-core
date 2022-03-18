@@ -38,8 +38,8 @@ async function main() {
   const sudtBalance = await collector.getSUDTBalance(sudt, provider.address);
   console.log(`sudt balance: ${sudtBalance}`);
 
-  // for ckb system lock script, its length of witness lock is 65 bytes, use RawScep256K1 here.
-  const options = { witnessArgs: Builder.WITNESS_ARGS.RawSecp256k1 };
+  // for ckb system lock script, its length of witness lock is 65 bytes, use Scep256K1Pw here which is 66 bytes.
+  const options = { witnessArgs: Builder.WITNESS_ARGS.Secp256k1Pw };
   // transfer
   const toAddr = new Address(
     '0x7Ad9ec46A9c2910b446148728aCEd0C7E2B50048',

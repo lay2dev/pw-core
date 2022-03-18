@@ -72,10 +72,10 @@ export abstract class Signer {
         );
       }
       used[i] = true;
-      this.hasher.update(txHash);
+      this.hasher.update(txHash.toArrayBuffer());
       const firstWitness = new Reader(tx.witnesses[i]);
       this.hasher.update(serializeBigInt(firstWitness.length()));
-      this.hasher.update(firstWitness);
+      this.hasher.update(firstWitness.toArrayBuffer());
       for (
         let j = i + 1;
         j < tx.raw.inputs.length && j < tx.witnesses.length;
@@ -85,7 +85,7 @@ export abstract class Signer {
           used[j] = true;
           const currentWitness = new Reader(tx.witnesses[j]);
           this.hasher.update(serializeBigInt(currentWitness.length()));
-          this.hasher.update(currentWitness);
+          this.hasher.update(currentWitness.toArrayBuffer());
         }
       }
       messages.push({
@@ -96,6 +96,7 @@ export abstract class Signer {
 
       this.hasher.reset();
     }
+
     return messages;
   }
 }
