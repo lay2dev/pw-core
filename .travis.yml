@@ -1,12 +1,17 @@
-sudo: false
+dist: focal
 language: node_js
 node_js:
-  - '10'
-  - '12'
+  - lts/*
+install: true
 # keep the npm cache to speed up installs
 cache:
   directories:
     - '$HOME/.npm'
+before_script:
+  - npm i --force
+script:
+  - npm run build
+  - npm run test
 after_success:
   - npm run cov:send
   - npm run cov:check
