@@ -25,9 +25,9 @@ export abstract class Provider {
     return new Blake2bHasher();
   }
 
-  abstract async init(): Promise<Provider>;
+  abstract init(): Promise<Provider>;
 
-  abstract async sign(message: string): Promise<string>;
+  abstract sign(message: string): Promise<string>;
 
-  abstract async close();
+  abstract close();
 }

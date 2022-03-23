@@ -10,12 +10,12 @@ export class PwCollector extends SUDTCollector {
   }
 
   async getBalance(address: Address): Promise<Amount> {
-    const res = await axios.get(
+    const result = await axios.get(
       `${this.apiBase}/cell/getCapacityByLockHash?lockHash=${address
         .toLockScript()
         .toHash()}`
     );
-    return new Amount(res.data.data, AmountUnit.shannon);
+    return new Amount(result.data.data, AmountUnit.shannon);
   }
 
   async collect(address: Address, options: CollectorOptions): Promise<Cell[]> {
@@ -23,13 +23,13 @@ export class PwCollector extends SUDTCollector {
       throw new Error("'neededAmount' in options must be provided");
     }
     const cells: Cell[] = [];
-    const res = await axios.get(
+    const result = await axios.get(
       `${this.apiBase}/cell/unSpent?lockHash=${address
         .toLockScript()
         .toHash()}&capacity=${options.neededAmount.toHexString()}`
     );
 
-    for (let { capacity, outPoint } of res.data.data) {
+    for (let { capacity, outPoint } of result.data.data) {
       capacity = new Amount(capacity, AmountUnit.shannon);
       outPoint = new OutPoint(outPoint.txHash, outPoint.index);
       cells.push(new Cell(capacity, address.toLockScript(), null, outPoint));
@@ -41,10 +41,10 @@ export class PwCollector extends SUDTCollector {
   async getSUDTBalance(sudt: SUDT, address: Address): Promise<Amount> {
     const lockHash = address.toLockScript().toHash();
     const typeHash = sudt.toTypeScript().toHash();
-    const res = await axios.get(
+    const result = await axios.get(
       `${this.apiBase}/sudt/balance?lockHash=${lockHash}&typeHash=${typeHash}`
     );
-    return new Amount(res.data.data.sudtAmount, AmountUnit.shannon);
+    return new Amount(result.data.data.sudtAmount, AmountUnit.shannon);
   }
 
   async collectSUDT(
@@ -59,13 +59,14 @@ export class PwCollector extends SUDTCollector {
     const lockHash = address.toLockScript().toHash();
     const typeHash = sudt.toTypeScript().toHash();
 
-    const res = await axios.get(
+    const result = await axios.get(
       `${
         this.apiBase
       }/cell/unSpent?lockHash=${lockHash}&capacity=0x0&typeHash=${typeHash}&sudtAmount=${options.neededAmount.toHexString()}`
     );
 
-    for (let { capacity, outPoint, type, data } of res.data.data) {
+    // eslint-disable-next-line prefer-const
+    for (let { capacity, outPoint, type, data } of result.data.data) {
       capacity = new Amount(capacity, AmountUnit.shannon);
       outPoint = new OutPoint(outPoint.txHash, outPoint.index);
       cells.push(

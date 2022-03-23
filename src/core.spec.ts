@@ -1,10 +1,10 @@
-import anyTest, { TestInterface } from 'ava';
+import anyTest, { TestFn } from 'ava';
 import PWCore, { Address, AddressType, Amount, ChainID } from '.';
 import { PwCollector } from './collectors/pw-collector';
 import { CHAIN_SPECS } from './constants';
 import { DummyProvider } from './providers/dummy-provider';
 
-const test = anyTest as TestInterface<{ pw: PWCore; address: Address }>;
+const test = anyTest as TestFn<{ pw: PWCore; address: Address }>;
 
 test.before(async (t) => {
   const address = new Address(

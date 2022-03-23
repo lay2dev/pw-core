@@ -1,4 +1,4 @@
-import anyTest, { TestInterface } from 'ava';
+import anyTest, { TestFn } from 'ava';
 import PWCore, {
   ChainID,
   Transaction,
@@ -12,7 +12,7 @@ import { DummyCollector } from '../collectors/dummy-collector';
 import { DummyProvider } from '../providers/dummy-provider';
 import { Builder } from '../builders';
 
-const test = anyTest as TestInterface<{ tx: Transaction }>;
+const test = anyTest as TestFn<{ tx: Transaction }>;
 
 const outPoint1 = new OutPoint(
   '0x85f2eb3737f79af418361e6c6c03a5d9f0060b085a888c0c70d762842af1b6c1',

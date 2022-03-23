@@ -6,8 +6,8 @@ export abstract class SUDTCollector extends Collector {
   protected constructor() {
     super();
   }
-  abstract async getSUDTBalance(sudt: SUDT, address: Address): Promise<Amount>;
-  abstract async collectSUDT(
+  abstract getSUDTBalance(sudt: SUDT, address: Address): Promise<Amount>;
+  abstract collectSUDT(
     sudt: SUDT,
     address: Address,
     options?: CollectorOptions

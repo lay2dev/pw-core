@@ -1,4 +1,4 @@
-import anyTest, { TestInterface } from 'ava';
+import anyTest, { TestFn } from 'ava';
 import PWCore, { ChainID } from '../core';
 import { Address, AddressType, LockType, Script } from '.';
 import { validators } from '../ckb-js-toolkit';
@@ -6,17 +6,24 @@ import { DummyProvider } from '../providers/dummy-provider';
 import { DummyCollector } from '../collectors/dummy-collector';
 import { NervosAddressVersion } from '..';
 
-
-const test = anyTest as TestInterface<{
+const test = anyTest as TestFn<{
   ckbLockScript: Script;
   ethLockScriptPw: Script;
 }>;
 
-const address = new Address('ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtq7jf409fnmd4t8nm30kjfezj4v5g8hwskhal6m', AddressType.ckb);
-const defaultLockScriptHash = '0xece2a204369183d34393c4cbffbe872ddb6666066667c7955234ce37f94288b7';
+const address = new Address(
+  'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtq7jf409fnmd4t8nm30kjfezj4v5g8hwskhal6m',
+  AddressType.ckb
+);
+const defaultLockScriptHash =
+  '0xece2a204369183d34393c4cbffbe872ddb6666066667c7955234ce37f94288b7';
 
-const ethAddress = new Address('0x26C5F390FF2033CbB44377361c63A3Dd2DE3121d', AddressType.eth);
-const ethLockScriptPwHash = '0x0ed227f99c630514b8f3147012377f59b0dd6b9a29a2dbae137870aefa98f1bc';
+const ethAddress = new Address(
+  '0x26C5F390FF2033CbB44377361c63A3Dd2DE3121d',
+  AddressType.eth
+);
+const ethLockScriptPwHash =
+  '0x0ed227f99c630514b8f3147012377f59b0dd6b9a29a2dbae137870aefa98f1bc';
 
 test.before(async (t) => {
   await new PWCore('https://testnet.ckb.dev').init(
@@ -52,8 +59,14 @@ test('sameWith', (t) => {
 });
 
 test('toAddress', (t) => {
-  t.is(t.context.ckbLockScript.toAddress().toCKBAddress(), address.toCKBAddress());
-  t.is(t.context.ethLockScriptPw.toAddress().toCKBAddress(), ethAddress.toCKBAddress(NervosAddressVersion.ckb2021, LockType.pw));
+  t.is(
+    t.context.ckbLockScript.toAddress().toCKBAddress(),
+    address.toCKBAddress()
+  );
+  t.is(
+    t.context.ethLockScriptPw.toAddress().toCKBAddress(),
+    ethAddress.toCKBAddress(NervosAddressVersion.ckb2021, LockType.pw)
+  );
 });
 
 test('toHash', (t) => {

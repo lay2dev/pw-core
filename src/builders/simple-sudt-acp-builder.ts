@@ -26,7 +26,7 @@ export class SimpleSUDTACPBuilder extends Builder {
       throw new Error("The receiver's address is not anyone-can-pay cell");
     }
     if (!(this.collector instanceof SUDTCollector)) {
-      throw new Error('this.collector is not a SUDTCollector instance');
+      throw new TypeError('this.collector is not a SUDTCollector instance');
     }
 
     const receiverSUDTCells = await this.collector.collectSUDT(

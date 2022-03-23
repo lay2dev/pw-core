@@ -40,7 +40,7 @@ export class Web3ModalProvider extends Provider {
   async ensResolver(ens: string): Promise<string> {
     try {
       return await new ENS(this.web3.currentProvider).resolver(ens).addr();
-    } catch (e) {
+    } catch {
       return 'Unknown ENS Name';
     }
   }

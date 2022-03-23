@@ -1,11 +1,11 @@
-import anyTest, { TestInterface } from 'ava';
+import anyTest, { TestFn } from 'ava';
 import PWCore, { Address, AddressType, Amount, ChainID } from '..';
 import { DummyCollector } from '../collectors/dummy-collector';
 import { SUDT } from '../models';
 import { DummyProvider } from '../providers/dummy-provider';
 import { SimpleSUDTACPBuilder } from './simple-sudt-acp-builder';
 
-const test = anyTest as TestInterface<{ builder: SimpleSUDTACPBuilder }>;
+const test = anyTest as TestFn<{ builder: SimpleSUDTACPBuilder }>;
 
 test.before(async (t) => {
   const address = new Address(

@@ -18,8 +18,6 @@ export interface SimpleSUDTBuilderOptions extends BuilderOption {
 }
 
 export class SimpleSUDTBuilder extends Builder {
-  fee: Amount;
-
   inputCells: Cell[] = [];
   outputCells: Cell[] = [];
 
@@ -113,7 +111,7 @@ export class SimpleSUDTBuilder extends Builder {
     );
 
     if (!(this.collector instanceof SUDTCollector)) {
-      throw new Error('this.collector is not a SUDTCollector instance');
+      throw new TypeError('this.collector is not a SUDTCollector instance');
     }
 
     const unspentSUDTCells = await this.collector.collectSUDT(

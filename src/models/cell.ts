@@ -97,7 +97,7 @@ export class Cell implements CKBModel {
     return this.capacity.sub(this.occupiedCapacity());
   }
 
-  toCellInput(since: string = '0x0'): CellInput | undefined {
+  toCellInput(since = '0x0'): CellInput | undefined {
     return this.outPoint ? new CellInput(this.outPoint, since) : undefined;
   }
 

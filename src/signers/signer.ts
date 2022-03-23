@@ -16,7 +16,7 @@ export interface Message {
 export abstract class Signer {
   protected constructor(private readonly hasher: Hasher) {}
 
-  protected abstract async signMessages(messages: Message[]): Promise<string[]>;
+  protected abstract signMessages(messages: Message[]): Promise<string[]>;
 
   async sign(tx: Transaction): Promise<Transaction> {
     const messages = this.toMessages(tx);
@@ -61,7 +61,7 @@ export abstract class Signer {
     );
 
     const messages = [];
-    const used = tx.raw.inputs.map((_input) => false);
+    const used = tx.raw.inputs.map(() => false);
     for (let i = 0; i < tx.raw.inputs.length; i++) {
       if (used[i]) {
         continue;

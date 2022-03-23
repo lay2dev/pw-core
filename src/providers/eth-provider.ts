@@ -49,31 +49,31 @@ export class EthProvider extends Provider {
   async ensResolver(ens: string): Promise<string> {
     try {
       return await new ENS(window.web3.currentProvider).resolver(ens).addr();
-    } catch (e) {
+    } catch {
       return 'Unknown ENS Name';
     }
+  }
+
+  protected handleResult(result): string {
+    let v = Number.parseInt(result.slice(-2), 16);
+    if (v >= 27) v -= 27;
+    result =
+      '0x' +
+      '5500000010000000550000005500000041000000' + // 20 bytes for RcLockWitnessLock Molecule table. https://bit.ly/3if4CRg
+      result.slice(2, -2) +
+      v.toString(16).padStart(2, '0');
+    return result;
   }
 
   async sign(message: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const from = this.address.addressString;
 
-      const handleResult = (result): string => {
-        let v = Number.parseInt(result.slice(-2), 16);
-        if (v >= 27) v -= 27;
-        result =
-          '0x' +
-          '5500000010000000550000005500000041000000' + // 20 bytes for RcLockWitnessLock Molecule table. https://bit.ly/3if4CRg
-          result.slice(2, -2) +
-          v.toString(16).padStart(2, '0');
-          return result;
-      };
-
       if (typeof window.ethereum !== 'undefined') {
         window.ethereum
           .request({ method: 'personal_sign', params: [from, message] })
           .then((result) => {
-            resolve(handleResult(result));
+            resolve(this.handleResult(result));
           });
       } else if (!!window.web3) {
         window.web3.currentProvider.sendAsync(
@@ -85,7 +85,7 @@ export class EthProvider extends Provider {
             if (result.error) {
               reject(result.error);
             }
-            resolve(handleResult(result.result));
+            resolve(this.handleResult(result.result));
           }
         );
       } else {

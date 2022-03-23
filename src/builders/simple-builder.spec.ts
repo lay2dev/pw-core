@@ -1,10 +1,10 @@
-import anyTest, { TestInterface } from 'ava';
+import anyTest, { TestFn } from 'ava';
 import PWCore, { Address, AddressType, Amount, ChainID } from '..';
 import { SimpleBuilder } from '.';
 import { DummyCollector } from '../collectors/dummy-collector';
 import { DummyProvider } from '../providers/dummy-provider';
 
-const test = anyTest as TestInterface<{ builder: SimpleBuilder }>;
+const test = anyTest as TestFn<{ builder: SimpleBuilder }>;
 
 test.before(async (t) => {
   const address = new Address(
