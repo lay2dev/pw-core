@@ -29,10 +29,10 @@ export class IndexerCollector extends SUDTCollector {
       (cell) => cell.output.type === null
     );
     let balance = Amount.ZERO;
-    cells.forEach((cell) => {
+    for (const cell of cells) {
       const amount = new Amount(cell.output.capacity, AmountUnit.shannon);
       balance = balance.add(amount);
-    });
+    }
     return balance;
   }
 
@@ -75,10 +75,10 @@ export class IndexerCollector extends SUDTCollector {
     };
     const cells = await this.indexer.getCells(searchKey);
     let balance = Amount.ZERO;
-    cells.forEach((cell) => {
+    for (const cell of cells) {
       const amount = Amount.fromUInt128LE(cell.output_data);
       balance = balance.add(amount);
-    });
+    }
     return balance;
   }
 

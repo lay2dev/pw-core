@@ -64,7 +64,7 @@ export declare type Terminator = (
   cell: IndexerCell
 ) => TerminatorResult;
 
-export const DefaultTerminator: Terminator = (_index, _cell) => {
+export const DefaultTerminator: Terminator = () => {
   return { stop: false, push: true };
 };
 
@@ -78,18 +78,20 @@ export class CkbIndexer {
       method,
       params,
     };
-    const res = await axios.post(this.ckbIndexerUrl, data);
-    if (res.status !== 200) {
-      throw new Error(`indexer request failed with HTTP code ${res.status}`);
+    const response = await axios.post(this.ckbIndexerUrl, data);
+    if (response.status !== 200) {
+      throw new Error(
+        `indexer request failed with HTTP code ${response.status}`
+      );
     }
-    if (res.data.error !== undefined) {
+    if (response.data.error !== undefined) {
       throw new Error(
         `indexer request rpc failed with error: ${JSON.stringify(
-          res.data.error
+          response.data.error
         )}`
       );
     }
-    return res.data.result;
+    return response.data.result;
   }
 
   public async getCells(
@@ -104,10 +106,11 @@ export class CkbIndexer {
     let cursor = null;
     let index = 0;
     const params = [searchKey, order, `0x${sizeLimit.toString(16)}`, cursor];
+    // eslint-disable-next-line no-constant-condition
     while (true) {
-      const res = await this.request('get_cells', params);
-      const liveCells = res.objects;
-      cursor = res.lastCursor;
+      const response = await this.request('get_cells', params);
+      const liveCells = response.objects;
+      cursor = response.lastCursor;
       for (const cell of liveCells) {
         const { stop, push } = terminator(index, cell);
         if (push) {

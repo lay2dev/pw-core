@@ -60,7 +60,7 @@ export class Amount {
     }
 
     if (Number.isNaN(amount)) {
-      throw new Error(`amount ${amount} must be a valid number`);
+      throw new TypeError(`amount ${amount} must be a valid number`);
     }
     this.amount = rationalNumberToBnString(amount, decimals);
   }

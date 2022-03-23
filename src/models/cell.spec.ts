@@ -1,4 +1,4 @@
-import anyTest, { TestInterface } from 'ava';
+import anyTest, { TestFn } from 'ava';
 import PWCore, { ChainID } from '../core';
 import { DummyCollector } from '../collectors/dummy-collector';
 import { validators, transformers } from '../ckb-js-toolkit';
@@ -19,7 +19,7 @@ import {
   scriptOccupiedBytes,
 } from '../utils';
 
-const test = anyTest as TestInterface<{ pw: PWCore }>;
+const test = anyTest as TestFn<{ pw: PWCore }>;
 
 const address = new Address(
   'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs',

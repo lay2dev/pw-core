@@ -53,10 +53,10 @@ export class EosProvider extends Provider {
     const network = ScatterJS.Network.fromJson(this.eosNetwork);
     const baseUrl = network.fullhost();
 
-    const res = await axios.post(`${baseUrl}/v1/chain/get_account`, {
+    const response = await axios.post(`${baseUrl}/v1/chain/get_account`, {
       account_name: account,
     });
-    const data = res.data;
+    const data = response.data;
 
     const pubkey = data.permissions[0].required_auth.keys[0].key;
     return pubkey;

@@ -66,5 +66,5 @@ export abstract class Builder {
     return this.fee;
   }
 
-  abstract async build(): Promise<Transaction>;
+  abstract build(): Promise<Transaction>;
 }

@@ -47,11 +47,10 @@ export function getDefaultPrefix(): AddressPrefix {
 }
 
 export class Address {
-
   constructor(
     readonly addressString: string,
     readonly addressType: AddressType,
-    readonly lockArgs: string|null = null
+    readonly lockArgs: string | null = null
   ) {
     // lockArgs generation logic moved to generateLockArgs().
     // This was done in preparation for OmniLock support which could require different data.
@@ -85,29 +84,30 @@ export class Address {
    * Note: String is not prefixed with '0x'.
    */
   generateOmniLockAuthFlag(addressType: AddressType) {
-    switch(addressType) {
+    switch (addressType) {
       case AddressType.ckb:
         return '00';
       case AddressType.eos:
         return '02';
-        case AddressType.eth:
+      case AddressType.eth:
         return '01';
-        case AddressType.tron:
+      case AddressType.tron:
         return '03';
       default:
-        throw new Error(`Unsupported AddressType specified: ${AddressType[addressType]}`);        
+        throw new Error(
+          `Unsupported AddressType specified: ${AddressType[addressType]}`
+        );
     }
   }
 
   /**
    * Generate lockArgs for the appropriate lockType.
-   * 
+   *
    * TODO: Add more sanity checks around edge conditions to help developers with debugging incorrect usage.
    */
-  generateLockArgs(lockType: LockType|null = null) {
+  generateLockArgs(lockType: LockType | null = null) {
     // If lockArgs were provided in the constructor, always return it unmodified.
-    if (this.lockArgs !== null)
-      return this.lockArgs;
+    if (this.lockArgs !== null) return this.lockArgs;
 
     // Generate the base lockArgs. This output is the same that is used with PW-Lock.
     let lockArgs;
@@ -118,18 +118,24 @@ export class Address {
       case AddressType.eos:
         throw new Error('lock args must provided for eos address');
       case AddressType.tron:
-        lockArgs = '0x' + Buffer.from(bs58.decode(this.addressString)).toString('hex', 1, 21);
+        lockArgs =
+          '0x' +
+          Buffer.from(bs58.decode(this.addressString)).toString('hex', 1, 21);
         break;
       case AddressType.ckb:
-        const lock = parseAddress(this.addressString, {config: getLumosConfigByNetworkPrefix(getDefaultPrefix())});
+        const lock = parseAddress(this.addressString, {
+          config: getLumosConfigByNetworkPrefix(getDefaultPrefix()),
+        });
         lockArgs = lock.args;
         break;
       default:
-        throw new Error(`Invalid address type specified: ${AddressType[this.addressType]}`);
+        throw new Error(
+          `Invalid address type specified: ${AddressType[this.addressType]}`
+        );
     }
 
     // Process the lock args based on the lock type.
-    switch(lockType) {
+    switch (lockType) {
       case null:
       case LockType.default:
       case LockType.multisig:
@@ -139,7 +145,9 @@ export class Address {
         return lockArgs;
       case LockType.omni:
         // Omni Lock Specification: https://github.com/XuJiandong/docs-bank/blob/master/omni_lock.md
-        const omniLockauthFlag = this.generateOmniLockAuthFlag(this.addressType); // 1 byte OmniLock Auth Flag
+        const omniLockauthFlag = this.generateOmniLockAuthFlag(
+          this.addressType
+        ); // 1 byte OmniLock Auth Flag
         const omniLockauthContent = lockArgs.replace('0x', ''); // 20 byte OmniLock Auth Content
         const omniLockArgs = this.generateOmniLockArgs(); // 1 byte OmniLock Args
         return `0x${omniLockauthFlag}${omniLockauthContent}${omniLockArgs}`;
@@ -152,17 +160,19 @@ export class Address {
    * Generate a lock script configuration based on the specified lock type.
    */
   generateLockScriptConfig(lockType: LockType) {
-    switch(lockType) {
-      case(LockType.default):
+    switch (lockType) {
+      case LockType.default:
         return PWCore.config.defaultLock.script;
-      case(LockType.multisig):
+      case LockType.multisig:
         return PWCore.config.multiSigLock.script;
-      case(LockType.omni):
+      case LockType.omni:
         return PWCore.config.omniLock.script;
-      case(LockType.pw):
+      case LockType.pw:
         return PWCore.config.pwLock.script;
       default:
-        throw new Error(`Invalid lock type specified: "${LockType[lockType]}".`);
+        throw new Error(
+          `Invalid lock type specified: "${LockType[lockType]}".`
+        );
     }
   }
 
@@ -173,10 +183,10 @@ export class Address {
     const network = ScatterJS.Network.fromJson(networkJSON);
     const baseUrl = network.fullhost();
 
-    const res = await axios.post(`${baseUrl}/v1/chain/get_account`, {
+    const response = await axios.post(`${baseUrl}/v1/chain/get_account`, {
       account_name: account,
     });
-    const data = res.data;
+    const data = response.data;
     const pubkey = data.permissions[0].required_auth.keys[0].key;
 
     const publicKeyHex = ecc.PublicKey(pubkey).toUncompressed().toHex();
@@ -190,9 +200,13 @@ export class Address {
 
   describe() {
     if (this.addressType === AddressType.ckb)
-      return describeAddress(this.addressString, {config: getLumosConfigByNetworkPrefix(getDefaultPrefix())});
+      return describeAddress(this.addressString, {
+        config: getLumosConfigByNetworkPrefix(getDefaultPrefix()),
+      });
     else
-      return describeAddress(this.toCKBAddress(), {config: getLumosConfigByNetworkPrefix(getDefaultPrefix())});
+      return describeAddress(this.toCKBAddress(), {
+        config: getLumosConfigByNetworkPrefix(getDefaultPrefix()),
+      });
   }
 
   /**
@@ -209,13 +223,13 @@ export class Address {
       case AddressType.tron:
         return verifyTronAddress(this.addressString);
       default:
-        throw Error('Invalid address type specified.');
+        throw new Error('Invalid address type specified.');
     }
   }
 
   /**
    * Returns the minimum amount of CKBytes that an address can receive.
-   * 
+   *
    * This function will detect well-known ACP locks, and will return an amount of 1 Shannon if detected.
    * To disable this functionality and force the calculation without ACP pass false. eg: minPaymentAmount(false)
    */
@@ -246,12 +260,16 @@ export class Address {
   /**
    * Generate a CKB address string for the Address.
    */
-  toCKBAddress(addressVersion = NervosAddressVersion.latest, lockType: LockType|null = null): string {
+  toCKBAddress(
+    addressVersion = NervosAddressVersion.latest,
+    lockType: LockType | null = null
+  ): string {
     // Warn when lock type is specified and a CKB address was provided.
-    if (this.addressType === AddressType.ckb && lockType !== null)
-    {
+    if (this.addressType === AddressType.ckb && lockType !== null) {
       lockType = null;
-      console.warn(`LockType should not be specified on toCKBAddress() when AddressType.ckb is used.`);
+      console.warn(
+        `LockType should not be specified on toCKBAddress() when AddressType.ckb is used.`
+      );
     }
 
     return generateCkbAddressString(
@@ -264,17 +282,20 @@ export class Address {
   /**
    * Generate a lock script for the Address.
    */
-  toLockScript(lockType: LockType|null = null): Script {
+  toLockScript(lockType: LockType | null = null): Script {
     // Warn when lock type is specified and a CKB address was provided.
-    if (this.addressType === AddressType.ckb && lockType !== null)
-    {
+    if (this.addressType === AddressType.ckb && lockType !== null) {
       lockType = null;
-      console.warn(`LockType should not be specified on toCKBAddress() when AddressType.ckb is used.`);
+      console.warn(
+        `LockType should not be specified on toCKBAddress() when AddressType.ckb is used.`
+      );
     }
 
     // Handle CKB native address type.
     if (this.addressType === AddressType.ckb) {
-      const lock = parseAddress(this.addressString, {config: getLumosConfigByNetworkPrefix(getDefaultPrefix())});
+      const lock = parseAddress(this.addressString, {
+        config: getLumosConfigByNetworkPrefix(getDefaultPrefix()),
+      });
       return new Script(lock.code_hash, lock.args, HashType[lock.hash_type]);
     }
 
@@ -284,6 +305,10 @@ export class Address {
     // Handle external address types. (ETH, EOS, Tron, etc.)
     const lockScriptConfig = this.generateLockScriptConfig(lockType);
     const lockArgs = this.generateLockArgs(lockType);
-    return new Script(lockScriptConfig.codeHash, lockArgs, lockScriptConfig.hashType);
+    return new Script(
+      lockScriptConfig.codeHash,
+      lockArgs,
+      lockScriptConfig.hashType
+    );
   }
 }

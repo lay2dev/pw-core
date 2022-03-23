@@ -1,5 +1,5 @@
 import { CKBModel, WitnessArgs } from '../interfaces';
-import { ECDSA_WITNESS_LEN } from '../constants';
+// import { ECDSA_WITNESS_LEN } from '../constants';
 import {
   validators,
   normalizers,
@@ -14,10 +14,9 @@ export class Transaction implements CKBModel {
 
   constructor(
     public raw: RawTransaction,
-    public witnessArgs: (WitnessArgs | string)[],
-    _witnessLengths: number[] = [ECDSA_WITNESS_LEN]
+    public witnessArgs: (WitnessArgs | string)[] // _witnessLengths: number[] = [ECDSA_WITNESS_LEN]
   ) {
-    this.witnesses = raw.inputs.map((_) => '0x');
+    this.witnesses = raw.inputs.map(() => '0x');
     // for (let i = 0; i < witnessLengths.length; i++) {
     //   this.witnesses[i] = '0x' + '0'.repeat(witnessLengths[i] - 2);
     // }

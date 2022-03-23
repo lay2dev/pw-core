@@ -58,9 +58,9 @@ export const bnStringToRationalNumber = (
           `value of 'fixed' must be a positive integer`
         );
       }
-      const res = new Decimal(`0.${dec}`).toFixed(options.fixed).split('.');
-      dec = res[1];
-      if (res[0] === '1') {
+      const result = new Decimal(`0.${dec}`).toFixed(options.fixed).split('.');
+      dec = result[1];
+      if (result[0] === '1') {
         int = JSBI.add(JSBI.BigInt(int), JSBI.BigInt(1)).toString();
       }
     } else if (options.pad && dec.length < decimals) {
@@ -296,7 +296,9 @@ export function describeAddress(address: string, { config = LINA } = {}) {
   }
 
   if (prefix !== config.PREFIX)
-    throw Error(`Invalid prefix! Expected: ${config.PREFIX}, actual: ${prefix}`);
+    throw Error(
+      `Invalid prefix! Expected: ${config.PREFIX}, actual: ${prefix}`
+    );
 
   const payloadFormatType = data[0];
   switch (payloadFormatType) {
@@ -309,20 +311,19 @@ export function describeAddress(address: string, { config = LINA } = {}) {
         description: 'Full address using CKB2021 address format.',
       };
     case Number(AddressType.HashIdx): // 0x01 Short version for locks with popular code_hash, deprecated.
-      if (data.length < 2)
-        throw Error(`Invalid payload length!`);
+      if (data.length < 2) throw Error(`Invalid payload length!`);
 
       const shortFormatType = data[1];
 
       let shortFormatTypeDescription;
-      switch(shortFormatType) {
-        case(0):
+      switch (shortFormatType) {
+        case 0:
           shortFormatTypeDescription = 'SECP256K1 + Blake160';
           break;
-        case(1):
+        case 1:
           shortFormatTypeDescription = 'SECP256K1 + MultiSig';
           break;
-        case(2):
+        case 2:
           shortFormatTypeDescription = 'ACP';
           break;
         default:
@@ -342,7 +343,8 @@ export function describeAddress(address: string, { config = LINA } = {}) {
         payloadFormatType,
         shortFormatType: null,
         deprecated: true,
-        description: 'Full address using a hash type of "data" and the pre-2021 address format. (Deprecated.)',
+        description:
+          'Full address using a hash type of "data" and the pre-2021 address format. (Deprecated.)',
       };
     case Number(AddressType.TypeCodeHash): // 0x04 Full version with hash_type = "Type", deprecated.
       return {
@@ -350,7 +352,8 @@ export function describeAddress(address: string, { config = LINA } = {}) {
         payloadFormatType,
         shortFormatType: null,
         deprecated: true,
-        description: 'Full address using a hash type of "data" and the pre-2021 address format. (Deprecated.)',
+        description:
+          'Full address using a hash type of "data" and the pre-2021 address format. (Deprecated.)',
       };
     default:
       throw Error(`Invalid payload format type: ${data[0]}`);
