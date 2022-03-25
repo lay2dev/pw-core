@@ -1,5 +1,6 @@
 import { Provider, Platform } from './provider';
 import { Address, AddressType } from '../models';
+import { Message } from '../signers';
 import ScatterJS from '@scatterjs/core';
 import ScatterEOS from '@scatterjs/eosjs2';
 import ecc from 'eosjs-ecc';
@@ -84,11 +85,11 @@ export class EosProvider extends Provider {
     return str;
   }
 
-  async sign(message: string): Promise<string> {
+  async sign(message: Message): Promise<string> {
     const pubkey = await this.getEosPublicKey(this.address.addressString);
     const sig = await window.scatter.getArbitrarySignature(
       pubkey,
-      this.processEosHash(message)
+      this.processEosHash(message.message)
     );
 
     const sigHex = ecc.Signature.from(sig).toHex().replace('0x', '');

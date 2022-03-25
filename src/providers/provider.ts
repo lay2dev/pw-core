@@ -1,5 +1,6 @@
 import { Address } from '../models';
 import { Blake2bHasher, Hasher } from '../hashers';
+import { Message } from '../signers';
 
 export enum Platform {
   ckb = 0,
@@ -27,7 +28,7 @@ export abstract class Provider {
 
   abstract init(): Promise<Provider>;
 
-  abstract sign(message: string): Promise<string>;
+  abstract sign(message: Message): Promise<string>;
 
   abstract close();
 }
