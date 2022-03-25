@@ -1,5 +1,5 @@
 import { Collector } from '../collectors/collector';
-import { Amount, AmountUnit, Transaction } from '../models';
+import { Amount, AmountUnit, Transaction, Script } from '../models';
 import { WitnessArgs } from '../interfaces';
 import PWCore, { ChainID } from '..';
 import { SUDTCollector } from '../collectors/sudt-collector';
@@ -52,15 +52,47 @@ export abstract class Builder {
     return new Amount(fee.toString(), AmountUnit.shannon);
   }
 
+  // TODO: Need more lock support here.
+  static determineWitnessArgs(lockScript: Script): WitnessArgs {
+    if (
+      lockScript.codeHash === PWCore.config.defaultLock.script.codeHash &&
+      lockScript.hashType === PWCore.config.defaultLock.script.hashType
+    )
+      return Builder.WITNESS_ARGS.Secp256k1;
+    else if (
+      lockScript.codeHash === PWCore.config.pwLock.script.codeHash &&
+      lockScript.hashType === PWCore.config.pwLock.script.hashType
+    )
+      return PWCore.chainId === ChainID.ckb
+        ? Builder.WITNESS_ARGS.Secp256k1
+        : Builder.WITNESS_ARGS.Secp256k1Pw;
+    else if (
+      Object.prototype.hasOwnProperty.call(PWCore.config, 'omniLock') &&
+      lockScript.codeHash === PWCore.config.omniLock.script.codeHash &&
+      lockScript.hashType === PWCore.config.omniLock.script.hashType
+    )
+      return Builder.WITNESS_ARGS.Secp256k1Omni;
+    else
+      throw new Error(
+        'A lock script was specified that has not been implemented.'
+      );
+  }
+
   protected fee: Amount;
 
   protected constructor(
     protected feeRate: number = Builder.MIN_FEE_RATE,
     protected collector: Collector | SUDTCollector = PWCore.defaultCollector,
-    protected witnessArgs: WitnessArgs = PWCore.chainId === ChainID.ckb
-      ? Builder.WITNESS_ARGS.Secp256k1
-      : Builder.WITNESS_ARGS.Secp256k1Pw
+    protected witnessArgs: WitnessArgs | null = null
   ) {}
+
+  // Set the witness args based on the provided lock script.
+  calculateWitnessArgs(lockScript: Script) {
+    // If witness args were provided in the options, then do not change them.
+    if (this.witnessArgs !== null) return;
+
+    this.witnessArgs = Builder.determineWitnessArgs(lockScript);
+  }
 
   getFee(): Amount {
     return this.fee;

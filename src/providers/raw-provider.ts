@@ -8,6 +8,7 @@ import { Blake2bHasher, Hasher } from '../hashers';
 import { Message } from '../signers';
 import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair';
 
+// TODO: Add support to specify Platform in the constructor.
 export class RawProvider extends Provider {
   protected keyPair: ECPair;
   constructor(protected privateKey: string) {
