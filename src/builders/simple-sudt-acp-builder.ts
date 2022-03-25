@@ -164,6 +164,10 @@ export class SimpleSUDTACPBuilder extends Builder {
       PWCore.config.omniLock.cellDep,
       PWCore.config.sudtType.cellDep,
     ];
+
+    // Set the witness args based on the current lock script.
+    this.calculateWitnessArgs(PWCore.provider.address.toLockScript());
+
     const tx = new Transaction(
       new RawTransaction(inputCells, outputCells, sudtCellDeps),
       [this.witnessArgs]
