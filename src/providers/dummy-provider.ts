@@ -1,9 +1,10 @@
 import { Provider, Platform } from './provider';
 import { Address, AddressType } from '../models';
+import { Message } from '../signers';
 
 export class DummyProvider extends Provider {
-  sign(message: string): Promise<string> {
-    console.log('message', message);
+  sign(message: Message): Promise<string> {
+    console.log('message', message.message);
     throw new Error('Method not implemented.');
   }
   constructor(platform: Platform = Platform.eth) {

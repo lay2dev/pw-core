@@ -20,7 +20,7 @@ export class DefaultSigner extends Signer {
       const lockHash = this.provider.address.toLockScript(lockType).toHash();
 
       if (lockHash === message.lock.toHash()) {
-        sigs.push(await this.provider.sign(message.message));
+        sigs.push(await this.provider.sign(message));
       } else {
         sigs.push('0x');
       }

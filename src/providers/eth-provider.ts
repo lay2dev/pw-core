@@ -1,5 +1,6 @@
 import { Provider, Platform } from './provider';
 import { Address, AddressType } from '../models';
+import { Message } from '../signers';
 import ENS from 'ethereum-ens';
 
 export class EthProvider extends Provider {
@@ -65,19 +66,19 @@ export class EthProvider extends Provider {
     return result;
   }
 
-  async sign(message: string): Promise<string> {
+  async sign(message: Message): Promise<string> {
     return new Promise((resolve, reject) => {
       const from = this.address.addressString;
 
       if (typeof window.ethereum !== 'undefined') {
         window.ethereum
-          .request({ method: 'personal_sign', params: [from, message] })
+          .request({ method: 'personal_sign', params: [from, message.message] })
           .then((result) => {
             resolve(this.handleResult(result));
           });
       } else if (!!window.web3) {
         window.web3.currentProvider.sendAsync(
-          { method: 'personal_sign', params: [message, from], from },
+          { method: 'personal_sign', params: [message.message, from], from },
           (err, result) => {
             if (err) {
               reject(err);

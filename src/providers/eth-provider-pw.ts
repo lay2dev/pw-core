@@ -3,6 +3,7 @@ import { Address, AddressType } from '../models';
 import ENS from 'ethereum-ens';
 import { Hasher, Keccak256Hasher } from '../hashers';
 import PWCore, { ChainID } from '../core';
+import { Message } from '../signers';
 
 export class EthProviderPw extends Provider {
   onAddressChanged: (newAddress: Address) => void;
@@ -69,19 +70,19 @@ export class EthProviderPw extends Provider {
     return result;
   }
 
-  async sign(message: string): Promise<string> {
+  async sign(message: Message): Promise<string> {
     return new Promise((resolve, reject) => {
       const from = this.address.addressString;
 
       if (typeof window.ethereum !== 'undefined') {
         window.ethereum
-          .request({ method: 'personal_sign', params: [from, message] })
+          .request({ method: 'personal_sign', params: [from, message.message] })
           .then((result) => {
             resolve(this.handleResult(result));
           });
       } else if (!!window.web3) {
         window.web3.currentProvider.sendAsync(
-          { method: 'personal_sign', params: [message, from], from },
+          { method: 'personal_sign', params: [message.message, from], from },
           (err, result) => {
             if (err) {
               reject(err);

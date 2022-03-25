@@ -1,5 +1,6 @@
 import { Provider, Platform } from './provider';
 import { Address, AddressType } from '../models';
+import { Message } from '../signers';
 
 export class TronProvider extends Provider {
   onAddressChanged: (newAddress: Address) => void;
@@ -30,8 +31,8 @@ export class TronProvider extends Provider {
     }
   }
 
-  async sign(message: string): Promise<string> {
-    let result = await window.tronWeb.trx.sign(message);
+  async sign(message: Message): Promise<string> {
+    let result = await window.tronWeb.trx.sign(message.message);
     let v = Number.parseInt(result.slice(-2), 16);
     if (v >= 27) v -= 27;
     result =

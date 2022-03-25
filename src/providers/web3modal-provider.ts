@@ -3,6 +3,7 @@ import { Address, AddressType } from '../models';
 import ENS from 'ethereum-ens';
 import { verifyEthAddress } from '../utils';
 import PWCore, { ChainID } from '../core';
+import { Message } from '../signers';
 
 export class Web3ModalProvider extends Provider {
   onAddressChanged: (newAddress: Address) => void;
@@ -45,9 +46,9 @@ export class Web3ModalProvider extends Provider {
     }
   }
 
-  async sign(message: string): Promise<string> {
+  async sign(message: Message): Promise<string> {
     let result = await this.web3.eth.personal.sign(
-      message,
+      message.message,
       this.address.addressString,
       null
     );
