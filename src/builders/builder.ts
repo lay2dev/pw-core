@@ -15,7 +15,7 @@ export interface BuilderOption {
 
 export abstract class Builder {
   static readonly MIN_FEE_RATE = 1000;
-  static readonly MIN_CHANGE = new Amount('61', AmountUnit.ckb);
+  static readonly MIN_CHANGE = new Amount('61', AmountUnit.ckb); // TODO: This will be wrong for some change addresses and should be calculated in real time.
   static readonly WITNESS_ARGS = {
     Secp256k1Pw: {
       lock: '0x' + '0'.repeat(132),

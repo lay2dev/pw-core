@@ -54,6 +54,7 @@
     "@nervosnetwork/ckb-sdk-utils": "0.102.3",
     "@scatterjs/core": "^2.7.54",
     "@scatterjs/eosjs2": "^1.5.36",
+    "arraybuffer-to-buffer": "^0.0.7",
     "axios": "^0.26.1",
     "bech32": "2.0.0",
     "blake2b": "^2.1.4",
@@ -62,6 +63,7 @@
     "decimal.js": "^10.3.1",
     "eosjs-ecc": "^4.0.7",
     "ethereum-ens": "^0.8.0",
+    "ethereumjs-wallet": "^1.0.2",
     "jsbi": "^4.2.0",
     "keccak": "^3.0.2"
   },
