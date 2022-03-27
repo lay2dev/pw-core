@@ -1,5 +1,4 @@
 import { Signer, Message } from './signer';
-import { Keccak256Hasher } from '../hashers';
 import { Platform } from '../providers';
 import PWCore, { ChainID } from '../core';
 // import {
@@ -39,7 +38,7 @@ export class EthSigner extends Signer {
   currentPlatform: Platform;
 
   constructor(public readonly from: string) {
-    super(new Keccak256Hasher());
+    super();
     this.currentPlatform = Platform.eth;
   }
 

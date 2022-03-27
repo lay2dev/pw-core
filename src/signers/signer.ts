@@ -1,11 +1,11 @@
 import { Transaction, WitnessArgs } from '..';
-import { Hasher, Blake2bHasher } from '../hashers';
+import { Hasher, Blake2bHasher, Keccak256Hasher } from '../hashers';
 import { normalizers, Reader, transformers } from '../ckb-js-toolkit';
 import {
   SerializeWitnessArgs,
   SerializeRawTransaction,
 } from '../ckb-lumos/core';
-import { Script } from '../models';
+import { Script, LockType } from '../models';
 
 export interface Message {
   index: number;
@@ -14,8 +14,6 @@ export interface Message {
 }
 
 export abstract class Signer {
-  protected constructor(private readonly hasher: Hasher) {}
-
   protected abstract signMessages(messages: Message[]): Promise<string[]>;
 
   async sign(tx: Transaction): Promise<Transaction> {
@@ -41,6 +39,12 @@ export abstract class Signer {
     tx = FillSignedWitnesses(tx, messages, witnesses);
 
     return tx;
+  }
+
+  protected initHasher(lockScript: Script): Hasher {
+    if (lockScript.identifyLockType() === LockType.pw)
+      return new Keccak256Hasher();
+    else return new Blake2bHasher();
   }
 
   public toMessages(tx: Transaction): Message[] {
@@ -72,10 +76,11 @@ export abstract class Signer {
         );
       }
       used[i] = true;
-      this.hasher.update(txHash.toArrayBuffer());
+      const hasher = this.initHasher(tx.raw.inputCells[i].lock);
+      hasher.update(txHash.toArrayBuffer());
       const firstWitness = new Reader(tx.witnesses[i]);
-      this.hasher.update(serializeBigInt(firstWitness.length()));
-      this.hasher.update(firstWitness.toArrayBuffer());
+      hasher.update(serializeBigInt(firstWitness.length()));
+      hasher.update(firstWitness.toArrayBuffer());
       for (
         let j = i + 1;
         j < tx.raw.inputs.length && j < tx.witnesses.length;
@@ -84,17 +89,17 @@ export abstract class Signer {
         if (tx.raw.inputCells[i].lock.sameWith(tx.raw.inputCells[j].lock)) {
           used[j] = true;
           const currentWitness = new Reader(tx.witnesses[j]);
-          this.hasher.update(serializeBigInt(currentWitness.length()));
-          this.hasher.update(currentWitness.toArrayBuffer());
+          hasher.update(serializeBigInt(currentWitness.length()));
+          hasher.update(currentWitness.toArrayBuffer());
         }
       }
       messages.push({
         index: i,
-        message: this.hasher.digest().serializeJson(), // hex string
+        message: hasher.digest().serializeJson(), // hex string
         lock: tx.raw.inputCells[i].lock,
       });
 
-      this.hasher.reset();
+      hasher.reset();
     }
 
     return messages;

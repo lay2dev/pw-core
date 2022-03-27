@@ -79,18 +79,25 @@ export abstract class Builder {
   }
 
   protected fee: Amount;
+  protected witnessArgsFixed = false;
 
   protected constructor(
     protected feeRate: number = Builder.MIN_FEE_RATE,
     protected collector: Collector | SUDTCollector = PWCore.defaultCollector,
     protected witnessArgs: WitnessArgs | null = null
-  ) {}
+  ) {
+    if (this.witnessArgs !== null) this.witnessArgsFixed = true;
+  }
 
   // Set the witness args based on the provided lock script.
   calculateWitnessArgs(lockScript: Script) {
     // If witness args were provided in the options, then do not change them.
-    if (this.witnessArgs !== null) return;
-
+    if (this.witnessArgsFixed) {
+      console.warn(
+        `calculateWitnessArgs() cannot be used when witnessArgs was specified in the constructor.`
+      );
+      return;
+    }
     this.witnessArgs = Builder.determineWitnessArgs(lockScript);
   }
 
