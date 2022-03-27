@@ -1,9 +1,8 @@
+import PWCore, { ChainID } from '../core';
 import { Provider, Platform } from './provider';
 import { Address, AddressType } from '../models';
-import ENS from 'ethereum-ens';
-import { Hasher, Keccak256Hasher } from '../hashers';
-import PWCore, { ChainID } from '../core';
 import { Message } from '../signers';
+import ENS from 'ethereum-ens';
 
 export class EthProviderPw extends Provider {
   onAddressChanged: (newAddress: Address) => void;
@@ -101,10 +100,6 @@ export class EthProviderPw extends Provider {
         );
       }
     });
-  }
-
-  hasher(): Hasher {
-    return new Keccak256Hasher();
   }
 
   async close() {

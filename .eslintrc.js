@@ -13,6 +13,7 @@ module.exports = {
         "no-extra-boolean-cast": "off",
         "no-shadow": "off",
         "no-use-before-define": "off",
+        // "@typescript-eslint/ban-ts-comment": "off",
         "@typescript-eslint/no-shadow": "error",
         "@typescript-eslint/no-use-before-define": "off",
         "@typescript-eslint/no-explicit-any": "off",

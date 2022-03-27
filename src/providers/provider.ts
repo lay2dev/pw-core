@@ -1,5 +1,4 @@
 import { Address } from '../models';
-import { Blake2bHasher, Hasher } from '../hashers';
 import { Message } from '../signers';
 
 export enum Platform {
@@ -20,10 +19,6 @@ export abstract class Provider {
   }
   set address(value: Address) {
     this._address = value;
-  }
-
-  hasher(): Hasher {
-    return new Blake2bHasher();
   }
 
   abstract init(): Promise<Provider>;
