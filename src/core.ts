@@ -163,8 +163,8 @@ export default class PWCore {
     options?: SimpleSUDTBuilderOptions
   ): Promise<string> {
     const builder = createAcp
-      ? new SimpleSUDTBuilder(sudt, address, amount, options)
-      : new SimpleSUDTACPBuilder(sudt, address, amount, options);
+      ? new SimpleSUDTACPBuilder(sudt, address, amount, options)
+      : new SimpleSUDTBuilder(sudt, address, amount, options);
 
     return this.sendTransaction(builder, signer);
   }
