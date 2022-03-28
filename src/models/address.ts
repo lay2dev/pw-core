@@ -33,6 +33,7 @@ export enum AddressType {
   // doge,
 }
 
+// TODO: Add ACP to this list.
 export enum LockType {
   default,
   multisig,

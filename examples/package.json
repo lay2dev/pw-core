@@ -1,0 +1,16 @@
+{
+  "name": "examples",
+  "version": "0.0.1",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "clean": "rm ./public/*.js",
+    "build": "tsc"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@lay2/pw-core": "file:..",
+    "ckb-js-toolkit": "^0.10.2",
+    "typescript": "^4.6.3"
+  }
+}
