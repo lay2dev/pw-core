@@ -69,6 +69,9 @@ export class SimpleACPBuilder extends Builder {
       PWCore.provider.address.toLockScript()
     );
 
+    // Set the witness args based on the current lock script.
+    this.calculateWitnessArgs(PWCore.provider.address.toLockScript());
+
     const tx = new Transaction(
       new RawTransaction(
         [...inputCells, this.receiverInputCell],
