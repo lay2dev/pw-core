@@ -13,3 +13,5 @@ coverage
 
 package-lock.json
 yarn.lock
+
+examples/**/*.js

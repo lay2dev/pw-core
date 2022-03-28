@@ -24,60 +24,58 @@ $ yarn add @lay2/pw-core
 
 Let's see how to send CKB with pw-core.
 
-```javascript
-import PWCore, {
-  EthProvider,
-  PwCollector,
-  ChainID,
-  Address,
-  Amount,
-  AddressType,
-} from '@lay2/pw-core';
+```typescript
+import PWCore, {Address, Amount, AddressType, EthProvider, IndexerCollector} from '@lay2/pw-core';
 
-// insdie an async scope
+const CKB_NODE_RPC_URL = 'https://testnet.ckb.dev/rpc';
+const CKB_INDEXER_RPC_URL = 'https://testnet.ckb.dev/indexer';
+const ETH_ADDRESS = '0x26C5F390FF2033CbB44377361c63A3Dd2DE3121d';
 
-const pwcore = await new PWCore('https://ckb-node-url').init(
-  new EthProvider(), // a built-in Provider for Ethereum env.
-  new PwCollector() // a custom Collector to retrive cells from cache server.
-);
+(async function main()
+{
+    const provider = new EthProvider(); // A built-in Provider for Ethereum wallets like MetaMask.
+    const collector = new IndexerCollector(CKB_INDEXER_RPC_URL); // A Collector to retrive cells from the CKB Indexer RPC.
+    const pwcore = await new PWCore(CKB_NODE_RPC_URL).init(provider, collector);
 
-const txHash = await pwcore.send(
-  new Address('0x26C5F390FF2033CbB44377361c63A3Dd2DE3121d', AddressType.eth),
-  new Amount('100')
-);
+    const destinationAddress = new Address(ETH_ADDRESS, AddressType.eth);
+    const sendAmount = new Amount('100');
+    const txHash = await pwcore.send(destinationAddress, sendAmount);
+})();
+
+// Note: This code is for demonstration purposes and will only properly execute 
+// when added to a web project and run in a browser with MetaMask installed.
 ```
 
 That's it! If CKB transaction (with Ethereum wallets, e.g. MetaMask) is the only thing you need, you can already start your integration with pw-core.
 
-You can also use it in backend scenarios with `RawProvider` and `IndexerCollector`.
+You can also use it in backend scenarios with `RawProvider`.
 
-```javascript
-import PWCore, {
-  ChainID,
-  Address,
-  Amount,
-  AddressType,
-  IndexerCollector,
-  RawProvider,
-  Builder,
-} from '@lay2/pw-core';
+```typescript
+import PWCore, {Address, Amount, AddressType, IndexerCollector, RawProvider} from '@lay2/pw-core';
 
-const provider = new RawProvider('your-private-key');
-const collector = new IndexerCollector('https://ckb-indexer-url');
-const pwcore = await new PWCore('https://ckb-node-url').init(
-  provider,
-  collector
-);
+const CKB_NODE_RPC_URL = 'https://testnet.ckb.dev/rpc';
+const CKB_INDEXER_RPC_URL = 'https://testnet.ckb.dev/indexer';
 
-const options = { witnessArgs: Builder.WITNESS_ARGS.RawSecp256k1 };
-const txHash = await pwcore.send(
-  new Address('0x26C5F390FF2033CbB44377361c63A3Dd2DE3121d', AddressType.eth),
-  new Amount('100'),
-  options
-);
+const PRIVATE_KEY = '0xcd708059624d8301382972808b3e504b5ea3d94e210edf229f48cadcb8fe0989';
+const ETH_ADDRESS = '0x26C5F390FF2033CbB44377361c63A3Dd2DE3121d';
+
+(async function main()
+{
+    const provider = new RawProvider(PRIVATE_KEY); // A built-in Provider for raw private keys. This can be replaced with wallet providers like EthProvider.
+    const collector = new IndexerCollector(CKB_INDEXER_RPC_URL); // A Collector to retrive cells from the CKB Indexer RPC.
+    const pwcore = await new PWCore(CKB_NODE_RPC_URL).init(provider, collector);
+
+    const destinationAddress = new Address(ETH_ADDRESS, AddressType.eth);
+    const sendAmount = new Amount('100');
+    const txHash = await pwcore.send(destinationAddress, sendAmount);
+})();
 ```
 
-### One Step Further
+## Examples
+
+Check out our [Examples](examples/README.md) page for many common use scenarios.
+
+## One Step Further
 
 However, if you need more features, such as adding multiple outputs, setting data, or adding custom lock/type scripts, you can always implement you own builder extends the `Builder` class. If you have more requirements with retriving unspent cells, a custom cell collector based on `Collector` is a good choice. The same approach applies to `Signer` / `Hasher` / `Provider`. In fact, you will find that almost every aspect of buiding a transaction can be customized to meet your demands. This is because we have well encapsulated the transaction process as **build -> sign -> send**, and any kind of transaction can be created and sent given a builder and a signer. For example, the basic `send` method used in the Hello World example is implented like this:
 
