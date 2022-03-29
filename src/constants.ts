@@ -96,6 +96,20 @@ export const CHAIN_SPECS = {
         HashType.type
       ),
     },
+    acpLock: {
+      cellDep: new CellDep(
+        DepType.depGroup,
+        new OutPoint(
+          '0x4153a2014952d7cac45f285ce9a7c5c0c0e1b21f2d378b82ac1433cb11c25c4d',
+          '0x0'
+        )
+      ),
+      script: new Script(
+        '0xd369597ff47f29fbc0d47d2e3775370d1250b85140c670e4718af712983a2354',
+        '0x',
+        HashType.type
+      ),
+    },
     acpLockList: [
       new Script(
         '0xbf43c3602455798c1a61a596e0d95278864c552fafe231c063b3fabf97a8febc',
@@ -201,6 +215,20 @@ export const CHAIN_SPECS = {
       ),
       script: new Script(
         '0x79f90bb5e892d80dd213439eeab551120eb417678824f282b4ffb5f21bad2e1e',
+        '0x',
+        HashType.type
+      ),
+    },
+    acpLock: {
+      cellDep: new CellDep(
+        DepType.code,
+        new OutPoint(
+          '0xec26b0f85ed839ece5f11c4c4e837ec359f5adc4420410f6453b1f6b60fb96a6',
+          '0x0'
+        )
+      ),
+      script: new Script(
+        '0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356',
         '0x',
         HashType.type
       ),

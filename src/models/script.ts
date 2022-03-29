@@ -22,21 +22,35 @@ export class Script implements CKBModel {
 
   identifyLockType(): LockType | null {
     for (const config of Object.values(CHAIN_SPECS)) {
+      // Default Lock
       if (this.sameCodeTypeWith(config.defaultLock.script)) {
         return LockType.default;
-      } else if (this.sameCodeTypeWith(config.multiSigLock.script)) {
+      }
+      // MultiSig Lock
+      else if (this.sameCodeTypeWith(config.multiSigLock.script)) {
         return LockType.multisig;
-      } else if (this.sameCodeTypeWith(config.pwLock.script)) {
+      }
+      // PW-Lock
+      else if (this.sameCodeTypeWith(config.pwLock.script)) {
         return LockType.pw;
-      } else if (
+      }
+      // Omni Lock
+      else if (
         Object.prototype.hasOwnProperty.call(config, 'omniLock') &&
         this.sameCodeTypeWith((config as any).omniLock.script)
       ) {
         return LockType.omni;
       }
+      // ACP Lock
+      else if (
+        Object.prototype.hasOwnProperty.call(config, 'acpLock') &&
+        this.sameCodeTypeWith((config as any).acpLock.script)
+      ) {
+        return LockType.acp;
+      }
     }
 
-    // No match was found.
+    // No match was found. Unknown Lock.
     return null;
   }
 
