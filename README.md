@@ -328,6 +328,10 @@ It's easy to findout that both inputs and outputs are Array of cells, and the lo
 
 You can find a detailed [API Document Here](https://docs.lay2.dev).
 
+## Upgrading to Support CKB2021
+
+The CKB2021 hard fork will occur in May, 2022. In order to fully support the hard fork, PW-Core must be updated to the newest version which contains several changes that may be incompatible with previous version. Please see [this guide](./ckb2021.md) for a list of the changes that need to be made during the update.
+
 ## Get Involved
 
 Currently pw-core is still at a very early stage, and all kinds of suggestions and bug reports are very much welcomed. Feel free to open an issue, or join our [Discord](https://discord.gg/ZuFQGCx) server to talk directly to us. And of couse, a **star** is very much appreciated :).
