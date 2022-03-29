@@ -1,6 +1,3 @@
-import { CollectorOptions } from './collector';
-import { SUDTCollector } from './sudt-collector';
-import { Cell, Address, Amount, AmountUnit, SUDT } from '..';
 import {
   CkbIndexer,
   HexString,
@@ -9,6 +6,17 @@ import {
   ScriptType,
   Terminator,
 } from '../helpers/ckb-indexer';
+import { BalanceOptions, CollectorOptions } from './collector';
+import {
+  Cell,
+  Address,
+  AddressType,
+  Amount,
+  AmountUnit,
+  SUDT,
+  LockTypeOmniPw,
+} from '../models';
+import { SUDTCollector } from './sudt-collector';
 
 export class IndexerCollector extends SUDTCollector {
   private indexer: CkbIndexer;
@@ -17,9 +25,18 @@ export class IndexerCollector extends SUDTCollector {
     this.indexer = new CkbIndexer(apiBase);
   }
 
-  async getBalance(address: Address): Promise<Amount> {
+  async getBalance(
+    address: Address,
+    options?: BalanceOptions
+  ): Promise<Amount> {
+    const lockScriptOptions =
+      options && options.lockType && address.addressType !== AddressType.ckb
+        ? (options.lockType as LockTypeOmniPw)
+        : undefined;
     const searchKey = {
-      script: address.toLockScript().serializeJson() as SnakeScript,
+      script: address
+        .toLockScript(lockScriptOptions)
+        .serializeJson() as SnakeScript,
       script_type: ScriptType.lock,
       filter: {
         output_data_len_range: ['0x0', '0x1'] as [HexString, HexString],
@@ -54,8 +71,14 @@ export class IndexerCollector extends SUDTCollector {
         return { stop: false, push: true };
       }
     };
+    const lockScriptOptions =
+      options && options.lockType && address.addressType !== AddressType.ckb
+        ? (options.lockType as LockTypeOmniPw)
+        : undefined;
     const searchKey = {
-      script: address.toLockScript().serializeJson() as SnakeScript,
+      script: address
+        .toLockScript(lockScriptOptions)
+        .serializeJson() as SnakeScript,
       script_type: ScriptType.lock,
       filter: {
         output_data_len_range: ['0x0', '0x1'] as [HexString, HexString],
@@ -65,9 +88,19 @@ export class IndexerCollector extends SUDTCollector {
     return cells.map((cell) => IndexerCellToCell(cell));
   }
 
-  async getSUDTBalance(sudt: SUDT, address: Address): Promise<Amount> {
+  async getSUDTBalance(
+    sudt: SUDT,
+    address: Address,
+    options?: BalanceOptions
+  ): Promise<Amount> {
+    const lockScriptOptions =
+      options && options.lockType && address.addressType !== AddressType.ckb
+        ? (options.lockType as LockTypeOmniPw)
+        : undefined;
     const searchKey = {
-      script: address.toLockScript().serializeJson() as SnakeScript,
+      script: address
+        .toLockScript(lockScriptOptions)
+        .serializeJson() as SnakeScript,
       script_type: ScriptType.lock,
       filter: {
         script: sudt.toTypeScript().serializeJson() as SnakeScript,
@@ -90,8 +123,14 @@ export class IndexerCollector extends SUDTCollector {
     if (!options || !options.neededAmount) {
       throw new Error("'neededAmount' in options must be provided");
     }
+    const lockScriptOptions =
+      options && options.lockType && address.addressType !== AddressType.ckb
+        ? (options.lockType as LockTypeOmniPw)
+        : undefined;
     const searchKey = {
-      script: address.toLockScript().serializeJson() as SnakeScript,
+      script: address
+        .toLockScript(lockScriptOptions)
+        .serializeJson() as SnakeScript,
       script_type: ScriptType.lock,
       filter: {
         script: sudt.toTypeScript().serializeJson() as SnakeScript,

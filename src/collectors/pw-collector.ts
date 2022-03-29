@@ -1,7 +1,15 @@
 import axios from 'axios';
-import { CollectorOptions } from './collector';
+import { BalanceOptions, CollectorOptions } from './collector';
+import {
+  Cell,
+  Address,
+  Amount,
+  AmountUnit,
+  OutPoint,
+  SUDT,
+  LockTypeOmniPw,
+} from '../models';
 import { SUDTCollector } from './sudt-collector';
-import { Cell, Address, Amount, AmountUnit, OutPoint, SUDT } from '..';
 
 export class PwCollector extends SUDTCollector {
   constructor(public apiBase: string) {
@@ -9,10 +17,16 @@ export class PwCollector extends SUDTCollector {
     this.apiBase = apiBase;
   }
 
-  async getBalance(address: Address): Promise<Amount> {
+  async getBalance(
+    address: Address,
+    options?: BalanceOptions
+  ): Promise<Amount> {
+    const lockScriptOptions = options.lockType
+      ? (options.lockType as LockTypeOmniPw)
+      : undefined;
     const result = await axios.get(
       `${this.apiBase}/cell/getCapacityByLockHash?lockHash=${address
-        .toLockScript()
+        .toLockScript(lockScriptOptions)
         .toHash()}`
     );
     return new Amount(result.data.data, AmountUnit.shannon);
@@ -22,24 +36,41 @@ export class PwCollector extends SUDTCollector {
     if (!options || !options.neededAmount) {
       throw new Error("'neededAmount' in options must be provided");
     }
+    const lockScriptOptions = options.lockType
+      ? (options.lockType as LockTypeOmniPw)
+      : undefined;
     const cells: Cell[] = [];
     const result = await axios.get(
       `${this.apiBase}/cell/unSpent?lockHash=${address
-        .toLockScript()
+        .toLockScript(lockScriptOptions)
         .toHash()}&capacity=${options.neededAmount.toHexString()}`
     );
 
     for (let { capacity, outPoint } of result.data.data) {
       capacity = new Amount(capacity, AmountUnit.shannon);
       outPoint = new OutPoint(outPoint.txHash, outPoint.index);
-      cells.push(new Cell(capacity, address.toLockScript(), null, outPoint));
+      cells.push(
+        new Cell(
+          capacity,
+          address.toLockScript(lockScriptOptions),
+          null,
+          outPoint
+        )
+      );
     }
 
     return cells;
   }
 
-  async getSUDTBalance(sudt: SUDT, address: Address): Promise<Amount> {
-    const lockHash = address.toLockScript().toHash();
+  async getSUDTBalance(
+    sudt: SUDT,
+    address: Address,
+    options?: BalanceOptions
+  ): Promise<Amount> {
+    const lockScriptOptions = options.lockType
+      ? (options.lockType as LockTypeOmniPw)
+      : undefined;
+    const lockHash = address.toLockScript(lockScriptOptions).toHash();
     const typeHash = sudt.toTypeScript().toHash();
     const result = await axios.get(
       `${this.apiBase}/sudt/balance?lockHash=${lockHash}&typeHash=${typeHash}`
@@ -56,7 +87,10 @@ export class PwCollector extends SUDTCollector {
       throw new Error("'neededAmount' in options must be provided");
     }
     const cells: Cell[] = [];
-    const lockHash = address.toLockScript().toHash();
+    const lockScriptOptions = options.lockType
+      ? (options.lockType as LockTypeOmniPw)
+      : undefined;
+    const lockHash = address.toLockScript(lockScriptOptions).toHash();
     const typeHash = sudt.toTypeScript().toHash();
 
     const result = await axios.get(
@@ -70,7 +104,13 @@ export class PwCollector extends SUDTCollector {
       capacity = new Amount(capacity, AmountUnit.shannon);
       outPoint = new OutPoint(outPoint.txHash, outPoint.index);
       cells.push(
-        new Cell(capacity, address.toLockScript(), type, outPoint, data)
+        new Cell(
+          capacity,
+          address.toLockScript(lockScriptOptions),
+          type,
+          outPoint,
+          data
+        )
       );
     }
 

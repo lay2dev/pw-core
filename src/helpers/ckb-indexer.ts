@@ -1,12 +1,12 @@
 import axios from 'axios';
+import { HashType } from '../interfaces';
 import {
   Cell,
   Amount,
   AmountUnit,
   OutPoint,
   Script as PwScript,
-  HashType,
-} from '..';
+} from '../models';
 
 export enum ScriptType {
   type = 'type',
