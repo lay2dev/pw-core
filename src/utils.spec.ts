@@ -82,24 +82,28 @@ test('describeAddress() general test', (t) => {
   address = 'ckt1qyqxpayn272n8km2k08hzldynj992egs0waqnr8zjs';
   validData = {
     addressVersion: 'pre2021',
-    deprecated: true,
-    payloadFormatType: 1,
-    shortFormatType: 0,
+    addressVersionCode: 1,
+    payloadFormatType: 'HashIdx',
+    payloadFormatTypeCode: 1,
+    shortFormatType: 'SECP256K1+Blake160',
+    shortFormatTypeCode: 0,
+    deprecated: true
   };
   result = describeAddress(address, { config: LumosConfigs[1] });
-  delete result.description;
   t.deepEqual(result, validData);
 
   // Short address (pre2021) ACP.
   address = 'ckt1qyp260h7pphjhlapmxqhrm7e0nmhujrqqmdqjfln9h';
   validData = {
     addressVersion: 'pre2021',
-    deprecated: true,
-    payloadFormatType: 1,
-    shortFormatType: 2,
+    addressVersionCode: 1,
+    payloadFormatType: 'HashIdx',
+    payloadFormatTypeCode: 1,
+    shortFormatType: 'ACP',
+    shortFormatTypeCode: 2,
+    deprecated: true
   };
   result = describeAddress(address, { config: LumosConfigs[1] });
-  delete result.description;
   t.deepEqual(result, validData);
 
   // Full address (pre2021) hash type "type".
@@ -107,12 +111,14 @@ test('describeAddress() general test', (t) => {
     'ckt1qjda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsc85jdte2v7md2eu7uta5jwg54t9zpam5y9ptgq';
   validData = {
     addressVersion: 'pre2021',
-    deprecated: true,
-    payloadFormatType: 4,
+    addressVersionCode: 1,
+    payloadFormatType: 'TypeCodeHash',
+    payloadFormatTypeCode: 4,
     shortFormatType: null,
+    shortFormatTypeCode: null,
+    deprecated: true
   };
   result = describeAddress(address, { config: LumosConfigs[1] });
-  delete result.description;
   t.deepEqual(result, validData);
 
   // Full address (ckb2021).
@@ -120,11 +126,13 @@ test('describeAddress() general test', (t) => {
     'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtq7jf409fnmd4t8nm30kjfezj4v5g8hwskhal6m';
   validData = {
     addressVersion: 'ckb2021',
-    deprecated: false,
-    payloadFormatType: 0,
+    addressVersionCode: 2,
+    payloadFormatType: 'FullVersion',
+    payloadFormatTypeCode: 0,
     shortFormatType: null,
+    shortFormatTypeCode: null,
+    deprecated: false
   };
   result = describeAddress(address, { config: LumosConfigs[1] });
-  delete result.description;
   t.deepEqual(result, validData);
 });

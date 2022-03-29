@@ -5,7 +5,7 @@ import Decimal from 'decimal.js';
 import {
   AddressPrefix,
   addressToScript,
-  AddressType,
+  AddressType as CkbSdkAddressType,
   scriptToAddress,
 } from '@nervosnetwork/ckb-sdk-utils';
 import {
@@ -14,14 +14,6 @@ import {
 } from './helpers/address';
 
 const BECH32_LIMIT = 1023;
-
-export const shannonToCKB = (
-  shannonAmount: string,
-  options: FormatOptions
-): string => bnStringToRationalNumber(shannonAmount, 8, options);
-
-export const ckbToShannon = (ckbAmount: string): string =>
-  rationalNumberToBnString(ckbAmount, 8);
 
 export const bnStringToRationalNumber = (
   bn: string,
@@ -119,6 +111,14 @@ export const rationalNumberToBnString = (
     decimals - (!!parts[1] ? parts[1].length : 0)
   )}`;
 };
+
+export const shannonToCKB = (
+  shannonAmount: string,
+  options: FormatOptions
+): string => bnStringToRationalNumber(shannonAmount, 8, options);
+
+export const ckbToShannon = (ckbAmount: string): string =>
+  rationalNumberToBnString(ckbAmount, 8);
 
 // from @lumos/helper
 
@@ -300,31 +300,41 @@ export function describeAddress(address: string, { config = LINA } = {}) {
       `Invalid prefix! Expected: ${config.PREFIX}, actual: ${prefix}`
     );
 
-  const payloadFormatType = data[0];
+  // The code below has not been included because compilation errors keep happening.
+  // Upgrading TypeScript might help but this cannot be done at present time.
+  //
+  // Generate a string label for the current lock type.
+  // import { Address, AddressType, LockType } from './models/address';
+  // let lockType = 'unknown';
+  // let lockTypeCode = (new Address(address, AddressType.ckb)).toLockScript().identifyLockType();
+  // if (lockTypeCode !== null) lockType = LockType[lockTypeCode];
+
+  const payloadFormatType = Number(data[0]).toString(16).padStart(4, '0x00');
   switch (payloadFormatType) {
-    case Number(AddressType.FullVersion): // 0x00 Full version identifies the hash_type.
+    case CkbSdkAddressType.FullVersion: // 0x00 Full version identifies the hash_type.
       return {
         addressVersion: NervosAddressVersion[NervosAddressVersion.ckb2021],
-        payloadFormatType,
+        addressVersionCode: NervosAddressVersion.ckb2021,
+        payloadFormatType: 'FullVersion',
+        payloadFormatTypeCode: Number(payloadFormatType),
         shortFormatType: null,
-        deprecated: false,
-        description: 'Full address using CKB2021 address format.',
+        shortFormatTypeCode: null,
+        deprecated: false
       };
-    case Number(AddressType.HashIdx): // 0x01 Short version for locks with popular code_hash, deprecated.
+    case CkbSdkAddressType.HashIdx: // 0x01 Short version for locks with popular code_hash, deprecated.
       if (data.length < 2) throw Error(`Invalid payload length!`);
 
-      const shortFormatType = data[1];
-
-      let shortFormatTypeDescription;
-      switch (shortFormatType) {
+      let shortFormatType;
+      let shortFormatTypeCode = data[1];
+      switch (shortFormatTypeCode) {
         case 0:
-          shortFormatTypeDescription = 'SECP256K1 + Blake160';
+          shortFormatType = 'SECP256K1+Blake160';
           break;
         case 1:
-          shortFormatTypeDescription = 'SECP256K1 + MultiSig';
+          shortFormatType = 'SECP256K1+MultiSig';
           break;
         case 2:
-          shortFormatTypeDescription = 'ACP';
+          shortFormatType = 'ACP';
           break;
         default:
           throw Error(`Invalid short format type!`);
@@ -332,28 +342,32 @@ export function describeAddress(address: string, { config = LINA } = {}) {
 
       return {
         addressVersion: NervosAddressVersion[NervosAddressVersion.pre2021],
-        payloadFormatType,
+        addressVersionCode: NervosAddressVersion.pre2021,
+        payloadFormatType: 'HashIdx',
+        payloadFormatTypeCode: Number(payloadFormatType),
         shortFormatType,
-        deprecated: true,
-        description: `Short address using the ${shortFormatTypeDescription} lock and the pre-2021 address format. (Deprecated.)`,
+        shortFormatTypeCode,
+        deprecated: true
       };
-    case Number(AddressType.DataCodeHash): // 0x02 Full version with hash_type = "Data", deprecated.
+    case CkbSdkAddressType.DataCodeHash: // 0x02 Full version with hash_type = "Data", deprecated.
       return {
         addressVersion: NervosAddressVersion[NervosAddressVersion.pre2021],
-        payloadFormatType,
+        addressVersionCode: NervosAddressVersion.pre2021,
+        payloadFormatType: 'DataCodeHash',
+        payloadFormatTypeCode: Number(payloadFormatType),
         shortFormatType: null,
-        deprecated: true,
-        description:
-          'Full address using a hash type of "data" and the pre-2021 address format. (Deprecated.)',
+        shortFormatTypeCode: null,
+        deprecated: true
       };
-    case Number(AddressType.TypeCodeHash): // 0x04 Full version with hash_type = "Type", deprecated.
+  case CkbSdkAddressType.TypeCodeHash: // 0x04 Full version with hash_type = "Type", deprecated.
       return {
         addressVersion: NervosAddressVersion[NervosAddressVersion.pre2021],
-        payloadFormatType,
+        addressVersionCode: NervosAddressVersion.pre2021,
+        payloadFormatType: 'TypeCodeHash',
+        payloadFormatTypeCode: Number(payloadFormatType),
         shortFormatType: null,
-        deprecated: true,
-        description:
-          'Full address using a hash type of "data" and the pre-2021 address format. (Deprecated.)',
+        shortFormatTypeCode: null,
+        deprecated: true
       };
     default:
       throw Error(`Invalid payload format type: ${data[0]}`);
@@ -382,14 +396,14 @@ export function parseAddress(address: string, { config = LINA } = {}) {
 
   const payloadFormatType = data[0];
   switch (payloadFormatType) {
-    case Number(AddressType.FullVersion): // 0x00 Full version identifies the hash_type.
+    case Number(CkbSdkAddressType.FullVersion): // 0x00 Full version identifies the hash_type.
       const parsedAddress = addressToScript(address);
       return {
         code_hash: parsedAddress.codeHash,
         hash_type: parsedAddress.hashType,
         args: parsedAddress.args,
       };
-    case Number(AddressType.HashIdx): // 0x01 Short version for locks with popular code_hash, deprecated.
+    case Number(CkbSdkAddressType.HashIdx): // 0x01 Short version for locks with popular code_hash, deprecated.
       if (data.length < 2) {
         throw Error(`Invalid payload length!`);
       }
@@ -400,7 +414,7 @@ export function parseAddress(address: string, { config = LINA } = {}) {
         throw Error(`Invalid code hash index: ${data[1]}!`);
       }
       return { ...scriptTemplate.SCRIPT, args: byteArrayToHex(data.slice(2)) };
-    case Number(AddressType.DataCodeHash): // 0x02 Full version with hash_type = "Data", deprecated.
+    case Number(CkbSdkAddressType.DataCodeHash): // 0x02 Full version with hash_type = "Data", deprecated.
       if (data.length < 33) {
         throw Error(`Invalid payload length!`);
       }
@@ -409,7 +423,7 @@ export function parseAddress(address: string, { config = LINA } = {}) {
         hash_type: 'data',
         args: byteArrayToHex(data.slice(33)),
       };
-    case Number(AddressType.TypeCodeHash): // 0x04 Full version with hash_type = "Type", deprecated.
+    case Number(CkbSdkAddressType.TypeCodeHash): // 0x04 Full version with hash_type = "Type", deprecated.
       if (data.length < 33) {
         throw Error(`Invalid payload length!`);
       }
