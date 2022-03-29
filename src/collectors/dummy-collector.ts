@@ -1,5 +1,13 @@
-import { Cell, Address, Amount, OutPoint } from '..';
-import { SUDT } from '../models';
+import { CollectorOptions } from './collector';
+import {
+  Address,
+  AddressType,
+  Amount,
+  Cell,
+  LockTypeOmniPw,
+  OutPoint,
+} from '../models';
+import { SUDT } from '../models/sudt';
 import { SUDTCollector } from './sudt-collector';
 
 export class DummyCollector extends SUDTCollector {
@@ -13,14 +21,21 @@ export class DummyCollector extends SUDTCollector {
     super();
   }
 
-  public async collect(address: Address): Promise<Cell[]> {
+  public async collect(
+    address: Address,
+    options?: CollectorOptions
+  ): Promise<Cell[]> {
     const outPoint = new OutPoint(
       '0x79221866125b9aff33c4303a6c35bde25d235e7e10025a86ca2a5d6ad657f51f',
       '0x0'
     );
+    const lockScriptOptions =
+      options && options.lockType && address.addressType !== AddressType.ckb
+        ? (options.lockType as LockTypeOmniPw)
+        : undefined;
     const cell = new Cell(
       new Amount('1000000'),
-      address.toLockScript(),
+      address.toLockScript(lockScriptOptions),
       null,
       outPoint
     );
@@ -32,14 +47,22 @@ export class DummyCollector extends SUDTCollector {
     throw new Error('Method not implemented.');
   }
 
-  async collectSUDT(sudt: SUDT, address: Address): Promise<Cell[]> {
+  async collectSUDT(
+    sudt: SUDT,
+    address: Address,
+    options?: CollectorOptions
+  ): Promise<Cell[]> {
     const outPoint = new OutPoint(
       '0x79221866125b9aff33c4303a6c35bde25d235e7e10025a86ca2a5d6ad657f51f',
       '0x0'
     );
+    const lockScriptOptions =
+      options && options.lockType && address.addressType !== AddressType.ckb
+        ? (options.lockType as LockTypeOmniPw)
+        : undefined;
     const cell = new Cell(
       new Amount('1000000'),
-      address.toLockScript(),
+      address.toLockScript(lockScriptOptions),
       sudt.toTypeScript(),
       outPoint,
       new Amount('1000').toUInt128LE()

@@ -41,6 +41,8 @@ export enum LockType {
   pw,
 }
 
+export type LockTypeOmniPw = LockType.omni | LockType.pw;
+
 export function getDefaultPrefix(): AddressPrefix {
   return PWCore.chainId === ChainID.ckb
     ? AddressPrefix.Mainnet
@@ -263,7 +265,7 @@ export class Address {
    */
   toCKBAddress(
     addressVersion = NervosAddressVersion.latest,
-    lockType: LockType | null = null
+    lockType: LockTypeOmniPw | null = null
   ): string {
     // Warn when lock type is specified and a CKB address was provided.
     if (this.addressType === AddressType.ckb && lockType !== null) {
@@ -283,12 +285,12 @@ export class Address {
   /**
    * Generate a lock script for the Address.
    */
-  toLockScript(lockType: LockType | null = null): Script {
+  toLockScript(lockType: LockTypeOmniPw | null = null): Script {
     // Warn when lock type is specified and a CKB address was provided.
     if (this.addressType === AddressType.ckb && lockType !== null) {
       lockType = null;
       console.warn(
-        `LockType should not be specified on toCKBAddress() when AddressType.ckb is used.`
+        `LockType should not be specified on toLockScript() when AddressType.ckb is used.`
       );
     }
 
