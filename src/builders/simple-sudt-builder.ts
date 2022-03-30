@@ -184,7 +184,7 @@ export class SimpleSUDTBuilder extends Builder {
     );
 
     if (!unspentCKBCells || unspentCKBCells.length === 0) {
-      throw new Error('no avaiable CKB');
+      throw new Error('no available CKB');
     }
 
     for (const ckbCell of unspentCKBCells) {
