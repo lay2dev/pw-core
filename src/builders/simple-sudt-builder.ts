@@ -9,12 +9,13 @@ import {
   SUDT,
 } from '../models';
 import PWCore, { cellOccupiedBytes } from '..';
-import { SUDTCollector } from '../collectors/sudt-collector';
+import { SUDTCollector, CollectorOptions } from '../collectors/';
 
 export interface SimpleSUDTBuilderOptions extends BuilderOption {
   autoCalculateCapacity?: boolean;
   minimumOutputCellCapacity?: Amount;
   maximumOutputCellCapacity?: Amount;
+  defaultCollectorOptions?: CollectorOptions;
 }
 
 export class SimpleSUDTBuilder extends Builder {
@@ -117,7 +118,7 @@ export class SimpleSUDTBuilder extends Builder {
     const unspentSUDTCells = await this.collector.collectSUDT(
       this.sudt,
       PWCore.provider.address,
-      { neededAmount: this.amount }
+      { ...this.options.defaultCollectorOptions, neededAmount: this.amount }
     );
 
     // build a tx including sender and receiver sudt cell only
@@ -179,7 +180,7 @@ export class SimpleSUDTBuilder extends Builder {
 
     const unspentCKBCells = await this.collector.collect(
       PWCore.provider.address,
-      { neededAmount }
+      { ...this.options.defaultCollectorOptions, neededAmount }
     );
 
     if (!unspentCKBCells || unspentCKBCells.length === 0) {
