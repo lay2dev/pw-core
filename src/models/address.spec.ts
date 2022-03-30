@@ -21,6 +21,18 @@ const ckbAddressStringFull2021 =
 // Interoperability Addresses: ETH
 const ethChainAddress = '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc';
 const ethAddress = new Address(ethChainAddress, AddressType.eth);
+const ethAddressOmni = new Address(
+  ethChainAddress,
+  AddressType.eth,
+  null,
+  LockType.omni
+);
+const ethAddressPw = new Address(
+  ethChainAddress,
+  AddressType.eth,
+  null,
+  LockType.pw
+);
 const ethAddressStringPre2021Pw =
   'ckt1q3vvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdxxvh5ct04panc49rqn6v03mnllv2tv7vmc9kkmjq';
 const ethAddressString2021Pw =
@@ -47,6 +59,18 @@ const eosAddressString2021Omni =
 // Interoperability Addresses: TRON
 const tronChainAddress = 'TNV2p8Zmy5JcZWbtn59Qee8jTdGmCRC6e8'; // Base lockArg: 0x89457bc04dc517b36a63f3ff609e95a28acd9800
 const tronAddress = new Address(tronChainAddress, AddressType.tron);
+const tronAddressOmni = new Address(
+  tronChainAddress,
+  AddressType.tron,
+  null,
+  LockType.omni
+);
+const tronAddressPw = new Address(
+  tronChainAddress,
+  AddressType.tron,
+  null,
+  LockType.pw
+);
 const tronAddressStringPre2021Pw =
   'ckt1q3vvtay34wndv9nckl8hah6fzzcltcqwcrx79apwp2a5lkd07fdx8z2900qym3ghkd4x8ullvz0ftg52ekvqqtyehuu';
 const tronAddressString2021Pw =
@@ -242,6 +266,37 @@ test('toCKBAddress() correctly outputs interoperability addresses when NervosAdd
   );
 });
 
+test('toCKBAddress() correctly outputs interoperability addresses when LockType was specified in the Address() contructor.', (t) => {
+  t.is(ethAddressOmni.toCKBAddress(), ethAddressString2021Omni);
+  t.is(
+    ethAddressOmni.toCKBAddress(null, LockType.omni),
+    ethAddressString2021Omni
+  );
+  t.is(ethAddressOmni.toCKBAddress(null, LockType.pw), ethAddressString2021Pw);
+  t.is(ethAddressPw.toCKBAddress(), ethAddressString2021Pw);
+  t.is(
+    ethAddressPw.toCKBAddress(null, LockType.omni),
+    ethAddressString2021Omni
+  );
+  t.is(ethAddressPw.toCKBAddress(null, LockType.pw), ethAddressString2021Pw);
+
+  t.is(tronAddressOmni.toCKBAddress(), tronAddressString2021Omni);
+  t.is(
+    tronAddressOmni.toCKBAddress(null, LockType.omni),
+    tronAddressString2021Omni
+  );
+  t.is(
+    tronAddressOmni.toCKBAddress(null, LockType.pw),
+    tronAddressString2021Pw
+  );
+  t.is(tronAddressPw.toCKBAddress(), tronAddressString2021Pw);
+  t.is(
+    tronAddressPw.toCKBAddress(null, LockType.omni),
+    tronAddressString2021Omni
+  );
+  t.is(tronAddressPw.toCKBAddress(null, LockType.pw), tronAddressString2021Pw);
+});
+
 // RFC: https://github.com/nervosnetwork/rfcs/pull/239
 test('to ckb2021 mainnet address (Nervos RFC21)', async (t) => {
   PWCore.chainId = ChainID.ckb;
@@ -263,7 +318,7 @@ test('to ckb2021 mainnet address (Nervos RFC21)', async (t) => {
   PWCore.chainId = ChainID.ckb_testnet;
 });
 
-test('to lock script', (t) => {
+test('toLockScript() general test', (t) => {
   t.deepEqual(ckbAddressShortPre2021.toLockScript().serializeJson(), {
     args: '0x60f493579533db6ab3cf717da49c8a5565107bba',
     code_hash: PWCore.config.defaultLock.script.codeHash,
@@ -276,6 +331,20 @@ test('to lock script', (t) => {
     hash_type: PWCore.config.omniLock.script.hashType,
   });
 
+  t.deepEqual(eosAddressOmni.toLockScript().serializeJson(), {
+    args: '0x026f58cadcc89fb31668a60a762ec476e1d094e15b00',
+    code_hash: PWCore.config.omniLock.script.codeHash,
+    hash_type: PWCore.config.omniLock.script.hashType,
+  });
+
+  t.deepEqual(tronAddress.toLockScript().serializeJson(), {
+    args: '0x0389457bc04dc517b36a63f3ff609e95a28acd980000',
+    code_hash: PWCore.config.omniLock.script.codeHash,
+    hash_type: PWCore.config.omniLock.script.hashType,
+  });
+});
+
+test('toLockScript() correctly outputs lock scripts when LockType is specified', (t) => {
   t.deepEqual(ethAddress.toLockScript(LockType.omni).serializeJson(), {
     args: '0x0132f4c2df50f678a94609e98f8ee7ffb14b6799bc00',
     code_hash: PWCore.config.omniLock.script.codeHash,
@@ -286,12 +355,6 @@ test('to lock script', (t) => {
     args: '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc',
     code_hash: PWCore.config.pwLock.script.codeHash,
     hash_type: PWCore.config.pwLock.script.hashType,
-  });
-
-  t.deepEqual(eosAddressOmni.toLockScript().serializeJson(), {
-    args: '0x026f58cadcc89fb31668a60a762ec476e1d094e15b00',
-    code_hash: PWCore.config.omniLock.script.codeHash,
-    hash_type: PWCore.config.omniLock.script.hashType,
   });
 
   t.deepEqual(eosAddressOmni.toLockScript(LockType.omni).serializeJson(), {
@@ -306,12 +369,6 @@ test('to lock script', (t) => {
     hash_type: PWCore.config.pwLock.script.hashType,
   });
 
-  t.deepEqual(tronAddress.toLockScript().serializeJson(), {
-    args: '0x0389457bc04dc517b36a63f3ff609e95a28acd980000',
-    code_hash: PWCore.config.omniLock.script.codeHash,
-    hash_type: PWCore.config.omniLock.script.hashType,
-  });
-
   t.deepEqual(tronAddress.toLockScript(LockType.omni).serializeJson(), {
     args: '0x0389457bc04dc517b36a63f3ff609e95a28acd980000',
     code_hash: PWCore.config.omniLock.script.codeHash,
@@ -319,6 +376,80 @@ test('to lock script', (t) => {
   });
 
   t.deepEqual(tronAddress.toLockScript(LockType.pw).serializeJson(), {
+    args: '0x89457bc04dc517b36a63f3ff609e95a28acd9800',
+    code_hash: PWCore.config.pwLock.script.codeHash,
+    hash_type: PWCore.config.pwLock.script.hashType,
+  });
+});
+
+test('toLockScript() correctly outputs lock scripts when LockType is specified in the constructor', (t) => {
+  t.deepEqual(ethAddressOmni.toLockScript().serializeJson(), {
+    args: '0x0132f4c2df50f678a94609e98f8ee7ffb14b6799bc00',
+    code_hash: PWCore.config.omniLock.script.codeHash,
+    hash_type: PWCore.config.omniLock.script.hashType,
+  });
+
+  t.deepEqual(ethAddressOmni.toLockScript(LockType.omni).serializeJson(), {
+    args: '0x0132f4c2df50f678a94609e98f8ee7ffb14b6799bc00',
+    code_hash: PWCore.config.omniLock.script.codeHash,
+    hash_type: PWCore.config.omniLock.script.hashType,
+  });
+
+  t.deepEqual(ethAddressOmni.toLockScript(LockType.pw).serializeJson(), {
+    args: '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc',
+    code_hash: PWCore.config.pwLock.script.codeHash,
+    hash_type: PWCore.config.pwLock.script.hashType,
+  });
+
+  t.deepEqual(ethAddressPw.toLockScript().serializeJson(), {
+    args: '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc',
+    code_hash: PWCore.config.pwLock.script.codeHash,
+    hash_type: PWCore.config.pwLock.script.hashType,
+  });
+
+  t.deepEqual(ethAddressPw.toLockScript(LockType.omni).serializeJson(), {
+    args: '0x0132f4c2df50f678a94609e98f8ee7ffb14b6799bc00',
+    code_hash: PWCore.config.omniLock.script.codeHash,
+    hash_type: PWCore.config.omniLock.script.hashType,
+  });
+
+  t.deepEqual(ethAddressPw.toLockScript(LockType.pw).serializeJson(), {
+    args: '0x32f4c2df50f678a94609e98f8ee7ffb14b6799bc',
+    code_hash: PWCore.config.pwLock.script.codeHash,
+    hash_type: PWCore.config.pwLock.script.hashType,
+  });
+
+  t.deepEqual(tronAddressOmni.toLockScript().serializeJson(), {
+    args: '0x0389457bc04dc517b36a63f3ff609e95a28acd980000',
+    code_hash: PWCore.config.omniLock.script.codeHash,
+    hash_type: PWCore.config.omniLock.script.hashType,
+  });
+
+  t.deepEqual(tronAddressOmni.toLockScript(LockType.omni).serializeJson(), {
+    args: '0x0389457bc04dc517b36a63f3ff609e95a28acd980000',
+    code_hash: PWCore.config.omniLock.script.codeHash,
+    hash_type: PWCore.config.omniLock.script.hashType,
+  });
+
+  t.deepEqual(tronAddressOmni.toLockScript(LockType.pw).serializeJson(), {
+    args: '0x89457bc04dc517b36a63f3ff609e95a28acd9800',
+    code_hash: PWCore.config.pwLock.script.codeHash,
+    hash_type: PWCore.config.pwLock.script.hashType,
+  });
+
+  t.deepEqual(tronAddressPw.toLockScript().serializeJson(), {
+    args: '0x89457bc04dc517b36a63f3ff609e95a28acd9800',
+    code_hash: PWCore.config.pwLock.script.codeHash,
+    hash_type: PWCore.config.pwLock.script.hashType,
+  });
+
+  t.deepEqual(tronAddressPw.toLockScript(LockType.omni).serializeJson(), {
+    args: '0x0389457bc04dc517b36a63f3ff609e95a28acd980000',
+    code_hash: PWCore.config.omniLock.script.codeHash,
+    hash_type: PWCore.config.omniLock.script.hashType,
+  });
+
+  t.deepEqual(tronAddressPw.toLockScript(LockType.pw).serializeJson(), {
     args: '0x89457bc04dc517b36a63f3ff609e95a28acd9800',
     code_hash: PWCore.config.pwLock.script.codeHash,
     hash_type: PWCore.config.pwLock.script.hashType,

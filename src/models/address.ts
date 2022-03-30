@@ -53,10 +53,19 @@ export class Address {
   constructor(
     readonly addressString: string,
     readonly addressType: AddressType,
-    readonly lockArgs: string | null = null
+    readonly lockArgs: string | null = null,
+    readonly lockType: LockTypeOmniPw | null = null // TODO: Consider changing this from LockTypeOmniPw to LockType in the future to allow MultiSig, ACP, etc.
   ) {
     // lockArgs generation logic moved to generateLockArgs().
     // This was done in preparation for OmniLock support which could require different data.
+
+    // Warn when lock type is specified and a CKB address was provided.
+    if (this.addressType === AddressType.ckb && this.lockType !== null) {
+      this.lockType = null;
+      console.warn(
+        `LockType should not be specified on Address() when AddressType.ckb is used.`
+      );
+    }
   }
 
   /**
@@ -241,7 +250,7 @@ export class Address {
       return new Amount('1', AmountUnit.shannon);
     }
     const bytes = cellOccupiedBytes({
-      lock: this.toLockScript(),
+      lock: this.toLockScript(this.lockType),
       type: null,
       data: '0x',
     });
@@ -252,10 +261,9 @@ export class Address {
    * Check if the address supports ACP.
    */
   isAcp(): boolean {
-    const script = this.toLockScript();
-    const { codeHash, hashType } = script;
-    const acpLock = PWCore.config.acpLockList.filter(
-      (x) => x.codeHash === codeHash && x.hashType === hashType
+    const script = this.toLockScript(this.lockType);
+    const acpLock = PWCore.config.acpLockList.filter((x) =>
+      script.sameCodeTypeWith(x)
     );
     return acpLock && acpLock.length > 0;
   }
@@ -275,8 +283,9 @@ export class Address {
       );
     }
 
+    const preferredLockType = lockType !== null ? lockType : this.lockType;
     return generateCkbAddressString(
-      this.toLockScript(lockType),
+      this.toLockScript(preferredLockType),
       getDefaultPrefix(),
       addressVersion
     );
@@ -302,12 +311,13 @@ export class Address {
       return new Script(lock.code_hash, lock.args, HashType[lock.hash_type]);
     }
 
-    // Default the lock type to LockType.omni for all address types that are not AddressType.ckb.
-    if (lockType === null) lockType = LockType.omni;
+    // Default the lock type to LockType.omni and allow the local `lockType` to override the class defined `this.lockType`.
+    let preferredLockType = lockType !== null ? lockType : this.lockType;
+    if (preferredLockType === null) preferredLockType = LockType.omni;
 
     // Handle external address types. (ETH, EOS, Tron, etc.)
-    const lockScriptConfig = this.generateLockScriptConfig(lockType);
-    const lockArgs = this.generateLockArgs(lockType);
+    const lockScriptConfig = this.generateLockScriptConfig(preferredLockType);
+    const lockArgs = this.generateLockArgs(preferredLockType);
     return new Script(
       lockScriptConfig.codeHash,
       lockArgs,
