@@ -1,5 +1,11 @@
 import { HashType, CKBModel } from '../interfaces';
-import { Address, AddressType, getDefaultPrefix, LockType } from './address';
+import {
+  Address,
+  AddressPrefix,
+  AddressType,
+  getDefaultPrefix,
+  LockType,
+} from './address';
 import { generateCkbAddressString } from '../utils';
 import { validators, transformers, normalizers } from '../ckb-js-toolkit';
 import { SerializeScript } from '../ckb-lumos/core';
@@ -103,7 +109,7 @@ export class Script implements CKBModel {
   }
 
   toAddress(
-    prefix = getDefaultPrefix(),
+    prefix: AddressPrefix = getDefaultPrefix(),
     addressVersion = NervosAddressVersion.latest
   ): Address {
     return new Address(
