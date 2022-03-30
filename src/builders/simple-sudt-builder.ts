@@ -16,7 +16,8 @@ export interface SimpleSUDTBuilderOptions extends BuilderOption {
   minimumOutputCellCapacity?: Amount;
   maximumOutputCellCapacity?: Amount;
   defaultCollectorOptions?: CollectorOptions;
-  changeCellLockType?: LockTypeOmniPw;
+  receiverLockType?: LockTypeOmniPw;
+  senderLockType?: LockTypeOmniPw;
 }
 
 export class SimpleSUDTBuilder extends Builder {
@@ -69,7 +70,7 @@ export class SimpleSUDTBuilder extends Builder {
 
     if (this.autoCalculateCapacity) {
       const receiverOutputCellSetup = {
-        lock: this.address.toLockScript(),
+        lock: this.address.toLockScript(this.options.receiverLockType),
         type: this.sudt.toTypeScript(),
         data: this.amount.toUInt128LE(),
       };
@@ -95,7 +96,7 @@ export class SimpleSUDTBuilder extends Builder {
 
     const receiverOutputCell = new Cell(
       receiverAmount,
-      this.address.toLockScript(),
+      this.address.toLockScript(this.options.receiverLockType),
       this.sudt.toTypeScript(),
       null,
       this.amount.toUInt128LE()
@@ -203,7 +204,7 @@ export class SimpleSUDTBuilder extends Builder {
     if (inputSum.gt(neededAmount)) {
       const changeCell = new Cell(
         inputSum.sub(ckbAmount),
-        PWCore.provider.address.toLockScript(this.options.changeCellLockType)
+        PWCore.provider.address.toLockScript(this.options.senderLockType)
       );
       this.outputCells.push(changeCell);
 
@@ -262,7 +263,9 @@ export class SimpleSUDTBuilder extends Builder {
     ];
 
     // Set the witness args based on the current lock script.
-    this.calculateWitnessArgs(PWCore.provider.address.toLockScript());
+    this.calculateWitnessArgs(
+      PWCore.provider.address.toLockScript(this.options.senderLockType)
+    );
 
     const tx = new Transaction(
       new RawTransaction(this.inputCells, this.outputCells, sudtCellDeps),
