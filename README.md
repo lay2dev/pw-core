@@ -1,6 +1,11 @@
-# pw-core: A Friendly and Powerful SDK for CKB dApps
+# PW-Core: A Friendly and Powerful SDK for CKB dApps
 
-> pw-core is the front-end sdk of [pw-sdk](https://talk.nervos.org/t/lay2-pw-sdk-build-dapps-on-ckb-and-run-them-everywhere/4289)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/lay2dev/pw-core)
+![GitHub last commit](https://img.shields.io/github/last-commit/lay2dev/pw-core)
+![Travis (.org)](https://img.shields.io/travis/lay2dev/pw-core)
+<!-- ![Libaries.io](https://img.shields.io/librariesio/release/github/lay2dev/pw-core) -->
+
+> PW-Core is the component of [PW-SDK](https://talk.nervos.org/t/lay2-pw-sdk-build-dapps-on-ckb-and-run-them-everywhere/4289) used for front-end dapp development in TypeScript or JavaScript.
 
 ## Quick Start
 
