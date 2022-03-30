@@ -25,7 +25,7 @@ export class SimpleSUDTBuilder extends Builder {
 
   protected autoCalculateCapacity = false;
   protected minimumOutputCellCapacity = new Amount('142', AmountUnit.ckb);
-  protected maximumOutputCellCapacity = new Amount('1000', AmountUnit.ckb);
+  protected maximumOutputCellCapacity = new Amount('500', AmountUnit.ckb);
 
   constructor(
     private sudt: SUDT,
