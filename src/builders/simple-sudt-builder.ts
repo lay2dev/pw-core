@@ -8,7 +8,7 @@ import {
   Transaction,
   SUDT,
 } from '../models';
-import PWCore, { cellOccupiedBytes } from '..';
+import PWCore, { cellOccupiedBytes, LockTypeOmniPw } from '..';
 import { SUDTCollector, CollectorOptions } from '../collectors/';
 
 export interface SimpleSUDTBuilderOptions extends BuilderOption {
@@ -16,6 +16,7 @@ export interface SimpleSUDTBuilderOptions extends BuilderOption {
   minimumOutputCellCapacity?: Amount;
   maximumOutputCellCapacity?: Amount;
   defaultCollectorOptions?: CollectorOptions;
+  changeCellLockType?: LockTypeOmniPw;
 }
 
 export class SimpleSUDTBuilder extends Builder {
@@ -202,7 +203,7 @@ export class SimpleSUDTBuilder extends Builder {
     if (inputSum.gt(neededAmount)) {
       const changeCell = new Cell(
         inputSum.sub(ckbAmount),
-        PWCore.provider.address.toLockScript()
+        PWCore.provider.address.toLockScript(this.options.changeCellLockType)
       );
       this.outputCells.push(changeCell);
 
