@@ -1,6 +1,12 @@
 import PWCore, { ChainID } from '../core';
 import { Platform, Provider } from './provider';
-import { Address, AddressType, getDefaultPrefix, LockType } from '../models';
+import {
+  Address,
+  AddressType,
+  getDefaultPrefix,
+  LockType,
+  LockTypeOmniPw,
+} from '../models';
 import {
   AddressType as CkbSdkAddressType,
   privateKeyToAddress,
@@ -12,12 +18,21 @@ import ethWallet from 'ethereumjs-wallet';
 import { arrayBufferToBuffer } from 'arraybuffer-to-buffer';
 import { Keccak256Hasher } from '../hashers';
 
-// TODO: Signer aglo needs support added for more platform types.
+// TODO: Signer algo needs support added for more platform types.
 export class RawProvider extends Provider {
+  // public readonly platform: Platform; // Inherited from Provider.
+  protected privateKey: string;
+  protected lockType: LockTypeOmniPw | null;
   protected keyPair: ECPair;
 
-  constructor(protected privateKey: string, platform: Platform = Platform.ckb) {
+  constructor(
+    privateKey: string,
+    platform: Platform = Platform.ckb,
+    lockType: LockTypeOmniPw | null = null
+  ) {
     super(platform);
+    this.privateKey = privateKey;
+    this.lockType = lockType;
     this.keyPair = new ECPair(privateKey);
   }
 
@@ -38,7 +53,12 @@ export class RawProvider extends Provider {
           arrayBufferToBuffer(new Reader(this.privateKey).toArrayBuffer())
         )
         .getAddressString();
-      this.address = new Address(ethAddress, AddressType.eth);
+      this.address = new Address(
+        ethAddress,
+        AddressType.eth,
+        undefined,
+        this.lockType
+      );
     } else
       throw new Error(
         `The specified platform type has not been implemented: ${
