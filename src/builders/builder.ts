@@ -17,6 +17,7 @@ export abstract class Builder {
   static readonly MIN_FEE_RATE = 1000;
   static readonly MIN_CHANGE = new Amount('61', AmountUnit.ckb); // TODO: This will be wrong for some change addresses and should be calculated in real time.
   static readonly WITNESS_ARGS = {
+    // SECP256k1 is used for PW-Lock on the Testnet only.
     Secp256k1Pw: {
       lock: '0x' + '0'.repeat(132),
       input_type: '',
@@ -28,6 +29,7 @@ export abstract class Builder {
       input_type: '',
       output_type: '',
     },
+    // SECP256k1 is used for the default lock in all environments and PW-Lock on the Mainnet.
     Secp256k1: {
       lock: '0x' + '0'.repeat(130),
       input_type: '',
@@ -54,22 +56,16 @@ export abstract class Builder {
 
   // TODO: Need more lock support here.
   static determineWitnessArgs(lockScript: Script): WitnessArgs {
-    if (
-      lockScript.codeHash === PWCore.config.defaultLock.script.codeHash &&
-      lockScript.hashType === PWCore.config.defaultLock.script.hashType
-    )
+    if (lockScript.sameCodeTypeWith(PWCore.config.defaultLock.script))
       return Builder.WITNESS_ARGS.Secp256k1;
-    else if (
-      lockScript.codeHash === PWCore.config.pwLock.script.codeHash &&
-      lockScript.hashType === PWCore.config.pwLock.script.hashType
-    )
+    else if (lockScript.sameCodeTypeWith(PWCore.config.pwLock.script))
       return PWCore.chainId === ChainID.ckb
-        ? Builder.WITNESS_ARGS.Secp256k1
+        ? Builder.WITNESS_ARGS.Secp256k1 // The Mainnet release uses the standard witness args length.
         : Builder.WITNESS_ARGS.Secp256k1Pw;
+    // The Testnet release requires a platform code making it one byte longer.
     else if (
       Object.prototype.hasOwnProperty.call(PWCore.config, 'omniLock') &&
-      lockScript.codeHash === PWCore.config.omniLock.script.codeHash &&
-      lockScript.hashType === PWCore.config.omniLock.script.hashType
+      lockScript.sameCodeTypeWith(PWCore.config.omniLock.script)
     )
       return Builder.WITNESS_ARGS.Secp256k1Omni;
     else
