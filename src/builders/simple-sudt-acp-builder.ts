@@ -8,7 +8,7 @@ import {
   Transaction,
   SUDT,
 } from '../models';
-import PWCore from '..';
+import PWCore, { WitnessArgs } from '..';
 import { SUDTCollector } from '../collectors/sudt-collector';
 
 export class SimpleSUDTACPBuilder extends Builder {
@@ -166,11 +166,13 @@ export class SimpleSUDTACPBuilder extends Builder {
     ];
 
     // Set the witness args based on the current lock script.
-    this.calculateWitnessArgs(PWCore.provider.address.toLockScript());
+    this.calculateWitnessArgs(
+      PWCore.provider.address.toLockScript(this.options.senderLockType)
+    );
 
     const tx = new Transaction(
       new RawTransaction(inputCells, outputCells, sudtCellDeps),
-      [this.witnessArgs]
+      [this.witnessArgs as WitnessArgs]
     );
 
     this.fee = Builder.calcFee(tx, this.feeRate);

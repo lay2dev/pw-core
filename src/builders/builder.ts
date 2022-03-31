@@ -1,7 +1,7 @@
 import { Collector } from '../collectors/collector';
 import { Amount, AmountUnit, Transaction, Script } from '../models';
 import { WitnessArgs } from '../interfaces';
-import PWCore, { ChainID } from '..';
+import PWCore, { ChainID, LockTypeOmniPw } from '..';
 import { SUDTCollector } from '../collectors/sudt-collector';
 
 const FEE_BASE = 1000;
@@ -11,6 +11,8 @@ export interface BuilderOption {
   collector?: Collector;
   witnessArgs?: WitnessArgs;
   data?: string;
+  receiverLockType?: LockTypeOmniPw;
+  senderLockType?: LockTypeOmniPw;
 }
 
 export abstract class Builder {
@@ -54,7 +56,14 @@ export abstract class Builder {
     return new Amount(fee.toString(), AmountUnit.shannon);
   }
 
-  // TODO: Need more lock support here.
+  /**
+   * Determine the WitnessArgs structure to use based on the specified lock script.
+   *
+   * TODO: Need more lock support here.
+   *
+   * @param lockScript The lock script to
+   * @returns The WitnessArgs structure required by the lock script.
+   */
   static determineWitnessArgs(lockScript: Script): WitnessArgs {
     if (lockScript.sameCodeTypeWith(PWCore.config.defaultLock.script))
       return Builder.WITNESS_ARGS.Secp256k1;

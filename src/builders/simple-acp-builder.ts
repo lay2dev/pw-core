@@ -7,7 +7,7 @@ import {
   RawTransaction,
   Transaction,
 } from '../models';
-import PWCore from '..';
+import PWCore, { WitnessArgs } from '..';
 export class SimpleACPBuilder extends Builder {
   receiverInputCell: Cell;
   receiverOutputCell: Cell;
@@ -66,18 +66,20 @@ export class SimpleACPBuilder extends Builder {
 
     const changeCell = new Cell(
       inputSum.sub(this.amount),
-      PWCore.provider.address.toLockScript()
+      PWCore.provider.address.toLockScript(this.options.senderLockType)
     );
 
     // Set the witness args based on the current lock script.
-    this.calculateWitnessArgs(PWCore.provider.address.toLockScript());
+    this.calculateWitnessArgs(
+      PWCore.provider.address.toLockScript(this.options.senderLockType)
+    );
 
     const tx = new Transaction(
       new RawTransaction(
         [...inputCells, this.receiverInputCell],
         [this.receiverOutputCell, changeCell]
       ),
-      [this.witnessArgs]
+      [this.witnessArgs as WitnessArgs]
     );
 
     this.fee = Builder.calcFee(tx, this.feeRate);
