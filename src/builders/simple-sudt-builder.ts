@@ -8,7 +8,7 @@ import {
   Transaction,
   SUDT,
 } from '../models';
-import PWCore, { cellOccupiedBytes, LockTypeOmniPw } from '..';
+import PWCore, { cellOccupiedBytes, WitnessArgs } from '..';
 import { SUDTCollector, CollectorOptions } from '../collectors/';
 
 export interface SimpleSUDTBuilderOptions extends BuilderOption {
@@ -16,8 +16,8 @@ export interface SimpleSUDTBuilderOptions extends BuilderOption {
   minimumOutputCellCapacity?: Amount;
   maximumOutputCellCapacity?: Amount;
   defaultCollectorOptions?: CollectorOptions;
-  receiverLockType?: LockTypeOmniPw;
-  senderLockType?: LockTypeOmniPw;
+  // receiverLockType?: LockTypeOmniPw; // receiverLockType inherited from BuilderOption.
+  // senderLockType?: LockTypeOmniPw; // senderLockType inherited from BuilderOption.
 }
 
 export class SimpleSUDTBuilder extends Builder {
@@ -269,7 +269,7 @@ export class SimpleSUDTBuilder extends Builder {
 
     const tx = new Transaction(
       new RawTransaction(this.inputCells, this.outputCells, sudtCellDeps),
-      [this.witnessArgs]
+      [this.witnessArgs as WitnessArgs]
     );
 
     this.fee = Builder.calcFee(tx, this.feeRate);
