@@ -17,13 +17,13 @@ const CKB_ADDRESS = 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqf
     const collector = new IndexerCollector(CKB_INDEXER_RPC_URL); // A Collector to retrive cells from the CKB Indexer RPC.
     const pwcore = await new PWCore(CKB_NODE_RPC_URL).init(provider, collector); // Initialize PWCore.
 
-    const destinationAddress = new Address(CKB_ADDRESS, AddressType.ckb);
+    const receiverAddress = new Address(CKB_ADDRESS, AddressType.ckb);
     const sendAmount = new Amount('100');
-    const builder = new SimpleBuilder(destinationAddress, sendAmount);
+    const builder = new SimpleBuilder(receiverAddress, sendAmount);
     const txHash = await pwcore.sendTransaction(builder);
 
     console.log(`Sending from: ${provider.address.toCKBAddress()}`);
-    console.log(`Sending to: ${destinationAddress.toCKBAddress()}`);
+    console.log(`Sending to: ${receiverAddress.toCKBAddress()}`);
     console.log(`Amount: ${sendAmount.toString()} CKB`);
     console.log(`Transaction Hash: ${txHash}`);
     console.log(`Explorer URL: https://explorer.nervos.org/aggron/transaction/${txHash}`);

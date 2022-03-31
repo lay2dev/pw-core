@@ -16,12 +16,12 @@ const ETH_ADDRESS = '0x7aaff596c5e5e788effa0be946014b794cdd8d51';
     const collector = new IndexerCollector(CKB_INDEXER_RPC_URL); // A Collector to retrive cells from the CKB Indexer RPC.
     const pwcore = await new PWCore(CKB_NODE_RPC_URL).init(provider, collector); // Initialize PWCore.
 
-    const destinationAddress = new Address(ETH_ADDRESS, AddressType.eth); // This will map the ETH address to it's corresponding CKB address using Omni Lock.
+    const receiverAddress = new Address(ETH_ADDRESS, AddressType.eth); // This will map the ETH address to it's corresponding CKB address using Omni Lock.
     const sendAmount = new Amount('100');
-    const txHash = await pwcore.send(destinationAddress, sendAmount);
+    const txHash = await pwcore.send(receiverAddress, sendAmount);
 
     console.log(`Sending from: ${provider.address.toCKBAddress()}`);
-    console.log(`Sending to: ${destinationAddress.toCKBAddress()}`);
+    console.log(`Sending to: ${receiverAddress.toCKBAddress()}`);
     console.log(`Amount: ${sendAmount.toString()} CKB`);
     console.log(`Transaction Hash: ${txHash}`);
     console.log(`Explorer URL: https://explorer.nervos.org/aggron/transaction/${txHash}`);

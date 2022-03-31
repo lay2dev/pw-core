@@ -19,16 +19,16 @@ const PRIVATE_KEY = '0xcd708059624d8301382972808b3e504b5ea3d94e210edf229f48cadcb
     const pwcore = await new PWCore(CKB_NODE_RPC_URL).init(provider, collector); // Initialize PWCore.
 
     const ethAddress = ethWallet.fromPrivateKey(arrayBufferToBuffer(new Reader(PRIVATE_KEY).toArrayBuffer())).getAddressString(); // 0x7aaff596c5e5e788effa0be946014b794cdd8d51
-    const sourceDestinationAddress = new Address(ethAddress, AddressType.eth);
-    const sourceAddressString = sourceDestinationAddress.toCKBAddress(NervosAddressVersion.pre2021, LockType.pw); // ckt1qjl58smqy32hnrq6vxjedcxe2fugvnz497h7yvwqvwel40uh4rltc7407ktvte083rhl5zlfgcq5k72vmkx4zkge6yj
-    const destinationAddressString = sourceDestinationAddress.toCKBAddress(NervosAddressVersion.ckb2021, LockType.omni); // ckt1qpuljza4azfdsrwjzdpea6442yfqadqhv7yzfu5zknlmtusm45hpuqgp02hlt9k9uhnc3ml6p055vq2t09xdmr23qqx8wz0x
+    const address = new Address(ethAddress, AddressType.eth);
+    const sourceAddressString = address.toCKBAddress(NervosAddressVersion.pre2021, LockType.pw); // ckt1qjl58smqy32hnrq6vxjedcxe2fugvnz497h7yvwqvwel40uh4rltc7407ktvte083rhl5zlfgcq5k72vmkx4zkge6yj
+    const receiverAddressString = address.toCKBAddress(NervosAddressVersion.ckb2021, LockType.omni); // ckt1qpuljza4azfdsrwjzdpea6442yfqadqhv7yzfu5zknlmtusm45hpuqgp02hlt9k9uhnc3ml6p055vq2t09xdmr23qqx8wz0x
     const sendAmount = new Amount('100');
 
-    const builder = new PWLockMigrationBuilder(sourceAddressString, destinationAddressString, sendAmount);
+    const builder = new PWLockMigrationBuilder(sourceAddressString, receiverAddressString, sendAmount);
     const txHash = await pwcore.sendTransaction(builder);
 
     console.log(`Sending from: ${sourceAddressString}`);
-    console.log(`Sending to: ${destinationAddressString}`);
+    console.log(`Sending to: ${receiverAddressString}`);
     console.log(`Amount: ${sendAmount.toString()} CKB`);
     console.log(`Transaction Hash: ${txHash}`);
     console.log(`Explorer URL: https://explorer.nervos.org/aggron/transaction/${txHash}`);
