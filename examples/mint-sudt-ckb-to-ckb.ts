@@ -14,14 +14,14 @@ const PRIVATE_KEY = '0xcd708059624d8301382972808b3e504b5ea3d94e210edf229f48cadcb
     const collector = new IndexerCollector(CKB_INDEXER_RPC_URL); // A Collector to retrive cells from the CKB Indexer RPC.
     const pwcore = await new PWCore(CKB_NODE_RPC_URL).init(provider, collector); // Initialize PWCore.
 
-    const destinationAddress = provider.address; // This will sent the SUDT tokens to the same address they were minted from.
+    const receiverAddress = provider.address; // This will sent the SUDT tokens to the same address they were minted from.
     const sendAmount = new Amount('100', 0); // The number of SUDT tokens to mint. (Decimals "0" must be specified for SUDT.)
 
-    const builder = new SUDTMintBuilder(destinationAddress, sendAmount);
+    const builder = new SUDTMintBuilder(receiverAddress, sendAmount);
     const txHash = await pwcore.sendTransaction(builder);
 
     console.log(`Minting from: ${provider.address.toCKBAddress()}`);
-    console.log(`Sending to: ${destinationAddress.toCKBAddress()}`);
+    console.log(`Sending to: ${receiverAddress.toCKBAddress()}`);
     console.log(`Amount: ${sendAmount.toString(0)} SUDT Tokens`); // Decimals specified as 0 to print properly.
     console.log(`Transaction Hash: ${txHash}`);
     console.log(`Explorer URL: https://explorer.nervos.org/aggron/transaction/${txHash}`);
