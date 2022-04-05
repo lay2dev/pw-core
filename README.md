@@ -335,7 +335,7 @@ You can find a detailed [API Document Here](https://docs.lay2.dev).
 
 ## Upgrading to Support CKB2021
 
-The CKB2021 hard fork will occur in May, 2022. In order to fully support the hard fork, PW-Core must be updated to the newest version which contains several changes that may be incompatible with previous version. Please see [this guide](./ckb2021.md) for a list of the changes that need to be made during the update.
+The CKB2021 hard fork will occur in May, 2022. In order to fully support the hard fork, PW-Core must be updated to the newest version which contains several changes that may be incompatible with previous version. Please see [this guide](https://github.com/jordanmack/nervos-ckb2021-hard-fork-migration-guide/blob/master/pw-sdk.md) for a list of the changes that need to be made during the update.
 
 ## Get Involved
 
