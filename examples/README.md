@@ -107,3 +107,18 @@ Amount: 100 SUDT Tokens
 Transaction Hash: 0x6e4085e19aa507d152dd084c943f2fe10fb03c72ff44a0f7afc74aa000bda34c
 Explorer URL: https://explorer.nervos.org/aggron/transaction/0x6e4085e19aa507d152dd084c943f2fe10fb03c72ff44a0f7afc74aa000bda34c
 ```
+
+### Getting a CKB and SUDT Token Balance (ckb-sudt-balance.ts)
+
+This example uses the built-in `PWCore.getBalance()` and `PWCore.getSUDTBalance()` methods to check the CKB and SUDT balance.
+
+```bash
+nodejs ckb-sudt-balance.js
+```
+
+```txt
+Address: ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqf8y2wrqq8y3up36e8mqg3tj8wkeyqs8uccxpsdt
+SUDT ID: 0x34c325c9859211a3e2ef9cdc5fe48becbd7d85e600fb408767ed7184763b9c61
+CKB Balance: 24,549.99964342 CKB
+SUDT Balance: 99,999,970,099,999,400 Tokens
+```
