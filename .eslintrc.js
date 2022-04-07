@@ -17,6 +17,8 @@ module.exports = {
         "@typescript-eslint/no-shadow": "error",
         "@typescript-eslint/no-use-before-define": "off",
         "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "unicorn/no-array-reduce": "off",
         "unicorn/no-null": "off",
         "unicorn/no-await-expression-member": "off",
         "unicorn/prefer-code-point": "off",

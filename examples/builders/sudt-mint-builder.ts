@@ -1,4 +1,14 @@
-import PWCore, {Address, Amount, AmountUnit, Builder, Cell, RawTransaction, SUDT, Transaction, WitnessArgs } from '@lay2/pw-core';
+import PWCore, {
+  Address,
+  Amount,
+  AmountUnit,
+  Builder,
+  Cell,
+  RawTransaction,
+  SUDT,
+  Transaction,
+  WitnessArgs,
+} from '@lay2/pw-core';
 
 export class SUDTMintBuilder extends Builder {
   public senderAddress;
@@ -13,20 +23,29 @@ export class SUDTMintBuilder extends Builder {
   }
 
   async build(fee: Amount = Amount.ZERO): Promise<Transaction> {
-
     // Create the SUDT token identifier from the source address.
     const sudt = new SUDT(this.senderAddress.toLockScript().toHash());
 
     // Create the output cell on the destination address with the specified amount SUDT tokens.
     // The capacity starts at 1000 CKB as a placeholder and will be reduced to the minimum using resize().
-    const outputCell = new Cell(new Amount('1000'), this.receiverAddress.toLockScript(), sudt.toTypeScript(), undefined, this.amount.toUInt128LE());
+    const outputCell = new Cell(
+      new Amount('1000'),
+      this.receiverAddress.toLockScript(),
+      sudt.toTypeScript(),
+      undefined,
+      this.amount.toUInt128LE()
+    );
     outputCell.resize();
 
     // Collect the input capacity from the source address.
-    const neededAmount = Amount.ZERO.add(outputCell.occupiedCapacity()).add(this.senderAddress.minPaymentAmount()).add(fee); // output cell + change cell + fee
+    const neededAmount = Amount.ZERO.add(outputCell.occupiedCapacity())
+      .add(this.senderAddress.minPaymentAmount())
+      .add(fee); // output cell + change cell + fee
     const inputCells: Cell[] = [];
     let inputSum = new Amount('0');
-    const cells = await this.collector.collect(this.senderAddress, { neededAmount });
+    const cells = await this.collector.collect(this.senderAddress, {
+      neededAmount,
+    });
     for (const cell of cells) {
       inputCells.push(cell);
       inputSum = inputSum.add(cell.capacity);
@@ -35,7 +54,11 @@ export class SUDTMintBuilder extends Builder {
 
     // Throw an error if not enough capacity was found on the source address.
     if (inputSum.lt(neededAmount)) {
-      throw new Error(`Not enough input capacity was found. Needed ${neededAmount.toString(AmountUnit.ckb)} CKB, found ${inputSum.toString(AmountUnit.ckb)} CKB.`);
+      throw new Error(
+        `Not enough input capacity was found. Needed ${neededAmount.toString(
+          AmountUnit.ckb
+        )} CKB, found ${inputSum.toString(AmountUnit.ckb)} CKB.`
+      );
     }
 
     // Create a change cell back to the source address.
@@ -49,8 +72,8 @@ export class SUDTMintBuilder extends Builder {
 
     // Specify the cell deps for the transaction.
     const sudtCellDeps = [
-        PWCore.config.defaultLock.cellDep,
-        PWCore.config.sudtType.cellDep,
+      PWCore.config.defaultLock.cellDep,
+      PWCore.config.sudtType.cellDep,
     ];
 
     // Create a new transaction.
@@ -63,7 +86,11 @@ export class SUDTMintBuilder extends Builder {
     this.fee = Builder.calcFee(tx, this.feeRate);
 
     // Ensure the change cell has enough to cover the calculated fee.
-    if (changeCell.capacity.gte(this.senderAddress.minPaymentAmount().add(this.fee))) {
+    if (
+      changeCell.capacity.gte(
+        this.senderAddress.minPaymentAmount().add(this.fee)
+      )
+    ) {
       changeCell.capacity = changeCell.capacity.sub(this.fee);
       tx.raw.outputs.pop();
       tx.raw.outputs.push(changeCell);
