@@ -221,7 +221,7 @@ export const CHAIN_SPECS = {
     },
     acpLock: {
       cellDep: new CellDep(
-        DepType.code,
+        DepType.depGroup,
         new OutPoint(
           '0xec26b0f85ed839ece5f11c4c4e837ec359f5adc4420410f6453b1f6b60fb96a6',
           '0x0'

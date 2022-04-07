@@ -29,6 +29,7 @@ export interface ConfigItem {
 }
 
 export interface Config {
+  acpLock?: any;
   daoType: ConfigItem;
   defaultLock: ConfigItem;
   multiSigLock: ConfigItem;
