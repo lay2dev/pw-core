@@ -10,6 +10,8 @@ npm i
 npm run build
 ```
 
+Individual examples can then be run using Node.js. eg: `nodejs hello-world.js`
+
 ## Using the Examples
 
 The examples available can be run using `nodejs` from the console. Most examples use `RawProvider` so they operate in a console without a browser. When used in a browser environment, switching in another provider is often the only change required.
