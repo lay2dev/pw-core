@@ -141,3 +141,22 @@ Amount to Burn: 100 Tokens
 Transaction Hash: 0x9c4487608e4b6783f50c886bcfe7b6adb0be847a00ede43898e2764986f445d9
 Explorer URL: https://explorer.nervos.org/aggron/transaction/0x9c4487608e4b6783f50c886bcfe7b6adb0be847a00ede43898e2764986f445d9
 ```
+
+### Send an SUDT Token using ACP (eth-to-acp.ts)
+
+This example uses the built-in `PWCore.sendSUDT()` method to do a transfer of SUDT tokens from a native CKB address (Default Lock; CKB2021) to another native CKB address (ACP Lock; CKB2021) using ACP.
+
+ACP stands for Anyone Can Pay, and it allows the sending of small amounts of CKB or SUDT tokens without having to provide extra CKB for the output cell of the recipient.
+
+```bash
+nodejs eth-to-acp.js
+```
+
+```txt
+Sending from: ckt1qpuljza4azfdsrwjzdpea6442yfqadqhv7yzfu5zknlmtusm45hpuqgp02hlt9k9uhnc3ml6p055vq2t09xdmr23qqx8wz0x
+Sending to: ckt1qq6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4vq2jkvdkvfmuc3jesdumyvp44aqwe7qp8ncdg6nrk
+SUDT ID: 0x34c325c9859211a3e2ef9cdc5fe48becbd7d85e600fb408767ed7184763b9c61
+SUDT Amount: 1 Tokens
+Transaction Hash: 0x8a1724ff805e6111d38bef5bf93cc8dc1e787d80286e5303fa417731aa2db4ae
+Explorer URL: https://explorer.nervos.org/aggron/transaction/0x8a1724ff805e6111d38bef5bf93cc8dc1e787d80286e5303fa417731aa2db4ae
+```
