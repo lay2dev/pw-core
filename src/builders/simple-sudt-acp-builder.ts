@@ -159,6 +159,7 @@ export class SimpleSUDTACPBuilder extends Builder {
 
   private rectifyTx(inputCells: Cell[], outputCells: Cell[]) {
     const sudtCellDeps = [
+      PWCore.config.acpLock.cellDep,
       PWCore.config.defaultLock.cellDep,
       PWCore.config.pwLock.cellDep,
       PWCore.config.omniLock.cellDep,
