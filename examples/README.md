@@ -122,3 +122,20 @@ SUDT ID: 0x34c325c9859211a3e2ef9cdc5fe48becbd7d85e600fb408767ed7184763b9c61
 CKB Balance: 24,549.99964342 CKB
 SUDT Balance: 99,999,970,099,999,400 Tokens
 ```
+
+### Burning SUDT Tokens (burn-sudt.ts)
+
+This example uses a custom builder `SUDTBurnBuilder` to burn SUDT tokens from a native CKB address (Default Lock; CKB2021).
+
+```bash
+nodejs burn-sudt.js
+```
+
+```txt
+Address: ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqf8y2wrqq8y3up36e8mqg3tj8wkeyqs8uccxpsdt
+SUDT ID: 0x34c325c9859211a3e2ef9cdc5fe48becbd7d85e600fb408767ed7184763b9c61
+SUDT Balance: 99,999,970,099,999,300 Tokens
+Amount to Burn: 100 Tokens
+Transaction Hash: 0x9c4487608e4b6783f50c886bcfe7b6adb0be847a00ede43898e2764986f445d9
+Explorer URL: https://explorer.nervos.org/aggron/transaction/0x9c4487608e4b6783f50c886bcfe7b6adb0be847a00ede43898e2764986f445d9
+```
