@@ -1,18 +1,13 @@
 import PWCore, { ChainID } from '../core';
-import { Address, AddressType, LockType, LockTypeOmniPw } from '../models';
 import { Provider, Platform } from './provider';
+import { Address, AddressType } from '../models';
 import { Message } from '../signers';
 import ENS from 'ethereum-ens';
 
-export class EthProvider extends Provider {
-  lockType: LockTypeOmniPw | null;
+export class EthProviderPw extends Provider {
   onAddressChanged: (newAddress: Address) => void;
-  constructor(
-    onAddressChanged?: (newAddress: Address) => void,
-    lockType: LockTypeOmniPw | null = null
-  ) {
+  constructor(onAddressChanged?: (newAddress: Address) => void) {
     super(Platform.eth);
-    this.lockType = lockType;
     this.onAddressChanged = onAddressChanged;
   }
   async init(): Promise<Provider> {
@@ -21,21 +16,11 @@ export class EthProvider extends Provider {
       const accounts = await window.ethereum.request({
         method: 'eth_requestAccounts',
       });
-      this.address = new Address(
-        accounts[0],
-        AddressType.eth,
-        undefined,
-        this.lockType
-      );
+      this.address = new Address(accounts[0], AddressType.eth);
 
       if (!!window.ethereum.on) {
         window.ethereum.on('accountsChanged', (newAccounts: string[]) => {
-          this.address = new Address(
-            newAccounts[0],
-            AddressType.eth,
-            undefined,
-            this.lockType
-          );
+          this.address = new Address(newAccounts[0], AddressType.eth);
           if (!!this.onAddressChanged) {
             this.onAddressChanged(this.address);
           }
@@ -53,12 +38,7 @@ export class EthProvider extends Provider {
           resolve(result);
         });
       });
-      this.address = new Address(
-        accounts[0],
-        AddressType.eth,
-        undefined,
-        this.lockType
-      );
+      this.address = new Address(accounts[0], AddressType.eth);
 
       return this;
     } else {
@@ -76,18 +56,7 @@ export class EthProvider extends Provider {
     }
   }
 
-  protected handleResultOmni(result): string {
-    let v = Number.parseInt(result.slice(-2), 16);
-    if (v >= 27) v -= 27;
-    result =
-      '0x' +
-      '5500000010000000550000005500000041000000' + // 20 bytes for RcLockWitnessLock Molecule table. https://bit.ly/3if4CRg
-      result.slice(2, -2) +
-      v.toString(16).padStart(2, '0');
-    return result;
-  }
-
-  protected handleResultPw = (result): string => {
+  protected handleResult(result): string {
     let v = Number.parseInt(result.slice(-2), 16);
     if (v >= 27) v -= 27;
     result =
@@ -98,22 +67,17 @@ export class EthProvider extends Provider {
       result.slice(2, -2) +
       v.toString(16).padStart(2, '0');
     return result;
-  };
+  }
 
   async sign(message: Message): Promise<string> {
     return new Promise((resolve, reject) => {
-      // Determine handler based on the lock type.
-      const handleResult =
-        message.lock.identifyLockType() === LockType.pw
-          ? this.handleResultPw
-          : this.handleResultOmni;
-
       const from = this.address.addressString;
+
       if (typeof window.ethereum !== 'undefined') {
         window.ethereum
           .request({ method: 'personal_sign', params: [from, message.message] })
           .then((result) => {
-            resolve(handleResult(result));
+            resolve(this.handleResult(result));
           });
       } else if (!!window.web3) {
         window.web3.currentProvider.sendAsync(
@@ -125,7 +89,7 @@ export class EthProvider extends Provider {
             if (result.error) {
               reject(result.error);
             }
-            resolve(handleResult(result.result));
+            resolve(this.handleResult(result.result));
           }
         );
       } else {
