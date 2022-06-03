@@ -11,7 +11,4 @@ coverage
 
 .editorconfig
 
-package-lock.json
-yarn.lock
-
 examples/**/*.js
