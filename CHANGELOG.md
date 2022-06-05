@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.23](https://github.com/lay2dev/pw-core/compare/v0.3.22...v0.3.23) (2022-06-05)
+
+
+### Bug Fixes
+
+* update ckb node url ([e4ecd58](https://github.com/lay2dev/pw-core/commit/e4ecd5842e206cdfa83a30c9a7945cf261a720f2))
+
 ### [0.3.22](https://github.com/lay2dev/pw-core/compare/v0.3.22-beta.0...v0.3.22) (2020-12-29)
 
 
