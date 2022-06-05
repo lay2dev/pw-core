@@ -20,7 +20,7 @@ const ethAddress = new Address(
 );
 
 test.before(async (t) => {
-  await new PWCore('https://aggron.ckb.dev').init(
+  await new PWCore('https://testnet.ckb.dev').init(
     new DummyProvider(),
     new DummyCollector(),
     ChainID.ckb_testnet

@@ -12,9 +12,9 @@ export class PwCollector extends SUDTCollector {
 
   async getBalance(address: Address): Promise<Amount> {
     const res = await axios.get(
-      `${
-        this.apiBase
-      }/cell/getCapacityByLockHash?lockHash=${address.toLockScript().toHash()}`
+      `${this.apiBase}/cell/getCapacityByLockHash?lockHash=${address
+        .toLockScript()
+        .toHash()}`
     );
     return new Amount(res.data.data, AmountUnit.shannon);
   }
@@ -25,9 +25,7 @@ export class PwCollector extends SUDTCollector {
     }
     const cells: Cell[] = [];
     const res = await axios.get(
-      `${
-        this.apiBase
-      }/cell/unSpent?lockHash=${address
+      `${this.apiBase}/cell/unSpent?lockHash=${address
         .toLockScript()
         .toHash()}&capacity=${options.neededAmount.toHexString()}`
     );

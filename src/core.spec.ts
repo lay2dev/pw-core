@@ -29,13 +29,13 @@ test.skip('send simple tx', async (t) => {
 });
 
 test.serial('chain specs auto select', async (t) => {
-  await new PWCore('https://lina.ckb.dev').init(
+  await new PWCore('https://mainnet.ckb.dev').init(
     new DummyProvider(),
     new PwCollector('https://cellapi.ckb.pw')
   );
   t.is(PWCore.chainId, ChainID.ckb);
 
-  await new PWCore('https://aggron.ckb.dev').init(
+  await new PWCore('https://testnet.ckb.dev').init(
     new DummyProvider(),
     new PwCollector('https://cellapi.ckb.pw')
   );

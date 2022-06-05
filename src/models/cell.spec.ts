@@ -27,7 +27,7 @@ const address = new Address(
 );
 
 test.before(async (t) => {
-  const pw = new PWCore('https://aggron.ckb.dev');
+  const pw = new PWCore('https://testnet.ckb.dev');
   await pw.init(new DummyProvider(), new DummyCollector(), ChainID.ckb_testnet);
 
   t.context.pw = pw;
