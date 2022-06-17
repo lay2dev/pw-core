@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0-alpha.3](https://github.com/lay2dev/pw-core/compare/v0.4.0-alpha.13...v0.5.0-alpha.3) (2022-06-17)
+
+
+### Bug Fixes
+
+* add change cell option to SimpleSUDTBuilder ([54c3792](https://github.com/lay2dev/pw-core/commit/54c37928f2b5416ba6390a6fc4f62373bac1c21a))
+* add change cell option to SimpleSUDTBuilder ([79b2007](https://github.com/lay2dev/pw-core/commit/79b200743bab16f0638b37c57a8d8775d92b1050))
+* fix ckb-indexer pagination cursor error ([9f7703c](https://github.com/lay2dev/pw-core/commit/9f7703c805a4dd0672c248e354f0ee4ad325103b))
+* fix prettier ([13efb7d](https://github.com/lay2dev/pw-core/commit/13efb7d818456d5f311d12b33368e0de1a3f35c6))
+* fix prettier ([8ba40c6](https://github.com/lay2dev/pw-core/commit/8ba40c6fd7f347310948aad88e6855fd39979e97))
+* fix sendSUDT with locktype ([45fd074](https://github.com/lay2dev/pw-core/commit/45fd07473e8fcccba112ce6b2c70297018fed1e3))
+* fix sendSUDT with locktype ([76d771c](https://github.com/lay2dev/pw-core/commit/76d771c1dc5e471f2e6beb9f589f209413c8a8d7))
+* fix type annotation error ([4b419f5](https://github.com/lay2dev/pw-core/commit/4b419f51fccd308ac93264e65e638a69b65dcad5))
+* fix type annotation error ([c84dec9](https://github.com/lay2dev/pw-core/commit/c84dec956080fd7bfce5fce79b9e9728f94e0841))
+* fix typo ([8ac685d](https://github.com/lay2dev/pw-core/commit/8ac685df7008e50504dab0eb00f74075bcbf9326))
+* fix typo ([c71f38d](https://github.com/lay2dev/pw-core/commit/c71f38d33827a09b477dc52d883c868a669c211d))
+
 ## [0.5.0-alpha.2](https://github.com/lay2dev/pw-core/compare/v0.4.0-alpha.13...v0.5.0-alpha.2) (2022-06-05)
 
 
