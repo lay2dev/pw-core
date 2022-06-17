@@ -105,12 +105,12 @@ export class CkbIndexer {
     const infos: IndexerCell[] = [];
     let cursor = null;
     let index = 0;
-    const params = [searchKey, order, `0x${sizeLimit.toString(16)}`, cursor];
     // eslint-disable-next-line no-constant-condition
     while (true) {
+      const params = [searchKey, order, `0x${sizeLimit.toString(16)}`, cursor];
       const response = await this.request('get_cells', params);
       const liveCells = response.objects;
-      cursor = response.lastCursor;
+      cursor = response.last_cursor;
       for (const cell of liveCells) {
         const { stop, push } = terminator(index, cell);
         if (push) {
